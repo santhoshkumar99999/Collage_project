@@ -1,17 +1,59 @@
 
+"use client";
+
+import { useState } from 'react';
 import { PageHeader } from '@/components/PageHeader';
-import { currentUser } from '@/lib/data';
+import { currentUser as initialUser } from '@/lib/data';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Progress } from '@/components/ui/progress';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { useToast } from '@/hooks/use-toast';
+import { Edit, Save, X } from 'lucide-react';
 
 export default function ProfilePage() {
+  const { toast } = useToast();
+  const [currentUser, setCurrentUser] = useState(initialUser);
+  const [isEditing, setIsEditing] = useState(false);
+  const [name, setName] = useState(currentUser.name);
+
   const xpPercentage = (currentUser.xp / currentUser.xpToNextLevel) * 100;
+
+  const handleSave = () => {
+    setCurrentUser({ ...currentUser, name: name });
+    setIsEditing(false);
+    toast({
+        title: "Profile Updated",
+        description: "Your name has been successfully changed.",
+    });
+  };
+
+  const handleCancel = () => {
+    setName(currentUser.name);
+    setIsEditing(false);
+  }
 
   return (
     <>
-      <PageHeader title="My Profile" />
+      <PageHeader title="My Profile">
+        {!isEditing ? (
+            <Button variant="outline" onClick={() => setIsEditing(true)}>
+                <Edit className="mr-2 h-4 w-4" /> Edit Profile
+            </Button>
+        ) : (
+            <div className="flex gap-2">
+                <Button onClick={handleSave}>
+                    <Save className="mr-2 h-4 w-4" /> Save
+                </Button>
+                <Button variant="outline" onClick={handleCancel}>
+                    <X className="mr-2 h-4 w-4" /> Cancel
+                </Button>
+            </div>
+        )}
+      </PageHeader>
       <main className="flex-1 p-4 md:p-6">
         <div className="grid gap-6 md:grid-cols-3">
           <div className="md:col-span-1">
@@ -20,7 +62,14 @@ export default function ProfilePage() {
                 <AvatarImage src={currentUser.avatarUrl} alt={currentUser.name} />
                 <AvatarFallback className="text-3xl">{currentUser.name.charAt(0)}</AvatarFallback>
               </Avatar>
-              <h2 className="text-2xl font-bold font-headline">{currentUser.name}</h2>
+              {isEditing ? (
+                 <div className="w-full space-y-2 mt-2">
+                    <Label htmlFor="name" className="sr-only">Name</Label>
+                    <Input id="name" value={name} onChange={(e) => setName(e.target.value)} className="text-center text-lg"/>
+                 </div>
+              ) : (
+                <h2 className="text-2xl font-bold font-headline">{currentUser.name}</h2>
+              )}
               <p className="text-muted-foreground">Level {currentUser.level}</p>
             </Card>
           </div>
