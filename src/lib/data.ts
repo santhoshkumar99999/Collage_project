@@ -45,11 +45,27 @@ let users: User[] = [
 // For this prototype, we'll use localStorage to persist user data.
 const CURRENT_USER_ID = 'user-1';
 
+function rehydrateUserBadges(user: User): User {
+    return {
+        ...user,
+        badges: user.badges.map(badge => {
+            const fullBadge = badges.find(b => b.id === badge.id);
+            return fullBadge || badge;
+        })
+    };
+}
+
 export function getUser(): User {
   if (typeof window !== 'undefined') {
     const storedUsers = localStorage.getItem('users');
     if (storedUsers) {
-      users = JSON.parse(storedUsers);
+        try {
+            const parsedUsers: User[] = JSON.parse(storedUsers);
+            users = parsedUsers.map(rehydrateUserBadges);
+        } catch (e) {
+            console.error("Failed to parse users from localStorage", e);
+            // Stick with initial data if parsing fails
+        }
     }
   }
   return users.find(u => u.id === CURRENT_USER_ID)!;

@@ -4,6 +4,7 @@
 import { useEffect, useState } from 'react';
 import { PageHeader } from '@/components/PageHeader';
 import { User } from '@/lib/types';
+import { badges } from '@/lib/data';
 import {
   Table,
   TableBody,
@@ -24,7 +25,28 @@ export default function AdminStudentsPage() {
     if (typeof window !== 'undefined') {
       const storedUsers = localStorage.getItem('users');
       if (storedUsers) {
-        setUsers(JSON.parse(storedUsers));
+        try {
+            const parsedUsers = JSON.parse(storedUsers).map((user: User) => ({
+                ...user,
+                badges: user.badges.map(badge => {
+                    const fullBadge = badges.find(b => b.id === badge.id);
+                    return fullBadge || badge;
+                })
+            }));
+            setUsers(parsedUsers);
+        } catch (e) {
+            console.error("Failed to parse users from localStorage", e);
+             // Fallback to initial data if localStorage is empty or corrupted
+            import('@/lib/data').then(mod => {
+                const initialUsers = [
+                        mod.users.find(u => u.id === 'user-1'),
+                        mod.users.find(u => u.id === 'user-2'),
+                        mod.users.find(u => u.id === 'user-3'),
+                ].filter(Boolean) as User[];
+                setUsers(initialUsers);
+                localStorage.setItem('users', JSON.stringify(initialUsers));
+            });
+        }
       } else {
         // Fallback to initial data if localStorage is empty
         import('@/lib/data').then(mod => {
