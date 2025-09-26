@@ -36,7 +36,7 @@ export default function SubjectSelectionPage() {
       <PageHeader title="Choose a Subject" />
       <main className="flex-1 p-4 md:p-6">
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {subjects.map((subject) => {
+          {subjects.map((subject, index) => {
             const placeholder = imageData.placeholderImages.find(p => p.id === subject.imageId) || imageData.placeholderImages.find(p => p.id === 'lesson_default');
             const SubjectIcon = subject.icon;
             return (
@@ -51,6 +51,7 @@ export default function SubjectSelectionPage() {
                         height={400}
                         data-ai-hint={placeholder.imageHint}
                         className="rounded-t-lg object-cover aspect-[3/2]"
+                        priority={index < 3} // Prioritize the first 3 images (usually above the fold)
                       />
                     )}
                   </CardContent>
@@ -70,5 +71,3 @@ export default function SubjectSelectionPage() {
     </>
   );
 }
-
-    
