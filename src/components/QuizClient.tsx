@@ -164,7 +164,7 @@ export function QuizClient({ quiz }: { quiz: Quiz }) {
       <CardHeader>
         <div className="mb-4">
             <Progress value={((currentQuestionIndex + 1) / quiz.questions.length) * 100} className="w-full" />
-            <p className="text-sm text-muted-foreground mt-2"><Translate>Question</Translate> {currentQuestionIndex + 1} <Translate>of</Translate> {quiz.questions.length}</p>
+            <div className="text-sm text-muted-foreground mt-2"><Translate>Question</Translate> {currentQuestionIndex + 1} <Translate>of</Translate> {quiz.questions.length}</div>
         </div>
         <div className="flex items-center gap-2">
             <CardTitle className="text-2xl font-headline"><Translate>{currentQuestion.question}</Translate></CardTitle>
