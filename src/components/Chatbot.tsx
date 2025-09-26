@@ -11,7 +11,7 @@ import { answerQuestion } from '@/ai/flows/lesson-chat-flow';
 import { textToSpeech } from '@/ai/flows/tts-flow';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-import { currentUser } from '@/lib/data';
+import { getUser } from '@/lib/data';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 
 interface Message {
@@ -38,6 +38,7 @@ export function Chatbot({ lessonContent }: { lessonContent: string }) {
   const [language, setLanguage] = useState<string | undefined>(undefined);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const currentUser = getUser();
 
   useEffect(() => {
     if (scrollAreaRef.current) {
@@ -199,7 +200,7 @@ export function Chatbot({ lessonContent }: { lessonContent: string }) {
                                     </div>
                                 )}
                             </div>
-                            {message.role === 'user' && <Avatar className="w-8 h-8"><AvatarImage src={currentUser.avatarUrl} /><AvatarFallback>{currentUser.name.charAt(0)}</AvatarFallback></Avatar>}
+                            {message.role === 'user' && currentUser && <Avatar className="w-8 h-8"><AvatarImage src={currentUser.avatarUrl} /><AvatarFallback>{currentUser.name.charAt(0)}</AvatarFallback></Avatar>}
                             </div>
                         ))}
                         {isBotLoading && (

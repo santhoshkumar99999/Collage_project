@@ -1,9 +1,9 @@
 
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { PageHeader } from '@/components/PageHeader';
-import { currentUser as initialUser } from '@/lib/data';
+import { getUser, updateUser, User } from '@/lib/data';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Progress } from '@/components/ui/progress';
@@ -16,14 +16,48 @@ import { Edit, Save, X } from 'lucide-react';
 
 export default function ProfilePage() {
   const { toast } = useToast();
-  const [currentUser, setCurrentUser] = useState(initialUser);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [name, setName] = useState(currentUser.name);
+  const [name, setName] = useState('');
+
+  useEffect(() => {
+    const user = getUser();
+    setCurrentUser(user);
+    if (user) {
+      setName(user.name);
+    }
+  }, []);
+
+  const refreshUser = () => {
+    const user = getUser();
+    setCurrentUser(user);
+    if (user) {
+      setName(user.name);
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener('storage', refreshUser);
+    return () => {
+      window.removeEventListener('storage', refreshUser);
+    }
+  }, []);
+
+
+  if (!currentUser) {
+    return null; // Or a loading spinner
+  }
 
   const xpPercentage = (currentUser.xp / currentUser.xpToNextLevel) * 100;
 
   const handleSave = () => {
-    setCurrentUser({ ...currentUser, name: name });
+    if (!name.trim()) {
+        toast({ title: 'Name cannot be empty', variant: 'destructive' });
+        return;
+    }
+    const updatedUser = { ...currentUser, name: name };
+    updateUser(updatedUser);
+    setCurrentUser(updatedUser);
     setIsEditing(false);
     toast({
         title: "Profile Updated",
@@ -102,7 +136,7 @@ export default function ProfilePage() {
               <CardHeader>
                 <CardTitle>My Badges</CardTitle>
                 <CardDescription>Achievements you have unlocked.</CardDescription>
-              </CardHeader>
+              </Header>
               <CardContent>
                 <TooltipProvider>
                   <div className="flex flex-wrap gap-4">

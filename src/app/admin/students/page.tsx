@@ -1,6 +1,9 @@
 
+"use client";
+
+import { useEffect, useState } from 'react';
 import { PageHeader } from '@/components/PageHeader';
-import { users } from '@/lib/data';
+import { User } from '@/lib/types';
 import {
   Table,
   TableBody,
@@ -15,6 +18,28 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 
 export default function AdminStudentsPage() {
+  const [users, setUsers] = useState<User[]>([]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const storedUsers = localStorage.getItem('users');
+      if (storedUsers) {
+        setUsers(JSON.parse(storedUsers));
+      } else {
+        // Fallback to initial data if localStorage is empty
+        import('@/lib/data').then(mod => {
+           const initialUsers = [
+                mod.users.find(u => u.id === 'user-1'),
+                mod.users.find(u => u.id === 'user-2'),
+                mod.users.find(u => u.id === 'user-3'),
+           ].filter(Boolean) as User[];
+           setUsers(initialUsers);
+           localStorage.setItem('users', JSON.stringify(initialUsers));
+        });
+      }
+    }
+  }, []);
+
   return (
     <>
       <PageHeader title="Student Management" />

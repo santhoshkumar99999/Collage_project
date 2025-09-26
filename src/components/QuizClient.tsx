@@ -10,23 +10,29 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
-import { CheckCircle, XCircle, Lightbulb, PartyPopper, Frown } from 'lucide-react';
+import { CheckCircle, XCircle, Lightbulb, PartyPopper, Frown, Award } from 'lucide-react';
+import { updateUser, getUser, badges, User } from '@/lib/data';
 
 export function QuizClient({ quiz }: { quiz: Quiz }) {
   const router = useRouter();
   const { toast } = useToast();
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [score, setScore] = useState(0);
   const [isFinished, setIsFinished] = useState(false);
   const [timeLeft, setTimeLeft] = useState(15 * quiz.questions.length); // 15 seconds per question
 
+  useEffect(() => {
+    setCurrentUser(getUser());
+  }, []);
+
   const currentQuestion = quiz.questions[currentQuestionIndex];
 
   useEffect(() => {
     if (isFinished) return;
     if (timeLeft === 0) {
-      setIsFinished(true);
+      handleFinish();
       toast({
         title: "Time's Up!",
         description: "You ran out of time. Better luck next time!",
@@ -55,9 +61,55 @@ export function QuizClient({ quiz }: { quiz: Quiz }) {
     if (currentQuestionIndex < quiz.questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     } else {
-      setIsFinished(true);
+      handleFinish(score + (selectedAnswer === currentQuestion.correctAnswer ? 1 : 0));
     }
   };
+
+  const handleFinish = (finalScore = score) => {
+    if(!currentUser) return;
+    const xpGained = finalScore * 10;
+    let newXp = currentUser.xp + xpGained;
+    let newLevel = currentUser.level;
+    let newBadges = [...currentUser.badges];
+    let leveledUp = false;
+
+    while (newXp >= currentUser.xpToNextLevel) {
+      newXp -= currentUser.xpToNextLevel;
+      newLevel++;
+      leveledUp = true;
+    }
+
+    // Add Scholar badge if they get a perfect score
+    if(finalScore === quiz.questions.length && !currentUser.badges.some(b => b.id === 'scholar')){
+      const scholarBadge = badges.find(b => b.id === 'scholar');
+      if (scholarBadge) {
+        newBadges.push(scholarBadge);
+        toast({
+          title: "Badge Unlocked!",
+          description: `You've earned the ${scholarBadge.name} badge!`,
+          action: (
+            <div className="p-2 rounded-full bg-accent">
+                <Award className={`w-8 h-8 ${scholarBadge.color}`} />
+            </div>
+          )
+        });
+      }
+    }
+    
+    updateUser({ 
+      ...currentUser, 
+      xp: newXp, 
+      level: newLevel,
+      badges: newBadges,
+    });
+
+    toast({
+        title: `Quiz Complete! +${xpGained} XP`,
+        description: leveledUp ? `Congratulations! You've reached Level ${newLevel}!` : `You scored ${finalScore}/${quiz.questions.length}.`,
+    });
+
+    setIsFinished(true);
+  }
 
   const showHint = () => {
     if (currentQuestion.hint) {
@@ -97,7 +149,7 @@ export function QuizClient({ quiz }: { quiz: Quiz }) {
       <CardHeader>
         <div className="mb-4">
             <p className="text-sm text-muted-foreground mb-1 text-right">{Math.floor(timeLeft / 60)}:{('0' + timeLeft % 60).slice(-2)}</p>
-            <Progress value={(currentQuestionIndex / quiz.questions.length) * 100} className="w-full" />
+            <Progress value={((currentQuestionIndex + 1) / quiz.questions.length) * 100} className="w-full" />
             <p className="text-sm text-muted-foreground mt-2">Question {currentQuestionIndex + 1} of {quiz.questions.length}</p>
         </div>
         <CardTitle className="text-2xl font-headline">{currentQuestion.question}</CardTitle>
