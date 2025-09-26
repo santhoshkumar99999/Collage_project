@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview A quiz assistant AI chatbot.
@@ -11,7 +12,7 @@ import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
 const QuizChatInputSchema = z.object({
-  quizQuestionContext: z.string().describe('The full context of the quiz question, including the question itself and the multiple-choice options.'),
+  quizQuestionContext: z.string().describe('The full context of the quiz question, including the question itself, the multiple-choice options, and the correct answer.'),
   question: z.string().describe("The student's question about the quiz question."),
   conversationHistory: z.array(z.object({
     role: z.enum(['user', 'model']),
@@ -35,11 +36,13 @@ const prompt = ai.definePrompt({
   name: 'quizChatPrompt',
   input: {schema: QuizChatInputSchema},
   output: {schema: QuizChatOutputSchema},
-  prompt: `You are a friendly and encouraging quiz assistant. Your goal is to help a student understand a quiz question without giving them the direct answer.
-
-You MUST NOT reveal the correct answer. Instead, provide hints, explanations, or ask leading questions to guide the student towards the correct answer on their own.
+  prompt: `You are a friendly and encouraging quiz assistant. Your goal is to help a student understand a quiz question.
 
 Your response should be based on the provided "QUIZ QUESTION CONTEXT".
+
+If the student asks for the answer directly, you should provide it along with a brief explanation.
+If the student provides an incorrect answer, explain why it is incorrect and guide them to the correct answer.
+Be encouraging and supportive in your tone.
 
 {{#if language}}
 You MUST answer in the following language: {{{language}}}.
@@ -57,7 +60,7 @@ QUIZ QUESTION CONTEXT:
 {{{quizQuestionContext}}}
 ---
 
-Based on the quiz question context and conversation history, answer the student's question below. Remember, do not give away the answer!
+Based on the quiz question context and conversation history, answer the student's question below.
 
 STUDENT'S QUESTION:
 "{{{question}}}"

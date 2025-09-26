@@ -50,7 +50,7 @@ export function QuizClient({ quiz, isTournament = false }: QuizClientProps) {
   
   const chatbotContext = useMemo(() => {
     if (!currentQuestion) return '';
-    return `Question: "${currentQuestion.question}"\nOptions: ${currentQuestion.options.join(', ')}`;
+    return `Question: "${currentQuestion.question}"\nOptions: ${currentQuestion.options.join(', ')}\nCorrect Answer: ${currentQuestion.correctAnswer}`;
   }, [currentQuestion]);
 
   const handleNext = () => {
