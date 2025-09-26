@@ -6,8 +6,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Bot, Send, X, LoaderCircle } from 'lucide-react';
+import { Bot, Send, X, LoaderCircle, Volume2, PlayCircle } from 'lucide-react';
 import { answerQuestion } from '@/ai/flows/lesson-chat-flow';
+import { textToSpeech } from '@/ai/flows/tts-flow';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { currentUser } from '@/lib/data';
@@ -15,20 +16,41 @@ import { currentUser } from '@/lib/data';
 interface Message {
   role: 'user' | 'model';
   content: string;
+  audioUrl?: string;
+  isAudioLoading?: boolean;
 }
 
 export function Chatbot({ lessonContent }: { lessonContent: string }) {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [isBotLoading, setIsBotLoading] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     if (scrollAreaRef.current) {
       scrollAreaRef.current.scrollTo({ top: scrollAreaRef.current.scrollHeight, behavior: 'smooth' });
     }
   }, [messages]);
+  
+  const generateAndPlayAudio = async (text: string, messageIndex: number) => {
+    setMessages(prev => prev.map((msg, idx) => idx === messageIndex ? { ...msg, isAudioLoading: true } : msg));
+    try {
+      const audioResponse = await textToSpeech(text);
+      const audioUrl = audioResponse.media;
+      setMessages(prev => prev.map((msg, idx) => idx === messageIndex ? { ...msg, audioUrl, isAudioLoading: false } : msg));
+
+      if (audioRef.current) {
+        audioRef.current.src = audioUrl;
+        audioRef.current.play();
+      }
+
+    } catch (error) {
+      console.error("Error generating speech:", error);
+      setMessages(prev => prev.map((msg, idx) => idx === messageIndex ? { ...msg, isAudioLoading: false } : msg));
+    }
+  };
 
   const handleSend = async () => {
     if (!input.trim()) return;
@@ -36,7 +58,7 @@ export function Chatbot({ lessonContent }: { lessonContent: string }) {
     const userMessage: Message = { role: 'user', content: input };
     setMessages((prev) => [...prev, userMessage]);
     setInput('');
-    setIsLoading(true);
+    setIsBotLoading(true);
 
     try {
       const response = await answerQuestion({
@@ -44,14 +66,19 @@ export function Chatbot({ lessonContent }: { lessonContent: string }) {
         question: input,
         conversationHistory: messages
       });
-      const modelMessage: Message = { role: 'model', content: response.answer };
+      const modelMessage: Message = { role: 'model', content: response.answer, isAudioLoading: false };
       setMessages((prev) => [...prev, modelMessage]);
+      
+      const newIndex = messages.length + 1; // Index of the new model message
+      await generateAndPlayAudio(response.answer, newIndex);
+
+
     } catch (error) {
       console.error("Error getting answer from AI:", error);
       const errorMessage: Message = { role: 'model', content: "Sorry, I'm having trouble connecting right now. Please try again later." };
       setMessages((prev) => [...prev, errorMessage]);
     } finally {
-      setIsLoading(false);
+      setIsBotLoading(false);
     }
   };
 
@@ -60,6 +87,14 @@ export function Chatbot({ lessonContent }: { lessonContent: string }) {
       handleSend();
     }
   };
+
+  const playAudio = (audioUrl: string) => {
+    if (audioRef.current) {
+        audioRef.current.src = audioUrl;
+        audioRef.current.play();
+    }
+  };
+
 
   return (
     <>
@@ -92,18 +127,33 @@ export function Chatbot({ lessonContent }: { lessonContent: string }) {
                         {message.role === 'model' && <Avatar className="w-8 h-8"><AvatarFallback><Bot size={20} /></AvatarFallback></Avatar>}
                         <div
                             className={cn(
-                            'rounded-lg px-3 py-2',
+                            'rounded-lg px-3 py-2 max-w-[80%]',
                             message.role === 'user'
                                 ? 'bg-primary text-primary-foreground'
                                 : 'bg-muted'
                             )}
                         >
                             {message.content}
+                             {message.role === 'model' && (
+                                <div className="mt-2">
+                                {message.isAudioLoading && <LoaderCircle className="animate-spin h-4 w-4 text-muted-foreground" />}
+                                {message.audioUrl && !message.isAudioLoading && (
+                                    <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => playAudio(message.audioUrl!)}>
+                                        <PlayCircle className="h-4 w-4" />
+                                    </Button>
+                                )}
+                                {!message.audioUrl && !message.isAudioLoading && (
+                                     <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => generateAndPlayAudio(message.content, index)}>
+                                         <Volume2 className="h-4 w-4" />
+                                     </Button>
+                                )}
+                                </div>
+                            )}
                         </div>
                         {message.role === 'user' && <Avatar className="w-8 h-8"><AvatarImage src={currentUser.avatarUrl} /><AvatarFallback>{currentUser.name.charAt(0)}</AvatarFallback></Avatar>}
                         </div>
                     ))}
-                    {isLoading && (
+                    {isBotLoading && (
                         <div className="flex justify-start gap-3 text-sm">
                              <Avatar className="w-8 h-8"><AvatarFallback><Bot size={20} /></AvatarFallback></Avatar>
                              <div className="rounded-lg px-3 py-2 bg-muted flex items-center">
@@ -122,10 +172,10 @@ export function Chatbot({ lessonContent }: { lessonContent: string }) {
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  disabled={isLoading}
+                  disabled={isBotLoading}
                   autoComplete='off'
                 />
-                <Button type="submit" size="icon" onClick={handleSend} disabled={isLoading}>
+                <Button type="submit" size="icon" onClick={handleSend} disabled={isBotLoading}>
                   <Send className="h-4 w-4" />
                   <span className="sr-only">Send</span>
                 </Button>
@@ -134,6 +184,7 @@ export function Chatbot({ lessonContent }: { lessonContent: string }) {
           </Card>
         </div>
       )}
+       <audio ref={audioRef} className="hidden" />
     </>
   );
 }
