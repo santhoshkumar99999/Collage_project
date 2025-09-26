@@ -17,13 +17,12 @@ import { textToSpeech } from '@/ai/flows/tts-flow';
 import { useLanguage } from '@/hooks/use-language';
 import { translateText } from '@/ai/flows/translate-flow';
 import { Chatbot } from './Chatbot';
+import { audioCache } from '@/services/audio-cache';
 
 interface QuizClientProps {
     quiz: Quiz;
     isTournament?: boolean;
 }
-
-const audioCache = new Map<string, string>();
 
 export function QuizClient({ quiz, isTournament = false }: QuizClientProps) {
   const router = useRouter();

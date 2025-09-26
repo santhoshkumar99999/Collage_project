@@ -18,6 +18,7 @@ import type { User } from '@/lib/types';
 import { useLanguage } from '@/hooks/use-language';
 import { LanguageSelector } from './LanguageSelector';
 import { useSpeechRecognition } from '@/hooks/use-speech-recognition';
+import { audioCache } from '@/services/audio-cache';
 
 
 interface Message {
@@ -31,8 +32,6 @@ interface ChatbotProps {
     context: string;
     flowType: 'lesson' | 'quiz';
 }
-
-const audioCache = new Map<string, string>();
 
 export function Chatbot({ context, flowType }: ChatbotProps) {
   const { language } = useLanguage();
