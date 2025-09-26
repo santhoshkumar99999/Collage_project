@@ -74,7 +74,7 @@ function AdminSidebar() {
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
-                        <Link href="/admin/login">
+                        <Link href="/login">
                             <LogOut className="mr-2" />
                             Logout
                         </Link>

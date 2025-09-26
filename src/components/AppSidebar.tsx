@@ -111,7 +111,7 @@ export function AppSidebar() {
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                 <Link href="/admin/login">
+                 <Link href="/login">
                   <Shield className="mr-2" />
                   Teacher Portal
                 </Link>
