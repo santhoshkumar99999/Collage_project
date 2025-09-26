@@ -2,33 +2,33 @@
   "placeholderImages": [
     {
       "id": "mathematics",
-      "description": "A compass drawing a circle on a piece of paper with geometric shapes.",
-      "imageUrl": "https://images.unsplash.com/photo-1596495577886-d9256e321d4b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxtYXRoZW1hdGljcyUyMGdlb21ldHJ5fGVufDB8fHx8MTc1ODg2NzQ0Nnww&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "mathematics geometry"
+      "description": "An abstract, colorful geometric pattern.",
+      "imageUrl": "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxtYXRoZW1hdGljcyUyMGFic3RyYWN0fGVufDB8fHx8MTc1ODg5ODg4Nnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "mathematics abstract"
     },
     {
       "id": "science",
-      "description": "A microscope in a laboratory setting, focused on a slide.",
-      "imageUrl": "https://images.unsplash.com/photo-1554469384-e58fac16e23a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxzY2llbmNlJTIwbWljcm9zY29wZXxlbnwwfHx8fDE3NTg4Njc0NzZ8MA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "science microscope"
+      "description": "A set of beakers with colorful liquids in a lab.",
+      "imageUrl": "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxzY2llbmNlJTIwbGFifGVufDB8fHx8MTc1ODg5ODkzM3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "science lab"
     },
     {
       "id": "physics",
-      "description": "A stylized representation of an atom with electrons orbiting a nucleus.",
-      "imageUrl": "https://images.unsplash.com/photo-1565451249757-c34431a4875b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxwaHlzaWNzJTIwYXRvbXxlbnwwfHx8fDE3NTg4Njc1MDJ8MA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "physics atom"
+      "description": "A glass prism refracting light into a rainbow.",
+      "imageUrl": "https://images.unsplash.com/photo-1517210122415-b0c70b2a09bf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxwaHlzaWNzJTIwbGlnaHR8ZW58MHx8fHwxNzU4ODk4OTgwfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "physics light"
     },
     {
       "id": "biology",
-      "description": "A close-up of a vibrant green leaf with water droplets on it.",
-      "imageUrl": "https://images.unsplash.com/photo-1512428209895-69213399479b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxiaW9sb2d5JTIwbGVhZnxlbnwwfHx8fDE3NTg4Njc1MTZ8MA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "biology leaf"
+      "description": "A digital rendering of a DNA double helix.",
+      "imageUrl": "https://images.unsplash.com/photo-1532153955177-f59af40d64f8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxiaW9sb2d5JTIwRE5BfGVufDB8fHx8MTc1ODg5OTAwN3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "biology dna"
     },
     {
       "id": "ai",
-      "description": "A robot hand and a human hand about to touch, representing the connection between AI and humanity.",
-      "imageUrl": "https://images.unsplash.com/photo-1593349480503-69c670f5765d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxhcnRpZmljaWFsJTIwaW50ZWxsaWdlbmNlJTIwcm9ib3QlMjBoYW5kfGVufDB8fHx8MTc1ODg2NzUyOXww&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "AI robot hand"
+      "description": "A glowing blue brain made of digital circuits.",
+      "imageUrl": "https://images.unsplash.com/photo-1526048598681-596041fde5d1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxhcnRpZmljaWFsJTIwaW50ZWxsaWdlbmNlJTIwYnJhaW58ZW58MHx8fHwxNzU4ODk5MDM2fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "AI brain"
     },
     {
       "id": "lesson_default",
