@@ -118,13 +118,8 @@ export function Chatbot({ context, flowType }: ChatbotProps) {
 
       const modelMessage: Message = { role: 'model', content: response.answer, isAudioLoading: false };
       const newMessages = [...messages, userMessage, modelMessage];
-      const newIndex = newMessages.length - 1; // Index of the new model message
 
       setMessages(newMessages);
-      
-      // Don't auto-play audio, let the user click
-      // await generateAndPlayAudio(response.answer, newIndex);
-
 
     } catch (error) {
       console.error("Error getting answer from AI:", error);
