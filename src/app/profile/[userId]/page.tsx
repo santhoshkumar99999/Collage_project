@@ -179,7 +179,7 @@ export default function PublicProfilePage({ params }: { params: { userId: string
               <CardHeader>
                 <CardTitle><Translate>Tournament Subjects</Translate></CardTitle>
                 <CardDescription><Translate>Subjects where tournament quizzes have been attempted.</Translate></CardDescription>
-              </CardHeader>
+              </Header>
               <CardContent>
                  <TooltipProvider>
                     <div className="flex flex-wrap gap-4">
@@ -246,5 +246,3 @@ export default function PublicProfilePage({ params }: { params: { userId: string
     </>
   );
 }
-
-    
