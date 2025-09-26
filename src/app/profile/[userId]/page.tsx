@@ -15,7 +15,11 @@ import { Skeleton } from '@/components/ui/skeleton';
 function rehydrateUserBadges(user: User): User {
     // Ensure badges are objects with an id, not just strings, before finding the full badge object.
     const validBadges = user.badges?.map(badge => {
-        const badgeId = typeof badge === 'string' ? badge : badge.id;
+        // In case the badge is already a full object from initial data
+        if (typeof badge === 'object' && badge.id && badge.name) {
+            return badge;
+        }
+        const badgeId = typeof badge === 'string' ? badge : (badge as any).id;
         const fullBadge = badges.find(b => b.id === badgeId);
         return fullBadge;
     }).filter(Boolean) as User['badges']; // filter(Boolean) removes any undefineds if a badge wasn't found
@@ -55,6 +59,7 @@ export default function PublicProfilePage({ params }: { params: { userId: string
       setIsLoading(false);
     }
     
+    // Defer loading until the component has mounted on the client
     loadUser();
   }, [params.userId]);
 
