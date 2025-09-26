@@ -2,33 +2,33 @@
   "placeholderImages": [
     {
       "id": "mathematics",
-      "description": "An abstract representation of mathematical concepts.",
-      "imageUrl": "https://images.unsplash.com/photo-1626438426506-73712ed296b4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxtYXRoZW1hdGljcyUyMGFic3RyYWN0fGVufDB8fHx8MTc1ODg1MzMxMHww&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "mathematics abstract"
+      "description": "A blackboard with complex mathematical formulas and graphs.",
+      "imageUrl": "https://images.unsplash.com/photo-1518600245233-024c2afe3e9a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxtYXRoZW1hdGljcyUyMGJsYWNrYm9hcmR8ZW58MHx8fHwxNzU4ODU5MjM3fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "mathematics blackboard"
     },
     {
       "id": "science",
-      "description": "A chemistry set with beakers and flasks.",
-      "imageUrl": "https://images.unsplash.com/photo-1532094349884-543bc11b234d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxzY2llbmNlJTIwbGFifGVufDB8fHx8MTc1ODgxNzU4N3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "description": "Colorful chemicals in beakers in a science laboratory.",
+      "imageUrl": "https://images.unsplash.com/photo-1576086213369-97a306d36557?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxzY2llbmNlJTIwbGFifGVufDB8fHx8MTc1ODgxNzU4N3ww&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "science lab"
     },
     {
       "id": "physics",
-      "description": "An image representing the concepts of physics, like an atom or galaxy.",
-      "imageUrl": "https://images.unsplash.com/photo-1758314896569-b3639ee707c4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxwaHlzaWNzJTIwY29uY2VwdHN8ZW58MHx8fHwxNzU4ODUzMzEwfDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "physics concepts"
+      "description": "A glass prism refracting light into a rainbow spectrum.",
+      "imageUrl": "https://images.unsplash.com/photo-1627389828416-674a6258043b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxwaHlzaWNzJTIwcHJpc218ZW58MHx8fHwxNzU4ODU5MjgzfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "physics prism"
     },
     {
       "id": "biology",
-      "description": "A microscopic view of cells or a DNA strand.",
-      "imageUrl": "https://images.unsplash.com/photo-1648792940059-3b782a7b8b20?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxiaW9sb2d5JTIwZG5hfGVufDB8fHx8MTc1ODc0NzU1MHww&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "biology dna"
+      "description": "A close-up view of a plant cell structure under a microscope.",
+      "imageUrl": "https://images.unsplash.com/photo-1554152562-421719b4eb24?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxiaW9sb2d5JTIwcGxhbnQlMjBjZWxsfGVufDB8fHx8MTc1ODg1OTI5N3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "biology plant cell"
     },
     {
       "id": "ai",
-      "description": "An abstract image of a neural network or circuit board.",
-      "imageUrl": "https://images.unsplash.com/photo-1694903110330-cc64b7e1d21d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxhcnRpZmljaWFsJTIwaW50ZWxsaWdlbmNlfGVufDB8fHx8MTc1ODc5NDU3Mnww&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "artificial intelligence"
+      "description": "An abstract visualization of a glowing brain made of neural network connections.",
+      "imageUrl": "https://images.unsplash.com/photo-1535223289827-42f1e9919769?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxhcnRpZmljaWFsJTIwaW50ZWxsaWdlbmNlJTIwYnJhaW58ZW58MHx8fHwxNzU4ODU5MzExfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "artificial intelligence brain"
     },
     {
       "id": "lesson_default",
