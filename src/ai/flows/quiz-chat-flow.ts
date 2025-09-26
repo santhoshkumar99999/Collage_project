@@ -19,6 +19,7 @@ const QuizChatInputSchema = z.object({
     content: z.string(),
   })).describe('The history of the conversation so far.'),
   language: z.string().optional().describe('The language to respond in. e.g., "Hindi", "Tamil", "English"'),
+  imageDataUri: z.string().optional().describe("An optional image provided by the user for context, as a data URI."),
 });
 export type QuizChatInput = z.infer<typeof QuizChatInputSchema>;
 
@@ -38,10 +39,11 @@ const prompt = ai.definePrompt({
   output: {schema: QuizChatOutputSchema},
   prompt: `You are a friendly and encouraging quiz assistant. Your goal is to help a student understand a quiz question.
 
-Your response should be based on the provided "QUIZ QUESTION CONTEXT".
+Your response should be based on the provided "QUIZ QUESTION CONTEXT" and any provided image.
 
 If the student asks for the answer directly, you should provide it along with a brief explanation.
 If the student provides an incorrect answer, explain why it is incorrect and guide them to the correct answer.
+If an image is provided, incorporate it into your explanation.
 Be encouraging and supportive in your tone.
 
 {{#if language}}
@@ -60,7 +62,12 @@ QUIZ QUESTION CONTEXT:
 {{{quizQuestionContext}}}
 ---
 
-Based on the quiz question context and conversation history, answer the student's question below.
+Based on the quiz question context, conversation history, and the image below (if any), answer the student's question.
+
+{{#if imageDataUri}}
+IMAGE:
+{{media url=imageDataUri}}
+{{/if}}
 
 STUDENT'S QUESTION:
 "{{{question}}}"

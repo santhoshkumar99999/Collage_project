@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview A lesson assistant AI chatbot.
@@ -18,6 +19,7 @@ const LessonChatInputSchema = z.object({
     content: z.string(),
   })).describe('The history of the conversation so far.'),
   language: z.string().optional().describe('The language to respond in. e.g., "Hindi", "Tamil", "English"'),
+  imageDataUri: z.string().optional().describe("An optional image provided by the user for context, as a data URI."),
 });
 export type LessonChatInput = z.infer<typeof LessonChatInputSchema>;
 
@@ -37,9 +39,10 @@ const prompt = ai.definePrompt({
   output: {schema: LessonChatOutputSchema},
   prompt: `You are a friendly and encouraging educational assistant for the Vidyagram learning platform. Your goal is to help students understand the provided lesson material.
 
-You must answer the student's question based ONLY on the context provided in the "LESSON CONTENT".
+You must answer the student's question based ONLY on the context provided in the "LESSON CONTENT" and any provided image.
 Do not use any external knowledge or information outside of the lesson content.
 If the question is not related to the lesson content, politely decline to answer and guide the student back to the topic.
+If an image is provided, use it as the primary context for your explanation.
 Keep your answers concise and easy to understand for a student.
 {{#if language}}
 You MUST answer in the following language: {{{language}}}.
@@ -58,7 +61,12 @@ LESSON CONTENT:
 {{{lessonContent}}}
 ---
 
-Based on the lesson content and conversation history, answer the following question.
+Based on the lesson content, conversation history, and the image below (if any), answer the student's question.
+
+{{#if imageDataUri}}
+IMAGE:
+{{media url=imageDataUri}}
+{{/if}}
 
 STUDENT'S QUESTION:
 "{{{question}}}"

@@ -2,11 +2,12 @@
 "use client";
 
 import { useState, useRef, useEffect } from 'react';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Bot, Send, X, LoaderCircle, PlayCircle, Languages, Volume2, Mic, MicOff } from 'lucide-react';
+import { Bot, Send, X, LoaderCircle, PlayCircle, Languages, Volume2, Mic, MicOff, Paperclip, XCircle } from 'lucide-react';
 import { answerQuestion as answerLessonQuestion } from '@/ai/flows/lesson-chat-flow';
 import { answerQuizQuestion } from '@/ai/flows/quiz-chat-flow';
 import { textToSpeech } from '@/ai/flows/tts-flow';
@@ -39,8 +40,10 @@ export function Chatbot({ context, flowType }: ChatbotProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isBotLoading, setIsBotLoading] = useState(false);
+  const [imageDataUri, setImageDataUri] = useState<string | null>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [hasSelectedLanguage, setHasSelectedLanguage] = useState(false);
 
@@ -97,7 +100,7 @@ export function Chatbot({ context, flowType }: ChatbotProps) {
   };
 
   const handleSend = async () => {
-    if (!input.trim() || !context) return;
+    if ((!input.trim() && !imageDataUri) || !context) return;
     if (isListening) stopListening();
 
     const userMessage: Message = { role: 'user', content: input };
@@ -115,6 +118,7 @@ export function Chatbot({ context, flowType }: ChatbotProps) {
           question: input,
           conversationHistory,
           language: language,
+          imageDataUri: imageDataUri || undefined,
         });
       } else {
          response = await answerLessonQuestion({
@@ -122,6 +126,7 @@ export function Chatbot({ context, flowType }: ChatbotProps) {
             question: input,
             conversationHistory,
             language: language,
+            imageDataUri: imageDataUri || undefined,
         });
       }
 
@@ -136,6 +141,7 @@ export function Chatbot({ context, flowType }: ChatbotProps) {
       setMessages((prev) => [...prev, errorMessage]);
     } finally {
       setIsBotLoading(false);
+      setImageDataUri(null); // Clear image after sending
     }
   };
 
@@ -159,6 +165,28 @@ export function Chatbot({ context, flowType }: ChatbotProps) {
       startListening();
     }
   };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setImageDataUri(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleAttachmentClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const removeImage = () => {
+    setImageDataUri(null);
+    if(fileInputRef.current) {
+        fileInputRef.current.value = '';
+    }
+  }
 
 
   return (
@@ -250,7 +278,15 @@ export function Chatbot({ context, flowType }: ChatbotProps) {
                 )}
             </CardContent>
             {hasSelectedLanguage && (
-                <CardFooter>
+                <CardFooter className="flex flex-col items-stretch gap-2">
+                {imageDataUri && (
+                    <div className="relative w-full h-24 rounded-md overflow-hidden border">
+                        <Image src={imageDataUri} alt="Uploaded preview" layout="fill" objectFit="cover" />
+                        <Button variant="destructive" size="icon" className="absolute top-1 right-1 h-6 w-6" onClick={removeImage}>
+                            <XCircle className="h-4 w-4" />
+                        </Button>
+                    </div>
+                )}
                 <div className="flex w-full items-center space-x-2">
                     <Input
                     id="message"
@@ -261,6 +297,11 @@ export function Chatbot({ context, flowType }: ChatbotProps) {
                     disabled={isBotLoading || !context}
                     autoComplete='off'
                     />
+                    <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/*" className="hidden" />
+                    <Button type="button" size="icon" variant="outline" onClick={handleAttachmentClick}>
+                        <Paperclip className="h-4 w-4" />
+                        <span className="sr-only">Attach image</span>
+                    </Button>
                      {isSupported && (
                         <Button type="button" size="icon" onClick={handleMicClick} variant={isListening ? 'destructive' : 'outline'}>
                             {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
