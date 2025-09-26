@@ -1,3 +1,40 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "mathematics",
+      "description": "An abstract representation of mathematical concepts.",
+      "imageUrl": "https://images.unsplash.com/photo-1626438426506-73712ed296b4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxtYXRoZW1hdGljcyUyMGFic3RyYWN0fGVufDB8fHx8MTc1ODg1MzMxMHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "mathematics abstract"
+    },
+    {
+      "id": "science",
+      "description": "A chemistry set with beakers and flasks.",
+      "imageUrl": "https://images.unsplash.com/photo-1532094349884-543bc11b234d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxzY2llbmNlJTIwbGFifGVufDB8fHx8MTc1ODgxNzU4N3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "science lab"
+    },
+    {
+      "id": "physics",
+      "description": "An image representing the concepts of physics, like an atom or galaxy.",
+      "imageUrl": "https://images.unsplash.com/photo-1758314896569-b3639ee707c4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxwaHlzaWNzJTIwY29uY2VwdHN8ZW58MHx8fHwxNzU4ODUzMzEwfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "physics concepts"
+    },
+    {
+      "id": "biology",
+      "description": "A microscopic view of cells or a DNA strand.",
+      "imageUrl": "https://images.unsplash.com/photo-1648792940059-3b782a7b8b20?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxiaW9sb2d5JTIwZG5hfGVufDB8fHx8MTc1ODc0NzU1MHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "biology dna"
+    },
+    {
+      "id": "ai",
+      "description": "An abstract image of a neural network or circuit board.",
+      "imageUrl": "https://images.unsplash.com/photo-1694903110330-cc64b7e1d21d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxhcnRpZmljaWFsJTIwaW50ZWxsaWdlbmNlfGVufDB8fHx8MTc1ODc5NDU3Mnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "artificial intelligence"
+    },
+    {
+      "id": "lesson_default",
+      "description": "A student studying at a desk.",
+      "imageUrl": "https://images.unsplash.com/photo-1669146894279-509f5de45390?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxzdHVkZW50JTIwc3R1ZHlpbmd8ZW58MHx8fHwxNzU4ODQwNDcwfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "student studying"
+    }
+  ]
 }

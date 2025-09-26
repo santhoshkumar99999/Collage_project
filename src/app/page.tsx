@@ -1,3 +1,47 @@
-export default function Home() {
-  return <></>;
+
+import Link from 'next/link';
+import Image from 'next/image';
+import { subjects } from '@/lib/data';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
+import { PageHeader } from '@/components/PageHeader';
+import { PlaceHolderImages } from '@/lib/placeholder-images';
+
+export default function SubjectSelectionPage() {
+  return (
+    <>
+      <PageHeader title="Choose a Subject" />
+      <main className="flex-1 p-4 md:p-6">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {subjects.map((subject) => {
+            const placeholder = PlaceHolderImages.find(p => p.id === subject.imageId);
+            return (
+              <Link href={`/subjects/${subject.id}`} key={subject.id}>
+                <Card className="h-full transform transition-transform duration-300 hover:-translate-y-1 hover:shadow-xl">
+                   <CardContent className="p-0">
+                    {placeholder && (
+                       <Image
+                        src={placeholder.imageUrl}
+                        alt={subject.name}
+                        width={600}
+                        height={400}
+                        data-ai-hint={placeholder.imageHint}
+                        className="rounded-t-lg object-cover aspect-[3/2]"
+                      />
+                    )}
+                  </CardContent>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 font-headline">
+                      <subject.icon className="w-6 h-6 text-primary" />
+                      {subject.name}
+                    </CardTitle>
+                    <CardDescription>{subject.description}</CardDescription>
+                  </CardHeader>
+                </Card>
+              </Link>
+            )
+          })}
+        </div>
+      </main>
+    </>
+  );
 }
