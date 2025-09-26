@@ -6,9 +6,8 @@ import { useTranslation } from '@/hooks/use-translation';
 import { Skeleton } from './ui/skeleton';
 
 export function Translate({ children }: { children: React.ReactNode }) {
-  const { getTranslation, isTranslating } = useTranslation();
+  const { getTranslation, isTranslating, registerKeys } = useTranslation();
 
-  // Convert children to a flat string to use as a key.
   const originalText = React.useMemo(() => {
     return React.Children.toArray(children).reduce((acc: string, child) => {
       if (typeof child === 'string' || typeof child === 'number') {
@@ -17,6 +16,12 @@ export function Translate({ children }: { children: React.ReactNode }) {
       return acc;
     }, '');
   }, [children]);
+  
+  React.useEffect(() => {
+    if (originalText) {
+      registerKeys([originalText]);
+    }
+  }, [originalText, registerKeys]);
 
   if (!originalText) {
     return <>{children}</>;
