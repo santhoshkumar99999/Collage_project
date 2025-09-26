@@ -12,6 +12,7 @@ import { textToSpeech } from '@/ai/flows/tts-flow';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { currentUser } from '@/lib/data';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 
 interface Message {
   role: 'user' | 'model';
@@ -20,11 +21,21 @@ interface Message {
   isAudioLoading?: boolean;
 }
 
+const supportedLanguages = [
+    { value: 'English', label: 'English' },
+    { value: 'Hindi', label: 'हिंदी' },
+    { value: 'Telugu', label: 'తెలుగు' },
+    { value: 'Kannada', label: 'ಕನ್ನಡ' },
+    { value: 'Tamil', label: 'தமிழ்' },
+    { value: 'Odia', label: 'ଓଡିଆ' },
+];
+
 export function Chatbot({ lessonContent }: { lessonContent: string }) {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isBotLoading, setIsBotLoading] = useState(false);
+  const [language, setLanguage] = useState('English');
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -64,7 +75,8 @@ export function Chatbot({ lessonContent }: { lessonContent: string }) {
       const response = await answerQuestion({
         lessonContent,
         question: input,
-        conversationHistory: messages
+        conversationHistory: messages,
+        language: language,
       });
       const modelMessage: Message = { role: 'model', content: response.answer, isAudioLoading: false };
       setMessages((prev) => [...prev, modelMessage]);
@@ -112,6 +124,16 @@ export function Chatbot({ lessonContent }: { lessonContent: string }) {
               <CardTitle className="flex items-center gap-2">
                 <Bot /> Lesson Assistant
               </CardTitle>
+               <Select value={language} onValueChange={setLanguage}>
+                <SelectTrigger className="w-[120px]">
+                  <SelectValue placeholder="Language" />
+                </SelectTrigger>
+                <SelectContent>
+                  {supportedLanguages.map(lang => (
+                    <SelectItem key={lang.value} value={lang.value}>{lang.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </CardHeader>
             <CardContent className="flex-1 overflow-hidden p-0">
                 <ScrollArea className="h-full p-4" ref={scrollAreaRef}>

@@ -17,6 +17,7 @@ const LessonChatInputSchema = z.object({
     role: z.enum(['user', 'model']),
     content: z.string(),
   })).describe('The history of the conversation so far.'),
+  language: z.string().optional().describe('The language to respond in. e.g., "Hindi", "Tamil", "English"'),
 });
 export type LessonChatInput = z.infer<typeof LessonChatInputSchema>;
 
@@ -40,6 +41,12 @@ You must answer the student's question based ONLY on the context provided in the
 Do not use any external knowledge or information outside of the lesson content.
 If the question is not related to the lesson content, politely decline to answer and guide the student back to the topic.
 Keep your answers concise and easy to understand for a student.
+{{#if language}}
+You MUST answer in the following language: {{{language}}}.
+{{else}}
+You MUST answer in English.
+{{/if}}
+
 
 Here is the conversation history so far:
 {{#each conversationHistory}}
