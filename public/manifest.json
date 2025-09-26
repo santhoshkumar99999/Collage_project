@@ -1,8 +1,11 @@
-
 {
   "name": "Vidyagram - Gamified Learning",
   "short_name": "Vidyagram",
   "description": "A gamified learning platform for rural education, focusing on STEM subjects.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#4CAF50",
   "icons": [
     {
       "src": "/icon-192x192.png",
@@ -14,10 +17,5 @@
       "sizes": "512x512",
       "type": "image/png"
     }
-  ],
-  "theme_color": "#4CAF50",
-  "background_color": "#F0FDF4",
-  "start_url": "/",
-  "display": "standalone",
-  "orientation": "portrait"
+  ]
 }
