@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Quiz, QuizQuestion } from '@/lib/types';
 import { Button } from '@/components/ui/button';
@@ -16,6 +16,7 @@ import { Translate } from './Translate';
 import { textToSpeech } from '@/ai/flows/tts-flow';
 import { useLanguage } from '@/hooks/use-language';
 import { translateText } from '@/ai/flows/translate-flow';
+import { Chatbot } from './Chatbot';
 
 export function QuizClient({ quiz }: { quiz: Quiz }) {
   const router = useRouter();
@@ -41,6 +42,11 @@ export function QuizClient({ quiz }: { quiz: Quiz }) {
   }, [router]);
 
   const currentQuestion = quiz.questions[currentQuestionIndex];
+  
+  const chatbotContext = useMemo(() => {
+    if (!currentQuestion) return '';
+    return `Question: "${currentQuestion.question}"\nOptions: ${currentQuestion.options.join(', ')}`;
+  }, [currentQuestion]);
 
   const handleNext = () => {
     if (selectedAnswer === null) {
@@ -184,6 +190,7 @@ export function QuizClient({ quiz }: { quiz: Quiz }) {
   }
 
   return (
+    <>
     <Card className="w-full max-w-2xl mx-auto">
       <CardHeader>
         <div className="mb-4">
@@ -227,5 +234,7 @@ export function QuizClient({ quiz }: { quiz: Quiz }) {
       </CardFooter>
       <audio ref={audioRef} className="hidden" />
     </Card>
+    <Chatbot context={chatbotContext} flowType="quiz" />
+    </>
   );
 }

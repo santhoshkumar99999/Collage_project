@@ -7,7 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/componen
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Bot, Send, X, LoaderCircle, PlayCircle, Languages, Volume2 } from 'lucide-react';
-import { answerQuestion } from '@/ai/flows/lesson-chat-flow';
+import { answerQuestion as answerLessonQuestion } from '@/ai/flows/lesson-chat-flow';
+import { answerQuizQuestion } from '@/ai/flows/quiz-chat-flow';
 import { textToSpeech } from '@/ai/flows/tts-flow';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
@@ -24,7 +25,12 @@ interface Message {
   isAudioLoading?: boolean;
 }
 
-export function Chatbot({ lessonContent }: { lessonContent: string }) {
+interface ChatbotProps {
+    context: string;
+    flowType: 'lesson' | 'quiz';
+}
+
+export function Chatbot({ context, flowType }: ChatbotProps) {
   const { language, setLanguage, supportedLanguages } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -76,7 +82,7 @@ export function Chatbot({ lessonContent }: { lessonContent: string }) {
   };
 
   const handleSend = async () => {
-    if (!input.trim()) return;
+    if (!input.trim() || !context) return;
 
     const userMessage: Message = { role: 'user', content: input };
     setMessages((prev) => [...prev, userMessage]);
@@ -84,12 +90,25 @@ export function Chatbot({ lessonContent }: { lessonContent: string }) {
     setIsBotLoading(true);
 
     try {
-      const response = await answerQuestion({
-        lessonContent,
-        question: input,
-        conversationHistory: messages.map(({ audioUrl, isAudioLoading, ...rest }) => rest), // Don't send audio data to chat model
-        language: language,
-      });
+      let response;
+      const conversationHistory = messages.map(({ audioUrl, isAudioLoading, ...rest }) => rest);
+      
+      if (flowType === 'quiz') {
+        response = await answerQuizQuestion({
+          quizQuestionContext: context,
+          question: input,
+          conversationHistory,
+          language: language,
+        });
+      } else {
+         response = await answerLessonQuestion({
+            lessonContent: context,
+            question: input,
+            conversationHistory,
+            language: language,
+        });
+      }
+
       const modelMessage: Message = { role: 'model', content: response.answer, isAudioLoading: false };
       const newMessages = [...messages, userMessage, modelMessage];
       const newIndex = newMessages.length - 1; // Index of the new model message
@@ -136,7 +155,7 @@ export function Chatbot({ lessonContent }: { lessonContent: string }) {
           <Card className="w-[350px] h-[500px] flex flex-col shadow-2xl">
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle className="flex items-center gap-2">
-                <Bot /> Lesson Assistant
+                <Bot /> {flowType === 'quiz' ? 'Quiz Helper' : 'Lesson Assistant'}
               </CardTitle>
                <LanguageSelector />
             </CardHeader>
@@ -157,7 +176,7 @@ export function Chatbot({ lessonContent }: { lessonContent: string }) {
                             <div className="flex justify-start gap-3 text-sm">
                                 <Avatar className="w-8 h-8"><AvatarFallback><Bot size={20} /></AvatarFallback></Avatar>
                                 <div className='rounded-lg px-3 py-2 bg-muted'>
-                                    Hello! How can I help you with this lesson?
+                                    Hello! How can I help you with this {flowType}?
                                 </div>
                             </div>
                         )}
@@ -219,10 +238,10 @@ export function Chatbot({ lessonContent }: { lessonContent: string }) {
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={handleKeyDown}
-                    disabled={isBotLoading}
+                    disabled={isBotLoading || !context}
                     autoComplete='off'
                     />
-                    <Button type="submit" size="icon" onClick={handleSend} disabled={isBotLoading}>
+                    <Button type="submit" size="icon" onClick={handleSend} disabled={isBotLoading || !context}>
                     <Send className="h-4 w-4" />
                     <span className="sr-only">Send</span>
                     </Button>

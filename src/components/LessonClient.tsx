@@ -95,7 +95,7 @@ export function LessonClient({ lesson, subject }: { lesson: Lesson, subject: Sub
             </div>
             </div>
         </main>
-        <Chatbot lessonContent={translatedContent || lesson.content} />
+        <Chatbot context={translatedContent || lesson.content} flowType="lesson" />
     </>
   );
 }
