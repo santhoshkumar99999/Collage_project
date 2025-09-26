@@ -176,7 +176,7 @@ export function logoutUser() {
 }
 
 
-export const subjects: Subject[] = [
+const initialSubjects: Subject[] = [
   {
     id: 'mathematics',
     name: 'Mathematics',
@@ -213,6 +213,52 @@ export const subjects: Subject[] = [
     imageId: 'ai',
   },
 ];
+
+const iconMap = {
+    Calculator,
+    FlaskConical,
+    Atom,
+    Dna,
+    Bot,
+    BookOpen,
+};
+
+function getSubjects(): Subject[] {
+    if (typeof window === 'undefined') {
+        return initialSubjects;
+    }
+    const storedSubjects = localStorage.getItem('subjects');
+    if (storedSubjects) {
+        try {
+            const parsedSubjects: (Subject & { iconName: keyof typeof iconMap })[] = JSON.parse(storedSubjects);
+            return parsedSubjects.map(s => ({...s, icon: iconMap[s.iconName] || BookOpen }));
+        } catch (e) {
+            localStorage.setItem('subjects', JSON.stringify(initialSubjects.map(s => ({...s, iconName: s.icon.displayName }))));
+            return initialSubjects;
+        }
+    } else {
+        localStorage.setItem('subjects', JSON.stringify(initialSubjects.map(s => ({...s, iconName: Object.keys(iconMap).find(key => iconMap[key as keyof typeof iconMap] === s.icon)}))));
+        return initialSubjects;
+    }
+}
+
+export const subjects: Subject[] = getSubjects();
+
+export function addSubject(subject: Omit<Subject, 'id' | 'icon' | 'imageId'>) {
+    if (typeof window !== 'undefined') {
+        const currentSubjects = getSubjects();
+        const newSubject: Subject = {
+            ...subject,
+            id: subject.name.toLowerCase().replace(/\s+/g, '-'),
+            icon: BookOpen,
+            iconName: 'BookOpen',
+            imageId: `custom-${Date.now()}` // Needs a corresponding entry in placeholder-images.json or a default
+        };
+        const updatedSubjects = [...currentSubjects, newSubject];
+        localStorage.setItem('subjects', JSON.stringify(updatedSubjects.map(s => ({...s, icon: undefined, iconName: (s as any).iconName || 'BookOpen' }))));
+        window.dispatchEvent(new Event("storage"));
+    }
+}
 
 export const lessons: Lesson[] = [
   {
@@ -374,6 +420,3 @@ function getLeaderboard(): LeaderboardEntry[] {
 export const initialLeaderboard: LeaderboardEntry[] = getLeaderboard();
 
     
-
-    
-

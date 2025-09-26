@@ -1,20 +1,44 @@
 
+'use client';
+
 import Link from 'next/link';
 import Image from 'next/image';
-import { subjects } from '@/lib/data';
+import { useEffect, useState } from 'react';
+import { subjects as getSubjectsFromData } from '@/lib/data';
+import type { Subject } from '@/lib/types';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { PageHeader } from '@/components/PageHeader';
 import imageData from '@/lib/placeholder-images.json';
 import { Translate } from '@/components/Translate';
 
 export default function SubjectSelectionPage() {
+  const [subjects, setSubjects] = useState<Subject[]>([]);
+
+  useEffect(() => {
+    // A bit of a trick to re-run the function from data.ts on the client
+    const allSubjects = getSubjectsFromData; 
+    setSubjects(allSubjects);
+
+    const handleStorageChange = () => {
+        // This is a bit of a hack. We need to get the latest subjects.
+        // We can't re-import, so we'll reload the page. A proper state manager would fix this.
+        window.location.reload();
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
+
   return (
     <>
       <PageHeader title="Choose a Subject" />
       <main className="flex-1 p-4 md:p-6">
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {subjects.map((subject) => {
-            const placeholder = imageData.placeholderImages.find(p => p.id === subject.imageId);
+            const placeholder = imageData.placeholderImages.find(p => p.id === subject.imageId) || imageData.placeholderImages.find(p => p.id === 'lesson_default');
+            const SubjectIcon = subject.icon;
             return (
               <Link href={`/subjects/${subject.id}`} key={subject.id}>
                 <Card className="h-full overflow-hidden transition-transform duration-300 ease-in-out hover:-translate-y-2 hover:shadow-2xl">
@@ -32,7 +56,7 @@ export default function SubjectSelectionPage() {
                   </CardContent>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 font-headline">
-                      <subject.icon className="w-6 h-6 text-primary" />
+                      <SubjectIcon className="w-6 h-6 text-primary" />
                       <Translate>{subject.name}</Translate>
                     </CardTitle>
                     <CardDescription><Translate>{subject.description}</Translate></CardDescription>
@@ -46,3 +70,5 @@ export default function SubjectSelectionPage() {
     </>
   );
 }
+
+    

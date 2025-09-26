@@ -1,10 +1,12 @@
 
+
 export interface Subject {
   id: string;
   name: string;
   description: string;
   icon: React.ElementType;
   imageId: string;
+  iconName?: string;
 }
 
 export interface Lesson {
@@ -56,3 +58,5 @@ export interface LeaderboardEntry {
   user: User;
   xp: number;
 }
+
+    

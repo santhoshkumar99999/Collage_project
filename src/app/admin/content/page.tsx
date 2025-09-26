@@ -1,7 +1,8 @@
 
+
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { PageHeader } from '@/components/PageHeader';
 import { Button } from '@/components/ui/button';
 import { PlusCircle } from 'lucide-react';
@@ -16,8 +17,8 @@ import {
     SelectTrigger,
     SelectValue,
   } from '@/components/ui/select';
-import { subjects, lessons as initialLessons } from '@/lib/data';
-import type { Lesson } from '@/lib/types';
+import { lessons as initialLessons, addSubject, subjects as getSubjectsFromData } from '@/lib/data';
+import type { Lesson, Subject } from '@/lib/types';
 import {
     Table,
     TableBody,
@@ -33,13 +34,35 @@ import { useToast } from '@/hooks/use-toast';
 export default function AdminContentPage() {
   const { toast } = useToast();
   const [lessons, setLessons] = useState<Lesson[]>(initialLessons);
-  const [title, setTitle] = useState('');
-  const [subjectId, setSubjectId] = useState('');
-  const [description, setDescription] = useState('');
-  const [content, setContent] = useState('');
+  const [subjects, setSubjects] = useState<Subject[]>([]);
+
+  // State for new lesson
+  const [lessonTitle, setLessonTitle] = useState('');
+  const [lessonSubjectId, setLessonSubjectId] = useState('');
+  const [lessonDescription, setLessonDescription] = useState('');
+  const [lessonContent, setLessonContent] = useState('');
+
+  // State for new subject
+  const [subjectName, setSubjectName] = useState('');
+  const [subjectDescription, setSubjectDescription] = useState('');
+  
+  const refreshSubjects = () => {
+    // This is a trick to get client-side data
+    const currentSubjects = getSubjectsFromData;
+    setSubjects(currentSubjects);
+  }
+
+  useEffect(() => {
+    refreshSubjects();
+    window.addEventListener('storage', refreshSubjects);
+    return () => {
+        window.removeEventListener('storage', refreshSubjects);
+    }
+  }, []);
+
 
   const handleAddLesson = () => {
-    if (!title || !subjectId || !description || !content) {
+    if (!lessonTitle || !lessonSubjectId || !lessonDescription || !lessonContent) {
         toast({
             title: 'Missing Fields',
             description: 'Please fill out all fields to add a new lesson.',
@@ -50,23 +73,23 @@ export default function AdminContentPage() {
 
     const newLesson: Lesson = {
       id: `lesson-${Date.now()}`,
-      subjectId,
-      title,
-      description,
-      content,
+      subjectId: lessonSubjectId,
+      title: lessonTitle,
+      description: lessonDescription,
+      content: lessonContent,
     };
 
     setLessons([newLesson, ...lessons]);
 
     // Reset form
-    setTitle('');
-    setSubjectId('');
-    setDescription('');
-    setContent('');
+    setLessonTitle('');
+    setLessonSubjectId('');
+    setLessonDescription('');
+    setLessonContent('');
 
     toast({
         title: 'Lesson Added',
-        description: `"${title}" has been successfully added.`,
+        description: `"${lessonTitle}" has been successfully added.`,
     });
   };
 
@@ -78,12 +101,61 @@ export default function AdminContentPage() {
     });
   }
 
+  const handleAddSubject = () => {
+      if (!subjectName || !subjectDescription) {
+          toast({
+              title: 'Missing Fields',
+              description: 'Please provide a name and description for the new subject.',
+              variant: 'destructive',
+          });
+          return;
+      }
+      addSubject({ name: subjectName, description: subjectDescription });
+      toast({
+          title: 'Subject Added',
+          description: `"${subjectName}" has been successfully added.`,
+      });
+      setSubjectName('');
+      setSubjectDescription('');
+      // The `storage` event listener will handle re-rendering the subjects list
+  }
+
   return (
     <>
       <PageHeader title="Content Management" />
       <main className="flex-1 p-4 md:p-6">
         <div className="grid gap-6 lg:grid-cols-3">
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-1 space-y-6">
+             <Card>
+              <CardHeader>
+                <CardTitle>Add New Subject</CardTitle>
+                <CardDescription>Create a new subject category for lessons.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                 <div className="space-y-2">
+                  <Label htmlFor="subject-name">Subject Name</Label>
+                  <Input 
+                    id="subject-name"
+                    placeholder="e.g., History"
+                    value={subjectName}
+                    onChange={(e) => setSubjectName(e.target.value)}
+                  />
+                </div>
+                 <div className="space-y-2">
+                  <Label htmlFor="subject-description">Subject Description</Label>
+                  <Textarea
+                    id="subject-description"
+                    placeholder="A brief summary of the subject."
+                    value={subjectDescription}
+                    onChange={(e) => setSubjectDescription(e.target.value)}
+                  />
+                </div>
+                 <Button className="w-full" onClick={handleAddSubject}>
+                  <PlusCircle className="mr-2 h-4 w-4" /> Add Subject
+                </Button>
+              </CardContent>
+            </Card>
+
             <Card>
               <CardHeader>
                 <CardTitle>Add New Lesson</CardTitle>
@@ -95,13 +167,13 @@ export default function AdminContentPage() {
                   <Input 
                     id="title"
                     placeholder="e.g., Introduction to Photosynthesis"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
+                    value={lessonTitle}
+                    onChange={(e) => setLessonTitle(e.target.value)}
                   />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="subject">Subject</Label>
-                  <Select value={subjectId} onValueChange={setSubjectId}>
+                  <Select value={lessonSubjectId} onValueChange={setLessonSubjectId}>
                     <SelectTrigger id="subject">
                       <SelectValue placeholder="Select a subject" />
                     </SelectTrigger>
@@ -115,8 +187,8 @@ export default function AdminContentPage() {
                   <Textarea
                     id="description"
                     placeholder="A brief summary of the lesson."
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
+                    value={lessonDescription}
+                    onChange={(e) => setLessonDescription(e.target.value)}
                   />
                 </div>
                 <div className="space-y-2">
@@ -125,8 +197,8 @@ export default function AdminContentPage() {
                     id="content"
                     rows={6}
                     placeholder="The main content of the lesson."
-                    value={content}
-                    onChange={(e) => setContent(e.target.value)}
+                    value={lessonContent}
+                    onChange={(e) => setLessonContent(e.target.value)}
                   />
                 </div>
                 <Button className="w-full" onClick={handleAddLesson}>
@@ -157,7 +229,7 @@ export default function AdminContentPage() {
                                 <TableRow key={lesson.id}>
                                 <TableCell className="font-medium">{lesson.title}</TableCell>
                                 <TableCell>
-                                    <Badge variant="outline">{subject?.name}</Badge>
+                                    <Badge variant="outline">{subject?.name || 'N/A'}</Badge>
                                 </TableCell>
                                 <TableCell className="text-right space-x-2">
                                     <Button variant="outline" size="sm" disabled>Edit</Button>
@@ -176,3 +248,5 @@ export default function AdminContentPage() {
     </>
   );
 }
+
+    
