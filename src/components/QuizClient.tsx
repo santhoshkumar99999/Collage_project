@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Quiz, QuizQuestion } from '@/lib/types';
 import { Button } from '@/components/ui/button';
@@ -10,9 +10,10 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
-import { CheckCircle, XCircle, Lightbulb, PartyPopper, Frown, Award } from 'lucide-react';
+import { CheckCircle, XCircle, Lightbulb, PartyPopper, Frown, Award, Volume2, LoaderCircle } from 'lucide-react';
 import { updateUser, getUser, badges, User, lessons } from '@/lib/data';
 import { Translate } from './Translate';
+import { textToSpeech } from '@/ai/flows/tts-flow';
 
 export function QuizClient({ quiz }: { quiz: Quiz }) {
   const router = useRouter();
@@ -22,6 +23,8 @@ export function QuizClient({ quiz }: { quiz: Quiz }) {
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [score, setScore] = useState(0);
   const [isFinished, setIsFinished] = useState(false);
+  const [isAudioLoading, setIsAudioLoading] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     const user = getUser();
@@ -114,6 +117,22 @@ export function QuizClient({ quiz }: { quiz: Quiz }) {
       toast({ title: 'No hint available for this question.' });
     }
   };
+
+  const handlePlayAudio = async (text: string) => {
+    setIsAudioLoading(true);
+    try {
+        const { media } = await textToSpeech(text);
+        if (audioRef.current) {
+            audioRef.current.src = media;
+            audioRef.current.play();
+        }
+    } catch (error) {
+        console.error("Error generating speech:", error);
+        toast({ title: "Could not play audio", variant: "destructive" });
+    } finally {
+        setIsAudioLoading(false);
+    }
+  };
   
   if (isFinished) {
     const isSuccess = score / quiz.questions.length >= 0.7;
@@ -147,7 +166,19 @@ export function QuizClient({ quiz }: { quiz: Quiz }) {
             <Progress value={((currentQuestionIndex + 1) / quiz.questions.length) * 100} className="w-full" />
             <p className="text-sm text-muted-foreground mt-2"><Translate>Question</Translate> {currentQuestionIndex + 1} <Translate>of</Translate> {quiz.questions.length}</p>
         </div>
-        <CardTitle className="text-2xl font-headline"><Translate>{currentQuestion.question}</Translate></CardTitle>
+        <div className="flex items-center gap-2">
+            <CardTitle className="text-2xl font-headline"><Translate>{currentQuestion.question}</Translate></CardTitle>
+             <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => handlePlayAudio(currentQuestion.question)}
+              disabled={isAudioLoading}
+              className="h-8 w-8"
+            >
+              {isAudioLoading ? <LoaderCircle className="animate-spin" /> : <Volume2 />}
+              <span className="sr-only">Read question</span>
+            </Button>
+        </div>
       </CardHeader>
       <CardContent>
         <RadioGroup onValueChange={setSelectedAnswer} value={selectedAnswer ?? undefined}>
@@ -169,6 +200,7 @@ export function QuizClient({ quiz }: { quiz: Quiz }) {
           {currentQuestionIndex === quiz.questions.length - 1 ? <Translate>Finish</Translate> : <Translate>Next</Translate>}
         </Button>
       </CardFooter>
+      <audio ref={audioRef} className="hidden" />
     </Card>
   );
 }
