@@ -17,9 +17,21 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { Button } from '@/components/ui/button';
+import { QrCode } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { StudentQrScanner } from '@/components/StudentQrScanner';
+
 
 export default function AdminStudentsPage() {
   const [users, setUsers] = useState<User[]>([]);
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -64,7 +76,22 @@ export default function AdminStudentsPage() {
 
   return (
     <>
-      <PageHeader title="Student Management" />
+      <PageHeader title="Student Management">
+        <Dialog open={isScannerOpen} onOpenChange={setIsScannerOpen}>
+          <DialogTrigger asChild>
+            <Button>
+              <QrCode className="mr-2 h-4 w-4" />
+              Scan Student QR
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Scan Student QR Code</DialogTitle>
+            </DialogHeader>
+            <StudentQrScanner onScanSuccess={() => setIsScannerOpen(false)} />
+          </DialogContent>
+        </Dialog>
+      </PageHeader>
       <main className="flex-1 p-4 md:p-6">
         <Card>
           <CardContent>
