@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Bot, Send, X, LoaderCircle, Volume2, PlayCircle } from 'lucide-react';
+import { Bot, Send, X, LoaderCircle, Volume2, PlayCircle, Languages } from 'lucide-react';
 import { answerQuestion } from '@/ai/flows/lesson-chat-flow';
 import { textToSpeech } from '@/ai/flows/tts-flow';
 import { cn } from '@/lib/utils';
@@ -35,7 +35,7 @@ export function Chatbot({ lessonContent }: { lessonContent: string }) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isBotLoading, setIsBotLoading] = useState(false);
-  const [language, setLanguage] = useState('English');
+  const [language, setLanguage] = useState<string | undefined>(undefined);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -124,85 +124,115 @@ export function Chatbot({ lessonContent }: { lessonContent: string }) {
               <CardTitle className="flex items-center gap-2">
                 <Bot /> Lesson Assistant
               </CardTitle>
-               <Select value={language} onValueChange={setLanguage}>
-                <SelectTrigger className="w-[120px]">
-                  <SelectValue placeholder="Language" />
-                </SelectTrigger>
-                <SelectContent>
-                  {supportedLanguages.map(lang => (
-                    <SelectItem key={lang.value} value={lang.value}>{lang.label}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+               {language && (
+                 <Select value={language} onValueChange={setLanguage}>
+                    <SelectTrigger className="w-[120px]">
+                    <SelectValue placeholder="Language" />
+                    </SelectTrigger>
+                    <SelectContent>
+                    {supportedLanguages.map(lang => (
+                        <SelectItem key={lang.value} value={lang.value}>{lang.label}</SelectItem>
+                    ))}
+                    </SelectContent>
+                </Select>
+               )}
             </CardHeader>
             <CardContent className="flex-1 overflow-hidden p-0">
-                <ScrollArea className="h-full p-4" ref={scrollAreaRef}>
-                    <div className="space-y-4">
-                    {messages.map((message, index) => (
-                        <div
-                        key={index}
-                        className={cn(
-                            'flex gap-3 text-sm',
-                            message.role === 'user' ? 'justify-end' : 'justify-start'
-                        )}
-                        >
-                        {message.role === 'model' && <Avatar className="w-8 h-8"><AvatarFallback><Bot size={20} /></AvatarFallback></Avatar>}
-                        <div
-                            className={cn(
-                            'rounded-lg px-3 py-2 max-w-[80%]',
-                            message.role === 'user'
-                                ? 'bg-primary text-primary-foreground'
-                                : 'bg-muted'
-                            )}
-                        >
-                            {message.content}
-                             {message.role === 'model' && (
-                                <div className="mt-2">
-                                {message.isAudioLoading && <LoaderCircle className="animate-spin h-4 w-4 text-muted-foreground" />}
-                                {message.audioUrl && !message.isAudioLoading && (
-                                    <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => playAudio(message.audioUrl!)}>
-                                        <PlayCircle className="h-4 w-4" />
-                                    </Button>
-                                )}
-                                {!message.audioUrl && !message.isAudioLoading && (
-                                     <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => generateAndPlayAudio(message.content, index)}>
-                                         <Volume2 className="h-4 w-4" />
-                                     </Button>
-                                )}
-                                </div>
-                            )}
-                        </div>
-                        {message.role === 'user' && <Avatar className="w-8 h-8"><AvatarImage src={currentUser.avatarUrl} /><AvatarFallback>{currentUser.name.charAt(0)}</AvatarFallback></Avatar>}
-                        </div>
-                    ))}
-                    {isBotLoading && (
-                        <div className="flex justify-start gap-3 text-sm">
-                             <Avatar className="w-8 h-8"><AvatarFallback><Bot size={20} /></AvatarFallback></Avatar>
-                             <div className="rounded-lg px-3 py-2 bg-muted flex items-center">
-                                <LoaderCircle className="animate-spin h-4 w-4" />
-                             </div>
-                        </div>
-                    )}
+                { !language ? (
+                    <div className="h-full flex flex-col items-center justify-center p-4 text-center">
+                        <Languages className="w-12 h-12 text-muted-foreground mb-4" />
+                        <h3 className="text-lg font-semibold mb-2">Select a Language</h3>
+                        <p className="text-muted-foreground mb-4">Please choose your preferred language to start the chat.</p>
+                        <Select onValueChange={setLanguage}>
+                            <SelectTrigger className="w-[200px]">
+                                <SelectValue placeholder="Choose a language" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {supportedLanguages.map(lang => (
+                                    <SelectItem key={lang.value} value={lang.value}>{lang.label}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </div>
-                </ScrollArea>
+                ) : (
+                    <ScrollArea className="h-full p-4" ref={scrollAreaRef}>
+                        <div className="space-y-4">
+                        {messages.length === 0 && (
+                            <div className="flex justify-start gap-3 text-sm">
+                                <Avatar className="w-8 h-8"><AvatarFallback><Bot size={20} /></AvatarFallback></Avatar>
+                                <div className='rounded-lg px-3 py-2 bg-muted'>
+                                    Hello! How can I help you with this lesson?
+                                </div>
+                            </div>
+                        )}
+                        {messages.map((message, index) => (
+                            <div
+                            key={index}
+                            className={cn(
+                                'flex gap-3 text-sm',
+                                message.role === 'user' ? 'justify-end' : 'justify-start'
+                            )}
+                            >
+                            {message.role === 'model' && <Avatar className="w-8 h-8"><AvatarFallback><Bot size={20} /></AvatarFallback></Avatar>}
+                            <div
+                                className={cn(
+                                'rounded-lg px-3 py-2 max-w-[80%]',
+                                message.role === 'user'
+                                    ? 'bg-primary text-primary-foreground'
+                                    : 'bg-muted'
+                                )}
+                            >
+                                {message.content}
+                                {message.role === 'model' && (
+                                    <div className="mt-2">
+                                    {message.isAudioLoading && <LoaderCircle className="animate-spin h-4 w-4 text-muted-foreground" />}
+                                    {message.audioUrl && !message.isAudioLoading && (
+                                        <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => playAudio(message.audioUrl!)}>
+                                            <PlayCircle className="h-4 w-4" />
+                                        </Button>
+                                    )}
+                                    {!message.audioUrl && !message.isAudioLoading && (
+                                        <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => generateAndPlayAudio(message.content, index)}>
+                                            <Volume2 className="h-4 w-4" />
+                                        </Button>
+                                    )}
+                                    </div>
+                                )}
+                            </div>
+                            {message.role === 'user' && <Avatar className="w-8 h-8"><AvatarImage src={currentUser.avatarUrl} /><AvatarFallback>{currentUser.name.charAt(0)}</AvatarFallback></Avatar>}
+                            </div>
+                        ))}
+                        {isBotLoading && (
+                            <div className="flex justify-start gap-3 text-sm">
+                                <Avatar className="w-8 h-8"><AvatarFallback><Bot size={20} /></AvatarFallback></Avatar>
+                                <div className="rounded-lg px-3 py-2 bg-muted flex items-center">
+                                    <LoaderCircle className="animate-spin h-4 w-4" />
+                                </div>
+                            </div>
+                        )}
+                        </div>
+                    </ScrollArea>
+                )}
             </CardContent>
-            <CardFooter>
-              <div className="flex w-full items-center space-x-2">
-                <Input
-                  id="message"
-                  placeholder="Ask a question..."
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  disabled={isBotLoading}
-                  autoComplete='off'
-                />
-                <Button type="submit" size="icon" onClick={handleSend} disabled={isBotLoading}>
-                  <Send className="h-4 w-4" />
-                  <span className="sr-only">Send</span>
-                </Button>
-              </div>
-            </CardFooter>
+            {language && (
+                <CardFooter>
+                <div className="flex w-full items-center space-x-2">
+                    <Input
+                    id="message"
+                    placeholder="Ask a question..."
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    disabled={isBotLoading}
+                    autoComplete='off'
+                    />
+                    <Button type="submit" size="icon" onClick={handleSend} disabled={isBotLoading}>
+                    <Send className="h-4 w-4" />
+                    <span className="sr-only">Send</span>
+                    </Button>
+                </div>
+                </CardFooter>
+            )}
           </Card>
         </div>
       )}
