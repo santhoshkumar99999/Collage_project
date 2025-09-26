@@ -18,7 +18,12 @@ import { useLanguage } from '@/hooks/use-language';
 import { translateText } from '@/ai/flows/translate-flow';
 import { Chatbot } from './Chatbot';
 
-export function QuizClient({ quiz }: { quiz: Quiz }) {
+interface QuizClientProps {
+    quiz: Quiz;
+    isTournament?: boolean;
+}
+
+export function QuizClient({ quiz, isTournament = false }: QuizClientProps) {
   const router = useRouter();
   const { toast } = useToast();
   const { language } = useLanguage();
@@ -76,7 +81,7 @@ export function QuizClient({ quiz }: { quiz: Quiz }) {
     let leveledUp = false;
     let newCompletedLessons = [...(currentUser.completedLessons || [])];
 
-    if (!newCompletedLessons.includes(quiz.lessonId)) {
+    if (!isTournament && !newCompletedLessons.includes(quiz.lessonId)) {
       newCompletedLessons.push(quiz.lessonId);
     }
 
@@ -182,11 +187,30 @@ export function QuizClient({ quiz }: { quiz: Quiz }) {
           </div>
         </CardContent>
         <CardFooter className="justify-center gap-2">
-          <Button onClick={() => router.back()}><Translate>Back to Lesson</Translate></Button>
-          <Button variant="outline" onClick={() => window.location.reload()}><Translate>Try Again</Translate></Button>
+           {isTournament ? (
+                <Button onClick={() => window.location.reload()}><Translate>Play Another Tournament</Translate></Button>
+           ) : (
+                <Button onClick={() => router.back()}><Translate>Back to Lesson</Translate></Button>
+           )}
+          <Button variant="outline" onClick={() => router.push('/')}><Translate>Back to Dashboard</Translate></Button>
         </CardFooter>
       </Card>
     );
+  }
+
+  if (!currentQuestion) {
+    return (
+        <Card className="w-full max-w-2xl mx-auto">
+            <CardHeader className="items-center">
+                <Frown className="w-16 h-16 text-muted-foreground" />
+                <CardTitle className="text-3xl font-bold font-headline">Quiz Error</CardTitle>
+                <CardDescription>Could not load the quiz questions.</CardDescription>
+            </CardHeader>
+            <CardFooter className="justify-center">
+                 <Button onClick={() => router.push('/')}><Translate>Back to Dashboard</Translate></Button>
+            </CardFooter>
+        </Card>
+    )
   }
 
   return (

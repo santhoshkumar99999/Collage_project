@@ -13,6 +13,7 @@ import {
   Settings,
   LogOut,
   MessageSquareHeart,
+  Swords,
 } from "lucide-react";
 
 import {
@@ -41,6 +42,7 @@ import { FeedbackDialog } from "./FeedbackDialog";
 
 const menuItems = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/tournament", label: "Tournament", icon: Swords },
   { href: "/leaderboard", label: "Leaderboard", icon: Trophy },
   { href: "/profile", label: "Profile", icon: User },
 ];

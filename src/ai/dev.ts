@@ -5,3 +5,4 @@ import './flows/quiz-chat-flow';
 import './flows/tts-flow';
 import './flows/translate-flow';
 import './flows/translate-batch-flow';
+import './flows/generate-quiz-flow';
