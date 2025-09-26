@@ -21,30 +21,12 @@ export function QuizClient({ quiz }: { quiz: Quiz }) {
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [score, setScore] = useState(0);
   const [isFinished, setIsFinished] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(15 * quiz.questions.length); // 15 seconds per question
 
   useEffect(() => {
     setCurrentUser(getUser());
   }, []);
 
   const currentQuestion = quiz.questions[currentQuestionIndex];
-
-  useEffect(() => {
-    if (isFinished) return;
-    if (timeLeft === 0) {
-      handleFinish();
-      toast({
-        title: "Time's Up!",
-        description: "You ran out of time. Better luck next time!",
-        variant: "destructive",
-      });
-      return;
-    }
-    const timer = setInterval(() => {
-      setTimeLeft((prev) => prev - 1);
-    }, 1000);
-    return () => clearInterval(timer);
-  }, [timeLeft, isFinished, toast]);
 
   const handleNext = () => {
     if (selectedAnswer === null) {
@@ -154,7 +136,6 @@ export function QuizClient({ quiz }: { quiz: Quiz }) {
     <Card className="w-full max-w-2xl mx-auto">
       <CardHeader>
         <div className="mb-4">
-            <p className="text-sm text-muted-foreground mb-1 text-right">{Math.floor(timeLeft / 60)}:{('0' + timeLeft % 60).slice(-2)}</p>
             <Progress value={((currentQuestionIndex + 1) / quiz.questions.length) * 100} className="w-full" />
             <p className="text-sm text-muted-foreground mt-2">Question {currentQuestionIndex + 1} of {quiz.questions.length}</p>
         </div>
