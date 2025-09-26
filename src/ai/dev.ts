@@ -6,3 +6,4 @@ import './flows/tts-flow';
 import './flows/translate-flow';
 import './flows/translate-batch-flow';
 import './flows/generate-quiz-flow';
+import './flows/generate-subject-description-flow';

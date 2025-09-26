@@ -5,7 +5,7 @@
 import { useState, useEffect } from 'react';
 import { PageHeader } from '@/components/PageHeader';
 import { Button } from '@/components/ui/button';
-import { PlusCircle } from 'lucide-react';
+import { PlusCircle, LoaderCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -29,12 +29,14 @@ import {
   } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
+import { generateSubjectDescription } from '@/ai/flows/generate-subject-description-flow';
 
 
 export default function AdminContentPage() {
   const { toast } = useToast();
   const [lessons, setLessons] = useState<Lesson[]>(initialLessons);
   const [subjects, setSubjects] = useState<Subject[]>([]);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   // State for new lesson
   const [lessonTitle, setLessonTitle] = useState('');
@@ -101,16 +103,42 @@ export default function AdminContentPage() {
     });
   }
 
-  const handleAddSubject = () => {
-      if (!subjectName || !subjectDescription) {
+  const handleAddSubject = async () => {
+      if (!subjectName) {
           toast({
               title: 'Missing Fields',
-              description: 'Please provide a name and description for the new subject.',
+              description: 'Please provide a name for the new subject.',
               variant: 'destructive',
           });
           return;
       }
-      addSubject({ name: subjectName, description: subjectDescription });
+
+      let descriptionToSave = subjectDescription;
+
+      if (!subjectDescription.trim()) {
+        setIsGenerating(true);
+        try {
+            const result = await generateSubjectDescription({ subjectName });
+            descriptionToSave = result.description;
+             toast({
+                title: 'Description Generated',
+                description: 'AI has created a description for you.',
+            });
+        } catch (error) {
+            console.error("Failed to generate description:", error);
+            toast({
+                title: 'AI Error',
+                description: 'Could not generate a description. Please write one manually.',
+                variant: 'destructive',
+            });
+            setIsGenerating(false);
+            return;
+        } finally {
+            setIsGenerating(false);
+        }
+      }
+
+      addSubject({ name: subjectName, description: descriptionToSave });
       toast({
           title: 'Subject Added',
           description: `"${subjectName}" has been successfully added.`,
@@ -129,7 +157,7 @@ export default function AdminContentPage() {
              <Card>
               <CardHeader>
                 <CardTitle>Add New Subject</CardTitle>
-                <CardDescription>Create a new subject category for lessons.</CardDescription>
+                <CardDescription>Create a new subject category for lessons. If you leave the description blank, AI will write one for you.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                  <div className="space-y-2">
@@ -145,13 +173,14 @@ export default function AdminContentPage() {
                   <Label htmlFor="subject-description">Subject Description</Label>
                   <Textarea
                     id="subject-description"
-                    placeholder="A brief summary of the subject."
+                    placeholder="Optional. AI will generate this if left empty."
                     value={subjectDescription}
                     onChange={(e) => setSubjectDescription(e.target.value)}
                   />
                 </div>
-                 <Button className="w-full" onClick={handleAddSubject}>
-                  <PlusCircle className="mr-2 h-4 w-4" /> Add Subject
+                 <Button className="w-full" onClick={handleAddSubject} disabled={isGenerating}>
+                  {isGenerating ? <LoaderCircle className="mr-2 h-4 w-4 animate-spin" /> : <PlusCircle className="mr-2 h-4 w-4" /> }
+                  {isGenerating ? "Generating Description..." : "Add Subject"}
                 </Button>
               </CardContent>
             </Card>
@@ -195,7 +224,6 @@ export default function AdminContentPage() {
                   <Label htmlFor="content">Full Content</Label>
                   <Textarea
                     id="content"
-                    rows={6}
                     placeholder="The main content of the lesson."
                     value={lessonContent}
                     onChange={(e) => setLessonContent(e.target.value)}
