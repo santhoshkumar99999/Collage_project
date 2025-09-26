@@ -9,7 +9,7 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
-import wav from 'wav';
+import * as wav from 'wav';
 
 const TextToSpeechInputSchema = z.string();
 export type TextToSpeechInput = z.infer<typeof TextToSpeechInputSchema>;
