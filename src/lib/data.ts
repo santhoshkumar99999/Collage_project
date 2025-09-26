@@ -15,6 +15,8 @@ export let users: User[] = [
   {
     id: 'user-1',
     name: 'Aarav Sharma',
+    email: 'student@example.com',
+    password: 'password',
     avatarUrl: 'https://picsum.photos/seed/user1/100/100',
     level: 5,
     xp: 450,
@@ -25,6 +27,8 @@ export let users: User[] = [
   {
     id: 'user-2',
     name: 'Priya Patel',
+    email: 'priya@example.com',
+    password: 'password',
     avatarUrl: 'https://picsum.photos/seed/user2/100/100',
     level: 8,
     xp: 720,
@@ -35,6 +39,8 @@ export let users: User[] = [
     {
     id: 'user-3',
     name: 'Rohan Singh',
+    email: 'rohan@example.com',
+    password: 'password',
     avatarUrl: 'https://picsum.photos/seed/user3/100/100',
     level: 3,
     xp: 210,
@@ -42,21 +48,21 @@ export let users: User[] = [
     badges: [badges[0]],
     completedLessons: [],
   },
-  { id: 'user-4', name: 'Saanvi Gupta', avatarUrl: 'https://picsum.photos/seed/user4/100/100', level: 7, xp: 650, xpToNextLevel: 700, badges: [badges[0], badges[1]], completedLessons: ['newtons-laws', 'cell-structure'] },
-  { id: 'user-5', name: 'Arjun Reddy', avatarUrl: 'https://picsum.photos/seed/user5/100/100', level: 6, xp: 550, xpToNextLevel: 600, badges: [badges[0]], completedLessons: ['ml-intro'] },
+  { id: 'user-4', name: 'Saanvi Gupta', email: 'saanvi@example.com', password: 'password', avatarUrl: 'https://picsum.photos/seed/user4/100/100', level: 7, xp: 650, xpToNextLevel: 700, badges: [badges[0], badges[1]], completedLessons: ['newtons-laws', 'cell-structure'] },
+  { id: 'user-5', name: 'Arjun Reddy', email: 'arjun@example.com', password: 'password', avatarUrl: 'https://picsum.photos/seed/user5/100/100', level: 6, xp: 550, xpToNextLevel: 600, badges: [badges[0]], completedLessons: ['ml-intro'] },
+  { id: 'user-teacher', name: 'Teacher', email: 'teacher@example.com', password: 'password', avatarUrl: 'https://picsum.photos/seed/teacher/100/100', level: 99, xp: 9999, xpToNextLevel: 10000, badges: badges, completedLessons: [] },
 ];
 
-// In a real app, this would be a proper user management system.
-// For this prototype, we'll use localStorage to persist user data.
-const CURRENT_USER_ID = 'user-1';
+const CURRENT_USER_ID_KEY = 'currentUser_id';
 
 function rehydrateUserBadges(user: User): User {
     return {
         ...user,
         badges: user.badges.map(badge => {
+            if (typeof badge === 'string') return badges.find(b => b.id === badge) || badge;
             const fullBadge = badges.find(b => b.id === (badge as any).id);
             return fullBadge || badge;
-        }),
+        }).filter(Boolean) as Badge[],
         completedLessons: user.completedLessons || [],
     };
 }
@@ -71,13 +77,18 @@ function getUsers(): User[] {
             } catch (e) {
                 console.error("Failed to parse users from localStorage", e);
             }
+        } else {
+             localStorage.setItem('users', JSON.stringify(users));
         }
       }
       return users.map(rehydrateUserBadges);
 }
 
-export function getUser(): User {
-  return getUsers().find(u => u.id === CURRENT_USER_ID)!;
+export function getUser(): User | null {
+    if (typeof window === 'undefined') return null;
+    const currentUserId = localStorage.getItem(CURRENT_USER_ID_KEY);
+    if (!currentUserId) return null;
+    return getUsers().find(u => u.id === currentUserId) || null;
 }
 
 export function updateUser(updatedUser: User) {
@@ -98,14 +109,16 @@ export function addUser({ name, email, password }: { name: string; email: string
       const allUsers = getUsers();
       
       // Check if user already exists
-      if (allUsers.some(u => u.name.toLowerCase() === name.toLowerCase())) {
-        throw new Error('A user with this name already exists.');
+      if (allUsers.some(u => u.email.toLowerCase() === email.toLowerCase())) {
+        throw new Error('A user with this email already exists.');
       }
       
       const userId = `user-${Date.now()}`;
       const newUser: User = {
         id: userId,
         name,
+        email,
+        password,
         avatarUrl: `https://picsum.photos/seed/${userId}/100/100`,
         level: 1,
         xp: 0,
@@ -121,6 +134,33 @@ export function addUser({ name, email, password }: { name: string; email: string
       return newUser;
     }
     throw new Error('This function can only be called on the client-side.');
+}
+
+export function loginUser({ email, password }: { email: string, password?: string }) {
+    if (typeof window !== 'undefined') {
+        const allUsers = getUsers();
+        const userToLogin = allUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
+
+        if (!userToLogin) {
+            throw new Error('No user found with this email.');
+        }
+
+        if (userToLogin.password !== password) {
+            throw new Error('Incorrect password.');
+        }
+        
+        localStorage.setItem(CURRENT_USER_ID_KEY, userToLogin.id);
+        window.dispatchEvent(new Event("storage")); // Notify components of user change
+        return userToLogin;
+    }
+    throw new Error('Login can only be performed on the client-side.');
+}
+
+export function logoutUser() {
+    if (typeof window !== 'undefined') {
+        localStorage.removeItem(CURRENT_USER_ID_KEY);
+        window.dispatchEvent(new Event("storage"));
+    }
 }
 
 

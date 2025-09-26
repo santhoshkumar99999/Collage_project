@@ -24,8 +24,14 @@ export function QuizClient({ quiz }: { quiz: Quiz }) {
   const [isFinished, setIsFinished] = useState(false);
 
   useEffect(() => {
-    setCurrentUser(getUser());
-  }, []);
+    const user = getUser();
+    if (user) {
+      setCurrentUser(user);
+    } else {
+      // Redirect to login if no user is found
+      router.push('/login');
+    }
+  }, [router]);
 
   const currentQuestion = quiz.questions[currentQuestionIndex];
 
@@ -68,7 +74,8 @@ export function QuizClient({ quiz }: { quiz: Quiz }) {
     }
 
     // Add Scholar badge if they get a perfect score
-    if(finalScore === quiz.questions.length && !currentUser.badges.some(b => b.id === 'scholar')){
+    const hasScholarBadge = currentUser.badges.some(b => b.id === 'scholar');
+    if(finalScore === quiz.questions.length && !hasScholarBadge){
       const scholarBadge = badges.find(b => b.id === 'scholar');
       if (scholarBadge) {
         newBadges.push(scholarBadge);

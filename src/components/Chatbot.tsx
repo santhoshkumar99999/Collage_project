@@ -12,6 +12,7 @@ import { textToSpeech } from '@/ai/flows/tts-flow';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { getUser } from '@/lib/data';
+import type { User } from '@/lib/types';
 import { useLanguage } from '@/hooks/use-language';
 import { LanguageSelector } from './LanguageSelector';
 
@@ -31,14 +32,17 @@ export function Chatbot({ lessonContent }: { lessonContent: string }) {
   const [isBotLoading, setIsBotLoading] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const currentUser = getUser();
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [hasSelectedLanguage, setHasSelectedLanguage] = useState(false);
 
   useEffect(() => {
-    if (localStorage.getItem('language')) {
+    setCurrentUser(getUser());
+    const storedLanguage = localStorage.getItem('language');
+    if (storedLanguage) {
+      setLanguage(storedLanguage);
       setHasSelectedLanguage(true);
     }
-  }, []);
+  }, [setLanguage]);
   
   useEffect(() => {
     if (language) {

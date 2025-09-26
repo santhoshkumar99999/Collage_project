@@ -25,8 +25,9 @@ import {
 } from "@/components/ui/sidebar";
 import { Logo } from "./Logo";
 import { Separator } from "./ui/separator";
-import { getUser } from "@/lib/data";
+import { getUser, logoutUser } from "@/lib/data";
 import { useEffect, useState } from "react";
+import type { User as UserType } from "@/lib/types";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -44,16 +45,27 @@ const menuItems = [
 
 export function AppSidebar() {
   const pathname = usePathname();
-  // In a real app, you'd have a proper auth state.
-  // We'll simulate it by checking if a user exists.
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const currentUser = getUser();
+  const [currentUser, setCurrentUser] = useState<UserType | null>(null);
+
+  const refreshUser = () => {
+    setCurrentUser(getUser());
+  }
 
   useEffect(() => {
-    // This check runs on the client side
-    const user = getUser();
-    setIsAuthenticated(!!user);
-  }, [pathname]); // Rerun on path change to simulate login/logout
+    refreshUser();
+    // Also listen for storage changes to update the user
+    window.addEventListener('storage', refreshUser);
+    return () => {
+        window.removeEventListener('storage', refreshUser);
+    }
+  }, [pathname]);
+
+  const handleLogout = () => {
+    logoutUser();
+    refreshUser();
+    // No need to push to /login, the component will re-render to show the login button
+  };
+
 
   return (
     <Sidebar>
@@ -62,7 +74,7 @@ export function AppSidebar() {
       </SidebarHeader>
       <SidebarContent>
         <SidebarMenu>
-          {isAuthenticated ? (
+          {currentUser ? (
             menuItems.map((item) => (
               <SidebarMenuItem key={item.label}>
                 <SidebarMenuButton
@@ -91,7 +103,7 @@ export function AppSidebar() {
       </SidebarContent>
       <SidebarFooter>
         <Separator className="my-2" />
-        {isAuthenticated && currentUser && (
+        {currentUser && (
            <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <SidebarMenuButton variant="ghost" className="h-auto p-2 w-full justify-start">
@@ -117,7 +129,7 @@ export function AppSidebar() {
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-               <DropdownMenuItem asChild>
+               <DropdownMenuItem onClick={handleLogout} asChild>
                  <Link href="/login">
                   <LogOut className="mr-2" />
                   Logout

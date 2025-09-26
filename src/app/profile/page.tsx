@@ -2,6 +2,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import QRCode from "react-qr-code";
 import { PageHeader } from '@/components/PageHeader';
 import { getUser, updateUser, User, lessons, subjects } from '@/lib/data';
@@ -26,34 +27,32 @@ import { Translate } from '@/components/Translate';
 
 export default function ProfilePage() {
   const { toast } = useToast();
+  const router = useRouter();
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState('');
   const [profileUrl, setProfileUrl] = useState('');
 
-  useEffect(() => {
-    const user = getUser();
-    setCurrentUser(user);
-    if (user) {
-      setName(user.name);
-      setProfileUrl(`${window.location.origin}/profile/${user.id}`);
-    }
-  }, []);
-
   const refreshUser = () => {
     const user = getUser();
-    setCurrentUser(user);
-    if (user) {
+     if (user) {
+      setCurrentUser(user);
       setName(user.name);
+      setProfileUrl(`${window.location.origin}/profile/${user.id}`);
+    } else {
+      // If no user is logged in, redirect to login
+      router.push('/login');
     }
   };
 
   useEffect(() => {
+    refreshUser();
     window.addEventListener('storage', refreshUser);
     return () => {
       window.removeEventListener('storage', refreshUser);
     }
-  }, []);
+  }, [router]);
+
 
   const learnedSubjects = currentUser ? 
     subjects.filter(subject => 

@@ -24,6 +24,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { logoutUser } from '@/lib/data';
 
 
 const adminMenuItems = [
@@ -33,6 +34,10 @@ const adminMenuItems = [
 ];
 
 function AdminSidebar() {
+    const handleLogout = () => {
+        logoutUser();
+    };
+
     return (
         <Sidebar>
             <SidebarHeader>
@@ -73,7 +78,7 @@ function AdminSidebar() {
                         </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem asChild>
+                    <DropdownMenuItem onClick={handleLogout} asChild>
                         <Link href="/login">
                             <LogOut className="mr-2" />
                             Logout
