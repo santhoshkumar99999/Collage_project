@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { subjects } from '@/lib/data';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { PageHeader } from '@/components/PageHeader';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
+import imageData from '@/lib/placeholder-images.json';
 import { Translate } from '@/components/Translate';
 
 export default function SubjectSelectionPage() {
@@ -14,7 +14,7 @@ export default function SubjectSelectionPage() {
       <main className="flex-1 p-4 md:p-6">
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {subjects.map((subject) => {
-            const placeholder = PlaceHolderImages.find(p => p.id === subject.imageId);
+            const placeholder = imageData.placeholderImages.find(p => p.id === subject.imageId);
             return (
               <Link href={`/subjects/${subject.id}`} key={subject.id}>
                 <Card className="h-full overflow-hidden transition-transform duration-300 ease-in-out hover:-translate-y-2 hover:shadow-2xl">
