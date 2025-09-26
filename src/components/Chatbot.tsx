@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Bot, Send, X, LoaderCircle, PlayCircle, Languages, Volume2 } from 'lucide-react';
+import { Bot, Send, X, LoaderCircle, PlayCircle, Languages, Volume2, Mic, MicOff } from 'lucide-react';
 import { answerQuestion as answerLessonQuestion } from '@/ai/flows/lesson-chat-flow';
 import { answerQuizQuestion } from '@/ai/flows/quiz-chat-flow';
 import { textToSpeech } from '@/ai/flows/tts-flow';
@@ -16,6 +16,7 @@ import { getUser } from '@/lib/data';
 import type { User } from '@/lib/types';
 import { useLanguage } from '@/hooks/use-language';
 import { LanguageSelector } from './LanguageSelector';
+import { useSpeechRecognition } from '@/hooks/use-speech-recognition';
 
 
 interface Message {
@@ -33,7 +34,7 @@ interface ChatbotProps {
 const audioCache = new Map<string, string>();
 
 export function Chatbot({ context, flowType }: ChatbotProps) {
-  const { language, setLanguage, supportedLanguages } = useLanguage();
+  const { language } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
@@ -43,14 +44,15 @@ export function Chatbot({ context, flowType }: ChatbotProps) {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [hasSelectedLanguage, setHasSelectedLanguage] = useState(false);
 
+  const { isListening, transcript, startListening, stopListening, isSupported } = useSpeechRecognition();
+
   useEffect(() => {
     setCurrentUser(getUser());
     const storedLanguage = localStorage.getItem('language');
     if (storedLanguage) {
-      setLanguage(storedLanguage);
       setHasSelectedLanguage(true);
     }
-  }, [setLanguage]);
+  }, []);
   
   useEffect(() => {
     if (language) {
@@ -64,6 +66,12 @@ export function Chatbot({ context, flowType }: ChatbotProps) {
       scrollAreaRef.current.scrollTo({ top: scrollAreaRef.current.scrollHeight, behavior: 'smooth' });
     }
   }, [messages]);
+
+  useEffect(() => {
+    if (transcript) {
+        setInput(transcript);
+    }
+  }, [transcript]);
   
   const generateAndPlayAudio = async (text: string, messageIndex: number) => {
     const cacheKey = `${language}:${text}`;
@@ -90,6 +98,7 @@ export function Chatbot({ context, flowType }: ChatbotProps) {
 
   const handleSend = async () => {
     if (!input.trim() || !context) return;
+    if (isListening) stopListening();
 
     const userMessage: Message = { role: 'user', content: input };
     setMessages((prev) => [...prev, userMessage]);
@@ -140,6 +149,14 @@ export function Chatbot({ context, flowType }: ChatbotProps) {
     if (audioRef.current) {
         audioRef.current.src = audioUrl;
         audioRef.current.play();
+    }
+  };
+
+  const handleMicClick = () => {
+    if (isListening) {
+      stopListening();
+    } else {
+      startListening();
     }
   };
 
@@ -237,13 +254,19 @@ export function Chatbot({ context, flowType }: ChatbotProps) {
                 <div className="flex w-full items-center space-x-2">
                     <Input
                     id="message"
-                    placeholder="Ask a question..."
+                    placeholder={isListening ? "Listening..." : "Ask a question..."}
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={handleKeyDown}
                     disabled={isBotLoading || !context}
                     autoComplete='off'
                     />
+                     {isSupported && (
+                        <Button type="button" size="icon" onClick={handleMicClick} variant={isListening ? 'destructive' : 'outline'}>
+                            {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+                            <span className="sr-only">{isListening ? 'Stop listening' : 'Start listening'}</span>
+                        </Button>
+                    )}
                     <Button type="submit" size="icon" onClick={handleSend} disabled={isBotLoading || !context}>
                     <Send className="h-4 w-4" />
                     <span className="sr-only">Send</span>
@@ -258,5 +281,3 @@ export function Chatbot({ context, flowType }: ChatbotProps) {
     </>
   );
 }
-
-    
