@@ -32,6 +32,20 @@ export function Chatbot({ lessonContent }: { lessonContent: string }) {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const currentUser = getUser();
+  const [hasSelectedLanguage, setHasSelectedLanguage] = useState(false);
+
+  useEffect(() => {
+    if (localStorage.getItem('language')) {
+      setHasSelectedLanguage(true);
+    }
+  }, []);
+  
+  useEffect(() => {
+    if (language) {
+      setHasSelectedLanguage(true);
+    }
+  }, [language]);
+
 
   useEffect(() => {
     if (scrollAreaRef.current) {
@@ -123,7 +137,7 @@ export function Chatbot({ lessonContent }: { lessonContent: string }) {
                <LanguageSelector />
             </CardHeader>
             <CardContent className="flex-1 overflow-hidden p-0">
-                { !language ? (
+                { !hasSelectedLanguage ? (
                     <div className="h-full flex flex-col items-center justify-center p-4 text-center">
                         <Languages className="w-12 h-12 text-muted-foreground mb-4" />
                         <h3 className="text-lg font-semibold mb-2">Select a Language</h3>
@@ -192,7 +206,7 @@ export function Chatbot({ lessonContent }: { lessonContent: string }) {
                     </ScrollArea>
                 )}
             </CardContent>
-            {language && (
+            {hasSelectedLanguage && (
                 <CardFooter>
                 <div className="flex w-full items-center space-x-2">
                     <Input
