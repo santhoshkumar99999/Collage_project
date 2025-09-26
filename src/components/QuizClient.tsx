@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
 import { CheckCircle, XCircle, Lightbulb, PartyPopper, Frown, Award, Volume2, LoaderCircle } from 'lucide-react';
-import { updateUser, getUser, badges, User, lessons } from '@/lib/data';
+import { updateUser, getUser, badges, User, lessons, subjects } from '@/lib/data';
 import { Translate } from './Translate';
 import { textToSpeech } from '@/ai/flows/tts-flow';
 import { useLanguage } from '@/hooks/use-language';
@@ -82,10 +82,18 @@ export function QuizClient({ quiz, isTournament = false }: QuizClientProps) {
     let newBadges = [...currentUser.badges];
     let leveledUp = false;
     let newCompletedLessons = [...(currentUser.completedLessons || [])];
+    let newCompletedTournaments = [...(currentUser.completedTournaments || [])];
 
-    if (!isTournament && !newCompletedLessons.includes(quiz.lessonId)) {
-      newCompletedLessons.push(quiz.lessonId);
+    if (isTournament) {
+        const lesson = lessons.find(l => l.id === quiz.lessonId);
+        const subjectId = lesson?.subjectId || quiz.id.split('-')[2]; // Fallback for generated quizzes
+        if (subjectId && !newCompletedTournaments.includes(subjectId)) {
+            newCompletedTournaments.push(subjectId);
+        }
+    } else if (!newCompletedLessons.includes(quiz.lessonId)) {
+        newCompletedLessons.push(quiz.lessonId);
     }
+
 
     while (newXp >= currentUser.xpToNextLevel) {
       newXp -= currentUser.xpToNextLevel;
@@ -116,7 +124,8 @@ export function QuizClient({ quiz, isTournament = false }: QuizClientProps) {
       xp: newXp, 
       level: newLevel,
       badges: newBadges,
-      completedLessons: newCompletedLessons
+      completedLessons: newCompletedLessons,
+      completedTournaments: newCompletedTournaments,
     });
 
     toast({

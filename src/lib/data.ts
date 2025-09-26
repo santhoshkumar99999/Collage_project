@@ -24,6 +24,7 @@ export let users: User[] = [
     xpToNextLevel: 500,
     badges: [badges[0]],
     completedLessons: ['algebra-basics'],
+    completedTournaments: ['mathematics'],
   },
   {
     id: 'user-2',
@@ -36,6 +37,7 @@ export let users: User[] = [
     xpToNextLevel: 800,
     badges: [badges[0], badges[1], badges[2]],
     completedLessons: ['algebra-basics', 'geometry-intro', 'photosynthesis'],
+    completedTournaments: ['mathematics', 'science'],
   },
     {
     id: 'user-3',
@@ -48,10 +50,11 @@ export let users: User[] = [
     xpToNextLevel: 300,
     badges: [badges[0]],
     completedLessons: [],
+    completedTournaments: [],
   },
-  { id: 'user-4', name: 'Saanvi Gupta', email: 'saanvi@example.com', password: 'password', avatarUrl: 'https://picsum.photos/seed/user4/100/100', level: 7, xp: 650, xpToNextLevel: 700, badges: [badges[0], badges[1]], completedLessons: ['newtons-laws', 'cell-structure'] },
-  { id: 'user-5', name: 'Arjun Reddy', email: 'arjun@example.com', password: 'password', avatarUrl: 'https://picsum.photos/seed/user5/100/100', level: 6, xp: 550, xpToNextLevel: 600, badges: [badges[0]], completedLessons: ['ml-intro'] },
-  { id: 'user-teacher', name: 'Teacher', email: 'teacher@example.com', password: 'password', avatarUrl: 'https://picsum.photos/seed/teacher/100/100', level: 99, xp: 9999, xpToNextLevel: 10000, badges: badges, completedLessons: [] },
+  { id: 'user-4', name: 'Saanvi Gupta', email: 'saanvi@example.com', password: 'password', avatarUrl: 'https://picsum.photos/seed/user4/100/100', level: 7, xp: 650, xpToNextLevel: 700, badges: [badges[0], badges[1]], completedLessons: ['newtons-laws', 'cell-structure'], completedTournaments: ['physics'] },
+  { id: 'user-5', name: 'Arjun Reddy', email: 'arjun@example.com', password: 'password', avatarUrl: 'https://picsum.photos/seed/user5/100/100', level: 6, xp: 550, xpToNextLevel: 600, badges: [badges[0]], completedLessons: ['ml-intro'], completedTournaments: ['ai'] },
+  { id: 'user-teacher', name: 'Teacher', email: 'teacher@example.com', password: 'password', avatarUrl: 'https://picsum.photos/seed/teacher/100/100', level: 99, xp: 9999, xpToNextLevel: 10000, badges: badges, completedLessons: [], completedTournaments: [] },
 ];
 
 const CURRENT_USER_ID_KEY = 'currentUser_id';
@@ -65,6 +68,7 @@ function rehydrateUserBadges(user: User): User {
             return fullBadge || badge;
         }).filter(Boolean) as Badge[],
         completedLessons: user.completedLessons || [],
+        completedTournaments: user.completedTournaments || [],
     };
 }
 
@@ -134,6 +138,7 @@ export function addUser({ name, email, password }: { name: string; email: string
         xpToNextLevel: 100,
         badges: [],
         completedLessons: [],
+        completedTournaments: [],
       };
       
       const updatedUsers = [...allUsers, newUser];
@@ -371,3 +376,4 @@ export const initialLeaderboard: LeaderboardEntry[] = getLeaderboard();
     
 
     
+

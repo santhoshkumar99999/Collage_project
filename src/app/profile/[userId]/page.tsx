@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -29,6 +30,7 @@ function rehydrateUser(user: User): User {
         ...user,
         badges: validBadges || [],
         completedLessons: user.completedLessons || [],
+        completedTournaments: user.completedTournaments || [],
     };
 }
 
@@ -72,6 +74,10 @@ export default function PublicProfilePage({ params }: { params: { userId: string
             user.completedLessons.includes(lesson.id) && lesson.subjectId === subject.id
         )
     ) : [];
+
+  const tournamentSubjects: Subject[] = user?.completedTournaments ? 
+    subjects.filter(subject => user.completedTournaments!.includes(subject.id))
+    : [];
 
   if (isLoading) {
     return (
@@ -154,8 +160,8 @@ export default function PublicProfilePage({ params }: { params: { userId: string
                                 <Tooltip key={subject.id}>
                                     <TooltipTrigger>
                                         <div className="flex flex-col items-center gap-2">
-                                            <div className="p-3 rounded-full bg-accent">
-                                                <SubjectIcon className="w-8 h-8 text-primary" />
+                                            <div className="p-3 rounded-full bg-secondary">
+                                                <SubjectIcon className="w-8 h-8 text-secondary-foreground" />
                                             </div>
                                         </div>
                                     </TooltipTrigger>
@@ -167,6 +173,39 @@ export default function PublicProfilePage({ params }: { params: { userId: string
                             })
                         ) : (
                             <p className="text-muted-foreground"><Translate>No subjects learned yet.</Translate></p>
+                        )}
+                    </div>
+                </TooltipProvider>
+              </CardContent>
+            </Card>
+             <Card>
+              <CardHeader>
+                <CardTitle><Translate>Tournament Subjects</Translate></CardTitle>
+                <CardDescription><Translate>Subjects where tournament quizzes have been attempted.</Translate></CardDescription>
+              </CardHeader>
+              <CardContent>
+                 <TooltipProvider>
+                    <div className="flex flex-wrap gap-4">
+                        {tournamentSubjects.length > 0 ? (
+                            tournamentSubjects.map((subject) => {
+                                const SubjectIcon = subject.icon;
+                                return (
+                                <Tooltip key={subject.id}>
+                                    <TooltipTrigger>
+                                        <div className="flex flex-col items-center gap-2">
+                                            <div className="p-3 rounded-full bg-primary/10">
+                                                <SubjectIcon className="w-8 h-8 text-primary" />
+                                            </div>
+                                        </div>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p className="font-semibold">{subject.name}</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                                )
+                            })
+                        ) : (
+                            <p className="text-muted-foreground"><Translate>No tournaments attempted yet.</Translate></p>
                         )}
                     </div>
                 </TooltipProvider>
