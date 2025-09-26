@@ -5,6 +5,7 @@ import { subjects } from '@/lib/data';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { PageHeader } from '@/components/PageHeader';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
+import { Translate } from '@/components/Translate';
 
 export default function SubjectSelectionPage() {
   return (
@@ -32,9 +33,9 @@ export default function SubjectSelectionPage() {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 font-headline">
                       <subject.icon className="w-6 h-6 text-primary" />
-                      {subject.name}
+                      <Translate>{subject.name}</Translate>
                     </CardTitle>
-                    <CardDescription>{subject.description}</CardDescription>
+                    <CardDescription><Translate>{subject.description}</Translate></CardDescription>
                   </CardHeader>
                 </Card>
               </Link>

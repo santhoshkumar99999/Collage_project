@@ -12,26 +12,34 @@ import { Chatbot } from '@/components/Chatbot';
 import { useLanguage } from '@/hooks/use-language';
 import { translateText } from '@/ai/flows/translate-flow';
 import type { Lesson, Subject } from '@/lib/types';
+import { Translate } from './Translate';
 
 export function LessonClient({ lesson, subject }: { lesson: Lesson, subject: Subject }) {
   const { language } = useLanguage();
   const [translatedContent, setTranslatedContent] = useState(lesson.content);
+  const [translatedDescription, setTranslatedDescription] = useState(lesson.description);
   const [isTranslating, setIsTranslating] = useState(false);
 
   useEffect(() => {
     if (!lesson || !language || language === 'English') {
       setTranslatedContent(lesson?.content || '');
+      setTranslatedDescription(lesson?.description || '');
       return;
     }
 
     const translateLessonContent = async () => {
       setIsTranslating(true);
       try {
-        const response = await translateText({ text: lesson.content, targetLanguage: language });
-        setTranslatedContent(response.translation);
+        const [contentResponse, descriptionResponse] = await Promise.all([
+            translateText({ text: lesson.content, targetLanguage: language }),
+            translateText({ text: lesson.description, targetLanguage: language })
+        ]);
+        setTranslatedContent(contentResponse.translation);
+        setTranslatedDescription(descriptionResponse.translation);
       } catch (error) {
         console.error("Failed to translate content:", error);
         setTranslatedContent(lesson.content); // Fallback to original content on error
+        setTranslatedDescription(lesson.description);
       } finally {
         setIsTranslating(false);
       }
@@ -63,12 +71,12 @@ export function LessonClient({ lesson, subject }: { lesson: Lesson, subject: Sub
             <Card>
                 <CardContent className="p-6">
                 <article className="prose dark:prose-invert max-w-none">
-                    <p className="text-lg text-muted-foreground">{lesson.description}</p>
+                    <p className="text-lg text-muted-foreground">{translatedDescription}</p>
                     <div className="mt-4 text-base leading-relaxed">
                     {isTranslating ? (
                         <div className="flex items-center gap-2 text-muted-foreground">
                         <LoaderCircle className="animate-spin h-5 w-5" />
-                        <span>Translating to {language}...</span>
+                        <span><Translate>Translating to</Translate> {language}...</span>
                         </div>
                     ) : (
                         translatedContent.split('\n').map((paragraph, i) => <p key={i}>{paragraph}</p>)
@@ -81,7 +89,7 @@ export function LessonClient({ lesson, subject }: { lesson: Lesson, subject: Sub
                 <Button asChild size="lg">
                 <Link href={`/subjects/${subject.id}/lessons/${lesson.id}/quiz`}>
                     <Gamepad2 className="mr-2 h-5 w-5" />
-                    Ready to test your knowledge? Start Quiz!
+                    <Translate>Ready to test your knowledge? Start Quiz!</Translate>
                 </Link>
                 </Button>
             </div>

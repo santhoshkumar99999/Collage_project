@@ -11,6 +11,7 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Progress } from '@/components/ui/progress';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Translate } from '@/components/Translate';
 
 function rehydrateUser(user: User): User {
     // Ensure badges are objects with an id, not just strings, before finding the full badge object.
@@ -110,20 +111,20 @@ export default function PublicProfilePage({ params }: { params: { userId: string
                 <AvatarFallback className="text-3xl">{user.name.charAt(0)}</AvatarFallback>
               </Avatar>
               <h2 className="text-2xl font-bold font-headline">{user.name}</h2>
-              <p className="text-muted-foreground">Level {user.level}</p>
+              <p className="text-muted-foreground"><Translate>Level</Translate> {user.level}</p>
             </Card>
           </div>
           <div className="md:col-span-2 space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Progress</CardTitle>
-                <CardDescription>Leveling up through learning!</CardDescription>
+                <CardTitle><Translate>Progress</Translate></CardTitle>
+                <CardDescription><Translate>Leveling up through learning!</Translate></CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm font-medium">
                     <span>XP: {user.xp} / {user.xpToNextLevel}</span>
-                    <span>Level {user.level}</span>
+                    <span><Translate>Level</Translate> {user.level}</span>
                   </div>
                   <TooltipProvider>
                     <Tooltip>
@@ -140,8 +141,8 @@ export default function PublicProfilePage({ params }: { params: { userId: string
             </Card>
             <Card>
               <CardHeader>
-                <CardTitle>Learned Subjects</CardTitle>
-                <CardDescription>Subjects where quizzes have been completed.</CardDescription>
+                <CardTitle><Translate>Learned Subjects</Translate></CardTitle>
+                <CardDescription><Translate>Subjects where quizzes have been completed.</Translate></CardDescription>
               </CardHeader>
               <CardContent>
                  <TooltipProvider>
@@ -165,7 +166,7 @@ export default function PublicProfilePage({ params }: { params: { userId: string
                                 )
                             })
                         ) : (
-                            <p className="text-muted-foreground">No subjects learned yet.</p>
+                            <p className="text-muted-foreground"><Translate>No subjects learned yet.</Translate></p>
                         )}
                     </div>
                 </TooltipProvider>
@@ -173,8 +174,8 @@ export default function PublicProfilePage({ params }: { params: { userId: string
             </Card>
             <Card>
               <CardHeader>
-                <CardTitle>Badges</CardTitle>
-                <CardDescription>Achievements unlocked.</CardDescription>
+                <CardTitle><Translate>Badges</Translate></CardTitle>
+                <CardDescription><Translate>Achievements unlocked.</Translate></CardDescription>
               </CardHeader>
               <CardContent>
                 <TooltipProvider>
@@ -197,7 +198,7 @@ export default function PublicProfilePage({ params }: { params: { userId: string
                         </Tooltip>
                       )})
                     ) : (
-                      <p className="text-muted-foreground">No badges earned yet.</p>
+                      <p className="text-muted-foreground"><Translate>No badges earned yet.</Translate></p>
                     )}
                   </div>
                 </TooltipProvider>

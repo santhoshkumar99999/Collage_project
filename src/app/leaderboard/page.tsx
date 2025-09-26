@@ -17,6 +17,7 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Card, CardContent } from '@/components/ui/card';
 import { Trophy } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Translate } from '@/components/Translate';
 
 
 export default function LeaderboardPage() {
@@ -77,10 +78,10 @@ export default function LeaderboardPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[80px]">Rank</TableHead>
-                  <TableHead>Student</TableHead>
+                  <TableHead className="w-[80px]"><Translate>Rank</Translate></TableHead>
+                  <TableHead><Translate>Student</Translate></TableHead>
                   <TableHead className="text-right">XP</TableHead>
-                  <TableHead className="text-right">Level</TableHead>
+                  <TableHead className="text-right"><Translate>Level</Translate></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

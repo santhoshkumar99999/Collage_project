@@ -12,6 +12,7 @@ import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
 import { CheckCircle, XCircle, Lightbulb, PartyPopper, Frown, Award } from 'lucide-react';
 import { updateUser, getUser, badges, User, lessons } from '@/lib/data';
+import { Translate } from './Translate';
 
 export function QuizClient({ quiz }: { quiz: Quiz }) {
   const router = useRouter();
@@ -113,11 +114,11 @@ export function QuizClient({ quiz }: { quiz: Quiz }) {
       <Card className="w-full max-w-2xl mx-auto">
         <CardHeader className="items-center">
             {isSuccess ? <PartyPopper className="w-16 h-16 text-yellow-400" /> : <Frown className="w-16 h-16 text-muted-foreground" />}
-          <CardTitle className="text-3xl font-bold font-headline">Quiz Completed!</CardTitle>
-          <CardDescription>You scored {score} out of {quiz.questions.length}.</CardDescription>
+          <CardTitle className="text-3xl font-bold font-headline"><Translate>Quiz Completed!</Translate></CardTitle>
+          <CardDescription><Translate>You scored</Translate> {score} <Translate>out of</Translate> {quiz.questions.length}.</CardDescription>
         </CardHeader>
         <CardContent className="text-center">
-          <p className="text-lg">{isSuccess ? "Great job! You've mastered this topic." : "Good effort! Review the lesson and try again."}</p>
+          <p className="text-lg">{isSuccess ? <Translate>Great job! You've mastered this topic.</Translate> : <Translate>Good effort! Review the lesson and try again.</Translate>}</p>
           <div className="flex items-center justify-center gap-2 mt-4">
             {Array.from({ length: quiz.questions.length }).map((_, i) => (
                 i < score ? <CheckCircle key={i} className="text-primary" /> : <XCircle key={i} className="text-destructive" />
@@ -125,8 +126,8 @@ export function QuizClient({ quiz }: { quiz: Quiz }) {
           </div>
         </CardContent>
         <CardFooter className="justify-center gap-2">
-          <Button onClick={() => router.back()}>Back to Lesson</Button>
-          <Button variant="outline" onClick={() => window.location.reload()}>Try Again</Button>
+          <Button onClick={() => router.back()}><Translate>Back to Lesson</Translate></Button>
+          <Button variant="outline" onClick={() => window.location.reload()}><Translate>Try Again</Translate></Button>
         </CardFooter>
       </Card>
     );
@@ -137,9 +138,9 @@ export function QuizClient({ quiz }: { quiz: Quiz }) {
       <CardHeader>
         <div className="mb-4">
             <Progress value={((currentQuestionIndex + 1) / quiz.questions.length) * 100} className="w-full" />
-            <p className="text-sm text-muted-foreground mt-2">Question {currentQuestionIndex + 1} of {quiz.questions.length}</p>
+            <p className="text-sm text-muted-foreground mt-2"><Translate>Question</Translate> {currentQuestionIndex + 1} <Translate>of</Translate> {quiz.questions.length}</p>
         </div>
-        <CardTitle className="text-2xl font-headline">{currentQuestion.question}</CardTitle>
+        <CardTitle className="text-2xl font-headline"><Translate>{currentQuestion.question}</Translate></CardTitle>
       </CardHeader>
       <CardContent>
         <RadioGroup onValueChange={setSelectedAnswer} value={selectedAnswer ?? undefined}>
@@ -147,7 +148,7 @@ export function QuizClient({ quiz }: { quiz: Quiz }) {
             {currentQuestion.options.map((option) => (
               <div key={option} className="flex items-center space-x-2">
                 <RadioGroupItem value={option} id={option} />
-                <Label htmlFor={option} className="text-base flex-1 cursor-pointer">{option}</Label>
+                <Label htmlFor={option} className="text-base flex-1 cursor-pointer"><Translate>{option}</Translate></Label>
               </div>
             ))}
           </div>
@@ -155,10 +156,10 @@ export function QuizClient({ quiz }: { quiz: Quiz }) {
       </CardContent>
       <CardFooter className="justify-between">
         <Button variant="ghost" onClick={showHint} disabled={!currentQuestion.hint}>
-          <Lightbulb className="mr-2 h-4 w-4" /> Hint
+          <Lightbulb className="mr-2 h-4 w-4" /> <Translate>Hint</Translate>
         </Button>
         <Button onClick={handleNext}>
-          {currentQuestionIndex === quiz.questions.length - 1 ? 'Finish' : 'Next'}
+          {currentQuestionIndex === quiz.questions.length - 1 ? <Translate>Finish</Translate> : <Translate>Next</Translate>}
         </Button>
       </CardFooter>
     </Card>

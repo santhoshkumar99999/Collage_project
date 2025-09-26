@@ -21,6 +21,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import { Translate } from '@/components/Translate';
 
 
 export default function ProfilePage() {
@@ -103,7 +104,7 @@ export default function ProfilePage() {
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>
-                <DialogTitle>Share Your Progress</DialogTitle>
+                <DialogTitle><Translate>Share Your Progress</Translate></DialogTitle>
               </DialogHeader>
               <div className="p-4 bg-white rounded-lg">
                 <QRCode
@@ -117,15 +118,15 @@ export default function ProfilePage() {
           </Dialog>
         {!isEditing ? (
             <Button variant="outline" onClick={() => setIsEditing(true)}>
-                <Edit className="mr-2 h-4 w-4" /> Edit Profile
+                <Edit className="mr-2 h-4 w-4" /> <Translate>Edit Profile</Translate>
             </Button>
         ) : (
             <div className="flex gap-2">
                 <Button onClick={handleSave}>
-                    <Save className="mr-2 h-4 w-4" /> Save
+                    <Save className="mr-2 h-4 w-4" /> <Translate>Save</Translate>
                 </Button>
                 <Button variant="outline" onClick={handleCancel}>
-                    <X className="mr-2 h-4 w-4" /> Cancel
+                    <X className="mr-2 h-4 w-4" /> <Translate>Cancel</Translate>
                 </Button>
             </div>
         )}
@@ -147,20 +148,20 @@ export default function ProfilePage() {
               ) : (
                 <h2 className="text-2xl font-bold font-headline">{currentUser.name}</h2>
               )}
-              <p className="text-muted-foreground">Level {currentUser.level}</p>
+              <p className="text-muted-foreground"><Translate>Level</Translate> {currentUser.level}</p>
             </Card>
           </div>
           <div className="md:col-span-2 space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>My Progress</CardTitle>
-                <CardDescription>Keep learning to level up!</CardDescription>
+                <CardTitle><Translate>My Progress</Translate></CardTitle>
+                <CardDescription><Translate>Keep learning to level up!</Translate></CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm font-medium">
                     <span>XP: {currentUser.xp} / {currentUser.xpToNextLevel}</span>
-                    <span>Level {currentUser.level}</span>
+                    <span><Translate>Level</Translate> {currentUser.level}</span>
                   </div>
                   <TooltipProvider>
                     <Tooltip>
@@ -177,8 +178,8 @@ export default function ProfilePage() {
             </Card>
             <Card>
               <CardHeader>
-                <CardTitle>Learned Subjects</CardTitle>
-                <CardDescription>Subjects where you have completed quizzes.</CardDescription>
+                <CardTitle><Translate>Learned Subjects</Translate></CardTitle>
+                <CardDescription><Translate>Subjects where you have completed quizzes.</Translate></CardDescription>
               </CardHeader>
               <CardContent>
                  <TooltipProvider>
@@ -196,13 +197,13 @@ export default function ProfilePage() {
                                         </div>
                                     </TooltipTrigger>
                                     <TooltipContent>
-                                        <p className="font-semibold">{subject.name}</p>
+                                        <p className="font-semibold"><Translate>{subject.name}</Translate></p>
                                     </TooltipContent>
                                 </Tooltip>
                                 )
                             })
                         ) : (
-                            <p className="text-muted-foreground">Complete a quiz to see your first learned subject!</p>
+                            <p className="text-muted-foreground"><Translate>Complete a quiz to see your first learned subject!</Translate></p>
                         )}
                     </div>
                 </TooltipProvider>
@@ -210,8 +211,8 @@ export default function ProfilePage() {
             </Card>
             <Card>
               <CardHeader>
-                <CardTitle>My Badges</CardTitle>
-                <CardDescription>Achievements you have unlocked.</CardDescription>
+                <CardTitle><Translate>My Badges</Translate></CardTitle>
+                <CardDescription><Translate>Achievements you have unlocked.</Translate></CardDescription>
               </CardHeader>
               <CardContent>
                 <TooltipProvider>
@@ -229,12 +230,12 @@ export default function ProfilePage() {
                             </div>
                           </TooltipTrigger>
                           <TooltipContent>
-                            <p className="font-semibold">{badge.name}</p>
+                            <p className="font-semibold"><Translate>{badge.name}</Translate></p>
                           </TooltipContent>
                         </Tooltip>
                       )})
                     ) : (
-                      <p className="text-muted-foreground">No badges earned yet. Keep playing!</p>
+                      <p className="text-muted-foreground"><Translate>No badges earned yet. Keep playing!</Translate></p>
                     )}
                   </div>
                 </TooltipProvider>
