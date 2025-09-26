@@ -50,5 +50,5 @@ export interface Badge {
 export interface LeaderboardEntry {
   rank: number;
   user: User;
-  score: number;
+  xp: number;
 }

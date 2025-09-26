@@ -39,6 +39,8 @@ let users: User[] = [
     xpToNextLevel: 300,
     badges: [badges[0]],
   },
+  { id: 'user-4', name: 'Saanvi Gupta', avatarUrl: 'https://picsum.photos/seed/user4/100/100', level: 7, xp: 650, xpToNextLevel: 700, badges: [badges[0], badges[1]] },
+  { id: 'user-5', name: 'Arjun Reddy', avatarUrl: 'https://picsum.photos/seed/user5/100/100', level: 6, xp: 550, xpToNextLevel: 600, badges: [badges[0]] },
 ];
 
 // In a real app, this would be a proper user management system.
@@ -55,28 +57,32 @@ function rehydrateUserBadges(user: User): User {
     };
 }
 
-export function getUser(): User {
-  if (typeof window !== 'undefined') {
-    const storedUsers = localStorage.getItem('users');
-    if (storedUsers) {
-        try {
-            const parsedUsers: User[] = JSON.parse(storedUsers);
-            users = parsedUsers.map(rehydrateUserBadges);
-        } catch (e) {
-            console.error("Failed to parse users from localStorage", e);
-            // Stick with initial data if parsing fails
+function getUsers(): User[] {
+    if (typeof window !== 'undefined') {
+        const storedUsers = localStorage.getItem('users');
+        if (storedUsers) {
+            try {
+                const parsedUsers: User[] = JSON.parse(storedUsers);
+                return parsedUsers.map(rehydrateUserBadges);
+            } catch (e) {
+                console.error("Failed to parse users from localStorage", e);
+            }
         }
-    }
-  }
-  return users.find(u => u.id === CURRENT_USER_ID)!;
+      }
+      return users;
+}
+
+export function getUser(): User {
+  return getUsers().find(u => u.id === CURRENT_USER_ID)!;
 }
 
 export function updateUser(updatedUser: User) {
   if (typeof window !== 'undefined') {
-    const index = users.findIndex(u => u.id === updatedUser.id);
+    const allUsers = getUsers();
+    const index = allUsers.findIndex(u => u.id === updatedUser.id);
     if (index !== -1) {
-      users[index] = updatedUser;
-      localStorage.setItem('users', JSON.stringify(users));
+      allUsers[index] = updatedUser;
+      localStorage.setItem('users', JSON.stringify(allUsers));
     }
   }
 }
@@ -266,10 +272,14 @@ export const quizzes: Quiz[] = [
 ];
 
 
-export const leaderboard: LeaderboardEntry[] = [
-  { rank: 1, user: users[1], score: 9850 },
-  { rank: 2, user: users[0], score: 8700 },
-  { rank: 3, user: users[2], score: 7600 },
-  { rank: 4, user: { id: 'user-4', name: 'Saanvi Gupta', avatarUrl: 'https://picsum.photos/seed/user4/100/100', level: 7, xp: 650, xpToNextLevel: 700, badges: [badges[0], badges[1]] }, score: 7550 },
-  { rank: 5, user: { id: 'user-5', name: 'Arjun Reddy', avatarUrl: 'https://picsum.photos/seed/user5/100/100', level: 6, xp: 550, xpToNextLevel: 600, badges: [badges[0]] }, score: 6400 },
-];
+function getLeaderboard(): LeaderboardEntry[] {
+    const allUsers = getUsers();
+    const sortedUsers = allUsers.sort((a, b) => b.xp - a.xp);
+    return sortedUsers.map((user, index) => ({
+        rank: index + 1,
+        user: user,
+        xp: user.xp,
+    }));
+}
+
+export const leaderboard: LeaderboardEntry[] = getLeaderboard();
