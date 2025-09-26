@@ -12,6 +12,7 @@ import {
   LogIn,
   Settings,
   LogOut,
+  MessageSquareHeart,
 } from "lucide-react";
 
 import {
@@ -36,6 +37,7 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { FeedbackDialog } from "./FeedbackDialog";
 
 const menuItems = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
@@ -122,6 +124,12 @@ export function AppSidebar() {
                   Profile
                 </Link>
               </DropdownMenuItem>
+              <FeedbackDialog>
+                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                    <MessageSquareHeart className="mr-2" />
+                    Feedback & Support
+                </DropdownMenuItem>
+              </FeedbackDialog>
               <DropdownMenuItem asChild>
                  <Link href="/login">
                   <Shield className="mr-2" />
