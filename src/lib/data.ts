@@ -93,6 +93,37 @@ export function updateUser(updatedUser: User) {
   }
 }
 
+export function addUser({ name, email, password }: { name: string; email: string; password?: string }) {
+    if (typeof window !== 'undefined') {
+      const allUsers = getUsers();
+      
+      // Check if user already exists
+      if (allUsers.some(u => u.name.toLowerCase() === name.toLowerCase())) {
+        throw new Error('A user with this name already exists.');
+      }
+      
+      const userId = `user-${Date.now()}`;
+      const newUser: User = {
+        id: userId,
+        name,
+        avatarUrl: `https://picsum.photos/seed/${userId}/100/100`,
+        level: 1,
+        xp: 0,
+        xpToNextLevel: 100,
+        badges: [],
+        completedLessons: [],
+      };
+      
+      const updatedUsers = [...allUsers, newUser];
+      localStorage.setItem('users', JSON.stringify(updatedUsers));
+      window.dispatchEvent(new Event("storage"));
+      
+      return newUser;
+    }
+    throw new Error('This function can only be called on the client-side.');
+}
+
+
 export const subjects: Subject[] = [
   {
     id: 'mathematics',
