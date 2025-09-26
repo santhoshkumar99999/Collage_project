@@ -274,10 +274,10 @@ export const quizzes: Quiz[] = [
     lessonId: 'algebra-basics',
     title: 'Algebra Basics Quiz',
     questions: [
-      { id: 'q1', question: 'What is x if x + 5 = 12?', options: ['5', '7', '10', '12'], correctAnswer: '7', hint: 'Subtract 5 from both sides.' },
-      { id: 'q2', question: 'What is 2y if y = 4?', options: ['2', '4', '6', '8'], correctAnswer: '8', hint: 'Substitute the value of y into the expression.' },
-      { id: 'q3', question: 'Which of these is a variable?', options: ['5', 'x', '+', '='], correctAnswer: 'x', hint: 'A variable is a letter representing an unknown value.' },
-      { id: 'q4', question: 'Solve for z: 3z = 15', options: ['3', '5', '12', '45'], correctAnswer: '5', hint: 'Divide both sides by 3.' },
+      { id: 'q1', question: 'What is x if x + 5 = 12?', options: ['5', '7', '10', '12'], correctAnswer: '7', hint: 'To find x, you need to isolate it. Subtract 5 from both sides of the equation.' },
+      { id: 'q2', question: 'What is 2y if y = 4?', options: ['2', '4', '6', '8'], correctAnswer: '8', hint: 'Substitute the value of y (which is 4) into the expression 2y.' },
+      { id: 'q3', question: 'Which of these is a variable?', options: ['5', 'x', '+', '='], correctAnswer: 'x', hint: 'A variable is a symbol, usually a letter, that represents an unknown number.' },
+      { id: 'q4', question: 'Solve for z: 3z = 15', options: ['3', '5', '12', '45'], correctAnswer: '5', hint: 'To solve for z, you need to perform the opposite operation. Divide both sides by 3.' },
     ],
   },
   {
@@ -285,10 +285,10 @@ export const quizzes: Quiz[] = [
     lessonId: 'geometry-intro',
     title: 'Geometry Intro Quiz',
     questions: [
-      { id: 'q1', question: 'How many degrees are in a right angle?', options: ['45', '90', '180', '360'], correctAnswer: '90', hint: 'It looks like the corner of a square.' },
-      { id: 'q2', question: 'What is the sum of angles in a triangle?', options: ['90', '180', '270', '360'], correctAnswer: '180', hint: 'Think about a square cut in half.' },
-      { id: 'q3', question: 'A flat surface that extends infinitely in all directions is called a...?', options: ['Line', 'Point', 'Plane', 'Angle'], correctAnswer: 'Plane', hint: 'It\'s a 2D surface.' },
-      { id: 'q4', question: 'What is the name for a polygon with 5 sides?', options: ['Hexagon', 'Pentagon', 'Octagon', 'Square'], correctAnswer: 'Pentagon', hint: 'Think of the building in Washington D.C.'},
+      { id: 'q1', question: 'How many degrees are in a right angle?', options: ['45', '90', '180', '360'], correctAnswer: '90', hint: 'A right angle looks like the corner of a square or a book.' },
+      { id: 'q2', question: 'What is the sum of angles in a triangle?', options: ['90', '180', '270', '360'], correctAnswer: '180', hint: 'No matter the shape of the triangle, the sum of its three angles is always the same.' },
+      { id: 'q3', question: 'A flat surface that extends infinitely in all directions is called a...?', options: ['Line', 'Point', 'Plane', 'Angle'], correctAnswer: 'Plane', hint: 'Think of it as a perfectly flat sheet of paper that goes on forever.' },
+      { id: 'q4', question: 'What is the name for a polygon with 5 sides?', options: ['Hexagon', 'Pentagon', 'Octagon', 'Square'], correctAnswer: 'Pentagon', hint: 'A famous five-sided building in the United States shares this name.'},
     ],
   },
    {
@@ -296,10 +296,10 @@ export const quizzes: Quiz[] = [
     lessonId: 'photosynthesis',
     title: 'Photosynthesis Quiz',
     questions: [
-      { id: 'q1', question: 'What is the primary pigment used in photosynthesis?', options: ['Melanin', 'Hemoglobin', 'Chlorophyll', 'Carotene'], correctAnswer: 'Chlorophyll', hint: 'It\'s what makes plants green.' },
-      { id: 'q2', question: 'Which gas do plants absorb from the atmosphere?', options: ['Oxygen', 'Nitrogen', 'Carbon Dioxide', 'Hydrogen'], correctAnswer: 'Carbon Dioxide', hint: 'It\'s the gas we exhale.' },
-      { id: 'q3', 'question': 'What is a byproduct of photosynthesis that is released into the air?', options: ['Water', 'Oxygen', 'Carbon', 'Sunlight'], correctAnswer: 'Oxygen', hint: 'It\'s what we breathe.' },
-      { id: 'q4', question: 'Where does photosynthesis primarily occur in a plant cell?', options: ['Nucleus', 'Mitochondria', 'Chloroplast', 'Ribosome'], correctAnswer: 'Chloroplast', hint: 'This organelle contains the pigment from the first question.' },
+      { id: 'q1', question: 'What is the primary pigment used in photosynthesis?', options: ['Melanin', 'Hemoglobin', 'Chlorophyll', 'Carotene'], correctAnswer: 'Chlorophyll', hint: 'This pigment is what gives plants their green color.' },
+      { id: 'q2', question: 'Which gas do plants absorb from the atmosphere?', options: ['Oxygen', 'Nitrogen', 'Carbon Dioxide', 'Hydrogen'], correctAnswer: 'Carbon Dioxide', hint: 'This is the gas that humans and animals breathe out.' },
+      { id: 'q3', 'question': 'What is a byproduct of photosynthesis that is released into the air?', options: ['Water', 'Oxygen', 'Carbon', 'Sunlight'], correctAnswer: 'Oxygen', hint: 'This gas is essential for most animals, including humans, to breathe.' },
+      { id: 'q4', question: 'Where does photosynthesis primarily occur in a plant cell?', options: ['Nucleus', 'Mitochondria', 'Chloroplast', 'Ribosome'], correctAnswer: 'Chloroplast', hint: 'This organelle contains the green pigment from the first question.' },
     ],
   },
   {
@@ -307,10 +307,10 @@ export const quizzes: Quiz[] = [
     lessonId: 'newtons-laws',
     title: 'Newton\'s Laws Quiz',
     questions: [
-        { id: 'q1', question: 'Which law is also known as the law of inertia?', options: ['First Law', 'Second Law', 'Third Law', 'Fourth Law'], correctAnswer: 'First Law', hint: 'An object in motion stays in motion...' },
-        { id: 'q2', question: 'F = ma is the formula for which law?', options: ['First Law', 'Second Law', 'Third Law', 'Law of Gravity'], correctAnswer: 'Second Law', hint: 'Force equals mass times acceleration.' },
-        { id: 'q3', question: 'For every action, there is an equal and opposite reaction. This is Newton\'s...?', options: ['First Law', 'Second Law', 'Third Law', 'Law of Universal Gravitation'], correctAnswer: 'Third Law', hint: 'Think about a rocket pushing gas down to go up.' },
-        { id: 'q4', question: 'An object at rest stays at rest unless acted upon by a...', options: ['Force', 'Mass', 'Inertia', 'Velocity'], correctAnswer: 'Force', hint: 'Something needs to push or pull it.'},
+        { id: 'q1', question: 'Which law is also known as the law of inertia?', options: ['First Law', 'Second Law', 'Third Law', 'Fourth Law'], correctAnswer: 'First Law', hint: 'This law states that an object in motion will stay in motion unless a force acts upon it.' },
+        { id: 'q2', question: 'F = ma is the formula for which law?', options: ['First Law', 'Second Law', 'Third Law', 'Law of Gravity'], correctAnswer: 'Second Law', hint: 'The formula relates Force (F), mass (m), and acceleration (a).' },
+        { id: 'q3', question: 'For every action, there is an equal and opposite reaction. This is Newton\'s...?', options: ['First Law', 'Second Law', 'Third Law', 'Law of Universal Gravitation'], correctAnswer: 'Third Law', hint: 'Think about how a rocket launches into space by pushing gas downwards.' },
+        { id: 'q4', question: 'An object at rest stays at rest unless acted upon by a...', options: ['Force', 'Mass', 'Inertia', 'Velocity'], correctAnswer: 'Force', hint: 'Something needs to push or pull the object to make it move.'},
     ],
   },
   {
@@ -318,9 +318,9 @@ export const quizzes: Quiz[] = [
     lessonId: 'cell-structure',
     title: 'Cell Structure Quiz',
     questions: [
-        { id: 'q1', question: 'What is known as the "powerhouse" of the cell?', options: ['Nucleus', 'Ribosome', 'Mitochondrion', 'Cell Membrane'], correctAnswer: 'Mitochondrion', hint: 'It generates most of the cell\'s supply of adenosine triphosphate (ATP).' },
-        { id: 'q2', question: 'Which organelle contains the cell\'s genetic material?', options: ['Cytoplasm', 'Nucleus', 'Vacuole', 'Lysosome'], correctAnswer: 'Nucleus', hint: 'It\'s often called the "control center" of the cell.' },
-        { id: 'q3', question: 'What is the jelly-like substance that fills the cell?', options: ['Chlorophyll', 'Cytoplasm', 'DNA', 'Membrane'], correctAnswer: 'Cytoplasm', hint: 'All the other organelles are suspended in it.' },
+        { id: 'q1', question: 'What is known as the "powerhouse" of the cell?', options: ['Nucleus', 'Ribosome', 'Mitochondrion', 'Cell Membrane'], correctAnswer: 'Mitochondrion', hint: 'This organelle generates the energy (ATP) that the cell needs to function.' },
+        { id: 'q2', question: 'Which organelle contains the cell\'s genetic material?', options: ['Cytoplasm', 'Nucleus', 'Vacuole', 'Lysosome'], correctAnswer: 'Nucleus', hint: 'This is often called the "control center" or "brain" of the cell.' },
+        { id: 'q3', question: 'What is the jelly-like substance that fills the cell?', options: ['Chlorophyll', 'Cytoplasm', 'DNA', 'Membrane'], correctAnswer: 'Cytoplasm', hint: 'All the other cell parts are suspended within this substance.' },
     ],
   },
   {
@@ -328,9 +328,9 @@ export const quizzes: Quiz[] = [
     lessonId: 'genetics-basics',
     title: 'Genetics 101 Quiz',
     questions: [
-      { id: 'q1', question: 'What does DNA stand for?', options: ['Deoxyribonucleic Acid', 'Deoxyribonuclear Acid', 'Denatured Nucleic Acid', 'Dynamic Nucleic Acid'], correctAnswer: 'Deoxyribonucleic Acid', hint: 'The "ribo" part refers to a type of sugar.' },
-      { id: 'q2', question: 'A specific sequence of DNA that codes for a protein is called a...?', options: ['Allele', 'Chromosome', 'Gene', 'Nucleotide'], correctAnswer: 'Gene', hint: 'These are the basic units of heredity.' },
-      { id: 'q3', question: 'Which of these is a dominant allele?', options: ['a', 'b', 'C', 'd'], correctAnswer: 'C', hint: 'Dominant alleles are usually represented by capital letters.' },
+      { id: 'q1', question: 'What does DNA stand for?', options: ['Deoxyribonucleic Acid', 'Deoxyribonuclear Acid', 'Denatured Nucleic Acid', 'Dynamic Nucleic Acid'], correctAnswer: 'Deoxyribonucleic Acid', hint: 'The name describes its chemical components: a sugar (deoxyribose), a phosphate, and nucleic acids.' },
+      { id: 'q2', question: 'A specific sequence of DNA that codes for a protein is called a...?', options: ['Allele', 'Chromosome', 'Gene', 'Nucleotide'], correctAnswer: 'Gene', hint: 'These are the fundamental units of heredity, passed from parent to child.' },
+      { id: 'q3', question: 'Which of these is a dominant allele?', options: ['a', 'b', 'C', 'd'], correctAnswer: 'C', hint: 'In genetics, dominant traits are typically represented by uppercase letters.' },
     ],
   },
   {
@@ -338,9 +338,9 @@ export const quizzes: Quiz[] = [
     lessonId: 'ml-intro',
     title: 'Intro to Machine Learning Quiz',
     questions: [
-        { id: 'q1', question: 'Which type of machine learning uses labeled data to train a model?', options: ['Supervised Learning', 'Unsupervised Learning', 'Reinforcement Learning', 'Deep Learning'], correctAnswer: 'Supervised Learning', hint: 'The "teacher" provides the correct answers.' },
-        { id: 'q2', question: 'Clustering data points into groups is an example of...?', options: ['Supervised Learning', 'Unsupervised Learning', 'Reinforcement Learning', 'Classification'], correctAnswer: 'Unsupervised Learning', hint: 'The model finds patterns on its own, without labels.' },
-        { id: 'q3', question: 'What is the goal of reinforcement learning?', options: ['To label data', 'To find hidden patterns', 'To maximize a cumulative reward', 'To classify data'], correctAnswer: 'To maximize a cumulative reward', hint: 'It is often used for training agents in games or robotics.' },
+        { id: 'q1', question: 'Which type of machine learning uses labeled data to train a model?', options: ['Supervised Learning', 'Unsupervised Learning', 'Reinforcement Learning', 'Deep Learning'], correctAnswer: 'Supervised Learning', hint: 'Think of a "supervisor" or "teacher" providing the correct answers for the model to learn from.' },
+        { id: 'q2', question: 'Clustering data points into groups is an example of...?', options: ['Supervised Learning', 'Unsupervised Learning', 'Reinforcement Learning', 'Classification'], correctAnswer: 'Unsupervised Learning', hint: 'In this type of learning, the model has to find patterns on its own without any pre-labeled examples.' },
+        { id: 'q3', question: 'What is the goal of reinforcement learning?', options: ['To label data', 'To find hidden patterns', 'To maximize a cumulative reward', 'To classify data'], correctAnswer: 'To maximize a cumulative reward', hint: 'This type of learning is about trial and error, like teaching a dog a new trick with treats.' },
     ],
   },
   {
@@ -348,9 +348,9 @@ export const quizzes: Quiz[] = [
     lessonId: 'neural-networks',
     title: 'Neural Networks Quiz',
     questions: [
-      { id: 'q1', question: 'What are the three main types of layers in a neural network?', options: ['Input, Hidden, Output', 'Start, Middle, End', 'Data, Processing, Result', 'First, Second, Third'], correctAnswer: 'Input, Hidden, Output', hint: 'Data flows in one end and out the other.' },
-      { id: 'q2', question: 'The process of adjusting a neural network\'s parameters is called...?', options: ['Running', 'Training', 'Thinking', 'Computing'], correctAnswer: 'Training', hint: 'It\'s how the network learns.' },
-      { id: 'q3', question: 'What is the name for the individual nodes within a neural network layer?', options: ['Points', 'Cells', 'Neurons', 'Units'], correctAnswer: 'Neurons', hint: 'They are inspired by the human brain.' },
+      { id: 'q1', question: 'What are the three main types of layers in a neural network?', options: ['Input, Hidden, Output', 'Start, Middle, End', 'Data, Processing, Result', 'First, Second, Third'], correctAnswer: 'Input, Hidden, Output', hint: 'Data flows in one side, is processed in the middle, and the result comes out the other side.' },
+      { id: 'q2', question: 'The process of adjusting a neural network\'s parameters is called...?', options: ['Running', 'Training', 'Thinking', 'Computing'], correctAnswer: 'Training', hint: 'This is how the network "learns" from data to make better predictions.' },
+      { id: 'q3', question: 'What is the name for the individual nodes within a neural network layer?', options: ['Points', 'Cells', 'Neurons', 'Units'], correctAnswer: 'Neurons', hint: 'These are named after the cells in the human brain that they are designed to mimic.' },
     ],
   },
 ];
