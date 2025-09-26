@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Download, Gamepad2 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
+import { Chatbot } from '@/components/Chatbot';
 
 export default function LessonPage({ params }: { params: { subjectId: string, lessonId: string } }) {
   const subject = subjects.find((s) => s.id === params.subjectId);
@@ -63,6 +64,7 @@ export default function LessonPage({ params }: { params: { subjectId: string, le
           </div>
         </div>
       </main>
+      <Chatbot lessonContent={lesson.content} />
     </>
   );
 }
