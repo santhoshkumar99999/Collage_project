@@ -2,33 +2,33 @@
   "placeholderImages": [
     {
       "id": "mathematics",
-      "description": "A blackboard with complex mathematical formulas and graphs.",
-      "imageUrl": "https://images.unsplash.com/photo-1518600245233-024c2afe3e9a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxtYXRoZW1hdGljcyUyMGJsYWNrYm9hcmR8ZW58MHx8fHwxNzU4ODU5MjM3fDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "mathematics blackboard"
+      "description": "A compass drawing a circle on a piece of paper with geometric shapes.",
+      "imageUrl": "https://images.unsplash.com/photo-1596495577886-d9256e321d4b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxtYXRoZW1hdGljcyUyMGdlb21ldHJ5fGVufDB8fHx8MTc1ODg2NzQ0Nnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "mathematics geometry"
     },
     {
       "id": "science",
-      "description": "Colorful chemicals in beakers in a science laboratory.",
-      "imageUrl": "https://images.unsplash.com/photo-1576086213369-97a306d36557?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxzY2llbmNlJTIwbGFifGVufDB8fHx8MTc1ODgxNzU4N3ww&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "science lab"
+      "description": "A microscope in a laboratory setting, focused on a slide.",
+      "imageUrl": "https://images.unsplash.com/photo-1554469384-e58fac16e23a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxzY2llbmNlJTIwbWljcm9zY29wZXxlbnwwfHx8fDE3NTg4Njc0NzZ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "science microscope"
     },
     {
       "id": "physics",
-      "description": "A glass prism refracting light into a rainbow spectrum.",
-      "imageUrl": "https://images.unsplash.com/photo-1627389828416-674a6258043b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxwaHlzaWNzJTIwcHJpc218ZW58MHx8fHwxNzU4ODU5MjgzfDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "physics prism"
+      "description": "A stylized representation of an atom with electrons orbiting a nucleus.",
+      "imageUrl": "https://images.unsplash.com/photo-1565451249757-c34431a4875b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxwaHlzaWNzJTIwYXRvbXxlbnwwfHx8fDE3NTg4Njc1MDJ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "physics atom"
     },
     {
       "id": "biology",
-      "description": "A close-up view of a plant cell structure under a microscope.",
-      "imageUrl": "https://images.unsplash.com/photo-1554152562-421719b4eb24?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxiaW9sb2d5JTIwcGxhbnQlMjBjZWxsfGVufDB8fHx8MTc1ODg1OTI5N3ww&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "biology plant cell"
+      "description": "A close-up of a vibrant green leaf with water droplets on it.",
+      "imageUrl": "https://images.unsplash.com/photo-1512428209895-69213399479b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxiaW9sb2d5JTIwbGVhZnxlbnwwfHx8fDE3NTg4Njc1MTZ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "biology leaf"
     },
     {
       "id": "ai",
-      "description": "An abstract visualization of a glowing brain made of neural network connections.",
-      "imageUrl": "https://images.unsplash.com/photo-1535223289827-42f1e9919769?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxhcnRpZmljaWFsJTIwaW50ZWxsaWdlbmNlJTIwYnJhaW58ZW58MHx8fHwxNzU4ODU5MzExfDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "artificial intelligence brain"
+      "description": "A robot hand and a human hand about to touch, representing the connection between AI and humanity.",
+      "imageUrl": "https://images.unsplash.com/photo-1593349480503-69c670f5765d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxhcnRpZmljaWFsJTIwaW50ZWxsaWdlbmNlJTIwcm9ib3QlMjBoYW5kfGVufDB8fHx8MTc1ODg2NzUyOXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "AI robot hand"
     },
     {
       "id": "lesson_default",
