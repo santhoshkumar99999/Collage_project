@@ -1,18 +1,51 @@
 
+"use client";
+
+import { useState, useEffect } from 'react';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { subjects, lessons } from '@/lib/data';
 import { PageHeader } from '@/components/PageHeader';
 import { Button } from '@/components/ui/button';
-import { Download, Gamepad2 } from 'lucide-react';
+import { Download, Gamepad2, LoaderCircle } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { Chatbot } from '@/components/Chatbot';
+import { useLanguage } from '@/hooks/use-language';
+import { translateText } from '@/ai/flows/translate-flow';
+
 
 export default function LessonPage({ params }: { params: { subjectId: string, lessonId: string } }) {
+  const { language } = useLanguage();
+  const [translatedContent, setTranslatedContent] = useState('');
+  const [isTranslating, setIsTranslating] = useState(false);
+
   const subject = subjects.find((s) => s.id === params.subjectId);
   const lesson = lessons.find((l) => l.id === params.lessonId && l.subjectId === params.subjectId);
+
+  useEffect(() => {
+    if (!lesson || !language || language === 'English') {
+      setTranslatedContent(lesson?.content || '');
+      return;
+    }
+
+    const translateLessonContent = async () => {
+      setIsTranslating(true);
+      try {
+        const response = await translateText({ text: lesson.content, targetLanguage: language });
+        setTranslatedContent(response.translation);
+      } catch (error) {
+        console.error("Failed to translate content:", error);
+        setTranslatedContent(lesson.content); // Fallback to original content on error
+      } finally {
+        setIsTranslating(false);
+      }
+    };
+
+    translateLessonContent();
+  }, [lesson, language]);
+
 
   if (!subject || !lesson) {
     notFound();
@@ -23,7 +56,7 @@ export default function LessonPage({ params }: { params: { subjectId: string, le
   return (
     <>
       <PageHeader title={lesson.title}>
-         <Button variant="outline">
+         <Button variant="outline" disabled>
             <Download className="mr-2 h-4 w-4" />
             Download for Offline
         </Button>
@@ -49,7 +82,14 @@ export default function LessonPage({ params }: { params: { subjectId: string, le
               <article className="prose dark:prose-invert max-w-none">
                 <p className="text-lg text-muted-foreground">{lesson.description}</p>
                 <div className="mt-4 text-base leading-relaxed">
-                  {lesson.content.split('\n').map((paragraph, i) => <p key={i}>{paragraph}</p>)}
+                  {isTranslating ? (
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <LoaderCircle className="animate-spin h-5 w-5" />
+                      <span>Translating to {language}...</span>
+                    </div>
+                  ) : (
+                    translatedContent.split('\n').map((paragraph, i) => <p key={i}>{paragraph}</p>)
+                  )}
                 </div>
               </article>
             </CardContent>
@@ -64,7 +104,7 @@ export default function LessonPage({ params }: { params: { subjectId: string, le
           </div>
         </div>
       </main>
-      <Chatbot lessonContent={lesson.content} />
+      <Chatbot lessonContent={translatedContent || lesson.content} />
     </>
   );
 }

@@ -1,5 +1,8 @@
 
+"use client";
+
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { LanguageSelector } from './LanguageSelector';
 
 export function PageHeader({ title, children }: { title: string, children?: React.ReactNode }) {
   return (
@@ -7,6 +10,7 @@ export function PageHeader({ title, children }: { title: string, children?: Reac
         <SidebarTrigger className="md:hidden" />
         <h1 className="text-lg font-semibold md:text-2xl font-headline">{title}</h1>
         <div className="ml-auto flex items-center gap-2">
+            <LanguageSelector />
             {children}
         </div>
     </header>

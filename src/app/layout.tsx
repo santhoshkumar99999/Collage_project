@@ -4,6 +4,7 @@ import './globals.css';
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
 import { Toaster } from '@/components/ui/toaster';
 import { AppSidebar } from '@/components/AppSidebar';
+import { LanguageProvider } from '@/hooks/use-language';
 
 export const metadata: Metadata = {
   title: 'Vidyagram - Gamified Learning',
@@ -29,12 +30,14 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
       </head>
       <body className="font-body antialiased">
-        <SidebarProvider>
-            <AppSidebar />
-            <SidebarInset>
-                {children}
-            </SidebarInset>
-        </SidebarProvider>
+        <LanguageProvider>
+          <SidebarProvider>
+              <AppSidebar />
+              <SidebarInset>
+                  {children}
+              </SidebarInset>
+          </SidebarProvider>
+        </LanguageProvider>
         <Toaster />
       </body>
     </html>

@@ -12,7 +12,9 @@ import { textToSpeech } from '@/ai/flows/tts-flow';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { getUser } from '@/lib/data';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import { useLanguage } from '@/hooks/use-language';
+import { LanguageSelector } from './LanguageSelector';
+
 
 interface Message {
   role: 'user' | 'model';
@@ -21,21 +23,12 @@ interface Message {
   isAudioLoading?: boolean;
 }
 
-const supportedLanguages = [
-    { value: 'English', label: 'English' },
-    { value: 'Hindi', label: 'हिंदी' },
-    { value: 'Telugu', label: 'తెలుగు' },
-    { value: 'Kannada', label: 'ಕನ್ನಡ' },
-    { value: 'Tamil', label: 'தமிழ்' },
-    { value: 'Odia', label: 'ଓଡିଆ' },
-];
-
 export function Chatbot({ lessonContent }: { lessonContent: string }) {
+  const { language, setLanguage, supportedLanguages } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isBotLoading, setIsBotLoading] = useState(false);
-  const [language, setLanguage] = useState<string | undefined>(undefined);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const currentUser = getUser();
@@ -127,16 +120,7 @@ export function Chatbot({ lessonContent }: { lessonContent: string }) {
               <CardTitle className="flex items-center gap-2">
                 <Bot /> Lesson Assistant
               </CardTitle>
-               <Select value={language} onValueChange={setLanguage}>
-                  <SelectTrigger className="w-[120px]">
-                  <SelectValue placeholder="Language" />
-                  </SelectTrigger>
-                  <SelectContent>
-                  {supportedLanguages.map(lang => (
-                      <SelectItem key={lang.value} value={lang.value}>{lang.label}</SelectItem>
-                  ))}
-                  </SelectContent>
-              </Select>
+               <LanguageSelector />
             </CardHeader>
             <CardContent className="flex-1 overflow-hidden p-0">
                 { !language ? (
@@ -144,16 +128,9 @@ export function Chatbot({ lessonContent }: { lessonContent: string }) {
                         <Languages className="w-12 h-12 text-muted-foreground mb-4" />
                         <h3 className="text-lg font-semibold mb-2">Select a Language</h3>
                         <p className="text-muted-foreground mb-4">Please choose your preferred language to start the chat.</p>
-                        <Select onValueChange={setLanguage}>
-                            <SelectTrigger className="w-[200px]">
-                                <SelectValue placeholder="Choose a language" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {supportedLanguages.map(lang => (
-                                    <SelectItem key={lang.value} value={lang.value}>{lang.label}</SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
+                        <div className="w-[200px]">
+                           <LanguageSelector />
+                        </div>
                     </div>
                 ) : (
                     <ScrollArea className="h-full p-4" ref={scrollAreaRef}>
