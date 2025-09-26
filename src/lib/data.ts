@@ -11,7 +11,7 @@ export const badges: Badge[] = [
   { id: 'legend', name: 'Legend', icon: Zap, color: 'text-indigo-400' },
 ];
 
-let users: User[] = [
+export let users: User[] = [
   {
     id: 'user-1',
     name: 'Aarav Sharma',
@@ -83,6 +83,8 @@ export function updateUser(updatedUser: User) {
     if (index !== -1) {
       allUsers[index] = updatedUser;
       localStorage.setItem('users', JSON.stringify(allUsers));
+      // Dispatch a storage event to notify other components (like the leaderboard)
+      window.dispatchEvent(new Event("storage"));
     }
   }
 }
@@ -274,7 +276,7 @@ export const quizzes: Quiz[] = [
 
 function getLeaderboard(): LeaderboardEntry[] {
     const allUsers = getUsers();
-    const sortedUsers = allUsers.sort((a, b) => b.xp - a.xp);
+    const sortedUsers = [...allUsers].sort((a, b) => b.xp - a.xp);
     return sortedUsers.map((user, index) => ({
         rank: index + 1,
         user: user,
@@ -282,4 +284,4 @@ function getLeaderboard(): LeaderboardEntry[] {
     }));
 }
 
-export const leaderboard: LeaderboardEntry[] = getLeaderboard();
+export const initialLeaderboard: LeaderboardEntry[] = getLeaderboard();
