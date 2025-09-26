@@ -80,9 +80,11 @@ export function Chatbot({ lessonContent }: { lessonContent: string }) {
         language: language,
       });
       const modelMessage: Message = { role: 'model', content: response.answer, isAudioLoading: false };
-      setMessages((prev) => [...prev, modelMessage]);
+      const newMessages = [...messages, userMessage, modelMessage];
+      const newIndex = newMessages.length - 1; // Index of the new model message
+
+      setMessages(newMessages);
       
-      const newIndex = messages.length + 1; // Index of the new model message
       await generateAndPlayAudio(response.answer, newIndex);
 
 
