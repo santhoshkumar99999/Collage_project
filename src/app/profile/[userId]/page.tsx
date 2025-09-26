@@ -4,7 +4,8 @@
 import { useState, useEffect } from 'react';
 import { notFound } from 'next/navigation';
 import { PageHeader } from '@/components/PageHeader';
-import { users as initialUsers, User, badges } from '@/lib/data';
+import { User } from '@/lib/types';
+import { badges, users as initialUsers } from '@/lib/data';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Progress } from '@/components/ui/progress';
@@ -12,12 +13,16 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { Skeleton } from '@/components/ui/skeleton';
 
 function rehydrateUserBadges(user: User): User {
+    // Ensure badges are objects with an id, not just strings, before finding the full badge object.
+    const validBadges = user.badges?.map(badge => {
+        const badgeId = typeof badge === 'string' ? badge : badge.id;
+        const fullBadge = badges.find(b => b.id === badgeId);
+        return fullBadge;
+    }).filter(Boolean) as User['badges']; // filter(Boolean) removes any undefineds if a badge wasn't found
+
     return {
         ...user,
-        badges: user.badges.map(badge => {
-            const fullBadge = badges.find(b => b.id === badge.id);
-            return fullBadge || badge;
-        })
+        badges: validBadges || [],
     };
 }
 
@@ -34,7 +39,7 @@ export default function PublicProfilePage({ params }: { params: { userId: string
             const allUsers: User[] = JSON.parse(storedUsers);
             foundUser = allUsers.find(u => u.id === params.userId);
         } catch(e) {
-            console.error("Failed to parse users, falling back to initial data.", e);
+            console.error("Failed to parse users from localStorage, falling back to initial data.", e);
             foundUser = initialUsers.find(u => u.id === params.userId);
         }
     } else {
@@ -53,7 +58,15 @@ export default function PublicProfilePage({ params }: { params: { userId: string
         <>
             <PageHeader title="Student Profile" />
             <main className="flex-1 p-4 md:p-6">
-                <Skeleton className="h-96 w-full" />
+                 <div className="grid gap-6 md:grid-cols-3">
+                    <div className="md:col-span-1">
+                        <Skeleton className="h-48 w-full" />
+                    </div>
+                    <div className="md:col-span-2 space-y-6">
+                        <Skeleton className="h-32 w-full" />
+                        <Skeleton className="h-32 w-full" />
+                    </div>
+                </div>
             </main>
         </>
     );
