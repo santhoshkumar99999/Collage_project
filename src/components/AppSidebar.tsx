@@ -10,6 +10,8 @@ import {
   User,
   Shield,
   LogIn,
+  Settings,
+  LogOut,
 } from "lucide-react";
 
 import {
@@ -25,6 +27,14 @@ import { Logo } from "./Logo";
 import { Separator } from "./ui/separator";
 import { getUser } from "@/lib/data";
 import { useEffect, useState } from "react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
 const menuItems = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
@@ -37,6 +47,7 @@ export function AppSidebar() {
   // In a real app, you'd have a proper auth state.
   // We'll simulate it by checking if a user exists.
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const currentUser = getUser();
 
   useEffect(() => {
     // This check runs on the client side
@@ -80,16 +91,41 @@ export function AppSidebar() {
       </SidebarContent>
       <SidebarFooter>
         <Separator className="my-2" />
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton asChild tooltip={{ children: "Teacher Portal" }}>
-              <Link href="/admin/login">
-                <Shield />
-                <span>Teacher Portal</span>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
+        {isAuthenticated && currentUser && (
+           <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <SidebarMenuButton variant="ghost" className="h-auto p-2 w-full justify-start">
+                  <Avatar className="w-8 h-8">
+                    <AvatarImage src={currentUser.avatarUrl} alt={currentUser.name} />
+                    <AvatarFallback>{currentUser.name.charAt(0)}</AvatarFallback>
+                  </Avatar>
+                  <span className="ml-2">{currentUser.name}</span>
+                 <Settings className="ml-auto h-5 w-5" />
+              </SidebarMenuButton>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56 mb-2" side="top" align="end">
+              <DropdownMenuItem asChild>
+                <Link href="/profile">
+                  <User className="mr-2" />
+                  Profile
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                 <Link href="/admin/login">
+                  <Shield className="mr-2" />
+                  Teacher Portal
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+               <DropdownMenuItem asChild>
+                 <Link href="/login">
+                  <LogOut className="mr-2" />
+                  Logout
+                </Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
       </SidebarFooter>
     </Sidebar>
   );

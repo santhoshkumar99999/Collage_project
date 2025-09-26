@@ -14,8 +14,17 @@ import {
 import Link from 'next/link';
 import { Logo } from '@/components/Logo';
 import { Separator } from '@/components/ui/separator';
-import { LayoutDashboard, Users, FileText, BookOpen } from 'lucide-react';
+import { LayoutDashboard, Users, FileText, BookOpen, User, Settings, LogOut } from 'lucide-react';
 import { usePathname } from 'next/navigation';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+
 
 const adminMenuItems = [
     { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -45,16 +54,33 @@ function AdminSidebar() {
             </SidebarContent>
             <SidebarFooter>
                 <Separator className="my-2" />
-                <SidebarMenu>
-                    <SidebarMenuItem>
-                        <SidebarMenuButton asChild tooltip={{ children: "Student View" }}>
-                            <Link href="/">
-                                <BookOpen />
-                                <span>Student View</span>
-                            </Link>
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
-                </SidebarMenu>
+                 <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                    <SidebarMenuButton variant="ghost" className="h-auto p-2 w-full justify-start">
+                        <Avatar className="w-8 h-8">
+                            {/* In a real app this would be the teacher's avatar */}
+                            <AvatarFallback>T</AvatarFallback> 
+                        </Avatar>
+                        <span className="ml-2">Teacher</span>
+                        <Settings className="ml-auto h-5 w-5" />
+                    </SidebarMenuButton>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-56 mb-2" side="top" align="end">
+                    <DropdownMenuItem asChild>
+                        <Link href="/">
+                            <BookOpen className="mr-2" />
+                            Student View
+                        </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                        <Link href="/admin/login">
+                            <LogOut className="mr-2" />
+                            Logout
+                        </Link>
+                    </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
             </SidebarFooter>
         </Sidebar>
     );
