@@ -1,4 +1,7 @@
 
+"use client";
+
+import { useState } from 'react';
 import { PageHeader } from '@/components/PageHeader';
 import { Button } from '@/components/ui/button';
 import { PlusCircle } from 'lucide-react';
@@ -13,7 +16,8 @@ import {
     SelectTrigger,
     SelectValue,
   } from '@/components/ui/select';
-import { subjects, lessons } from '@/lib/data';
+import { subjects, lessons as initialLessons } from '@/lib/data';
+import type { Lesson } from '@/lib/types';
 import {
     Table,
     TableBody,
@@ -23,8 +27,57 @@ import {
     TableRow,
   } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
+import { useToast } from '@/hooks/use-toast';
+
 
 export default function AdminContentPage() {
+  const { toast } = useToast();
+  const [lessons, setLessons] = useState<Lesson[]>(initialLessons);
+  const [title, setTitle] = useState('');
+  const [subjectId, setSubjectId] = useState('');
+  const [description, setDescription] = useState('');
+  const [content, setContent] = useState('');
+
+  const handleAddLesson = () => {
+    if (!title || !subjectId || !description || !content) {
+        toast({
+            title: 'Missing Fields',
+            description: 'Please fill out all fields to add a new lesson.',
+            variant: 'destructive',
+        });
+      return;
+    }
+
+    const newLesson: Lesson = {
+      id: `lesson-${Date.now()}`,
+      subjectId,
+      title,
+      description,
+      content,
+    };
+
+    setLessons([newLesson, ...lessons]);
+
+    // Reset form
+    setTitle('');
+    setSubjectId('');
+    setDescription('');
+    setContent('');
+
+    toast({
+        title: 'Lesson Added',
+        description: `"${title}" has been successfully added.`,
+    });
+  };
+
+  const handleDeleteLesson = (lessonId: string) => {
+    setLessons(lessons.filter(l => l.id !== lessonId));
+    toast({
+        title: 'Lesson Deleted',
+        description: 'The lesson has been removed.',
+    });
+  }
+
   return (
     <>
       <PageHeader title="Content Management" />
@@ -39,11 +92,16 @@ export default function AdminContentPage() {
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="title">Lesson Title</Label>
-                  <Input id="title" placeholder="e.g., Introduction to Photosynthesis" />
+                  <Input 
+                    id="title"
+                    placeholder="e.g., Introduction to Photosynthesis"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="subject">Subject</Label>
-                  <Select>
+                  <Select value={subjectId} onValueChange={setSubjectId}>
                     <SelectTrigger id="subject">
                       <SelectValue placeholder="Select a subject" />
                     </SelectTrigger>
@@ -54,13 +112,24 @@ export default function AdminContentPage() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="description">Short Description</Label>
-                  <Textarea id="description" placeholder="A brief summary of the lesson." />
+                  <Textarea
+                    id="description"
+                    placeholder="A brief summary of the lesson."
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="content">Full Content</Label>
-                  <Textarea id="content" rows={6} placeholder="The main content of the lesson." />
+                  <Textarea
+                    id="content"
+                    rows={6}
+                    placeholder="The main content of the lesson."
+                    value={content}
+                    onChange={(e) => setContent(e.target.value)}
+                  />
                 </div>
-                <Button className="w-full">
+                <Button className="w-full" onClick={handleAddLesson}>
                   <PlusCircle className="mr-2 h-4 w-4" /> Add Lesson
                 </Button>
               </CardContent>
@@ -91,8 +160,8 @@ export default function AdminContentPage() {
                                     <Badge variant="outline">{subject?.name}</Badge>
                                 </TableCell>
                                 <TableCell className="text-right space-x-2">
-                                    <Button variant="outline" size="sm">Edit</Button>
-                                    <Button variant="destructive" size="sm">Delete</Button>
+                                    <Button variant="outline" size="sm" disabled>Edit</Button>
+                                    <Button variant="destructive" size="sm" onClick={() => handleDeleteLesson(lesson.id)}>Delete</Button>
                                 </TableCell>
                                 </TableRow>
                             );
