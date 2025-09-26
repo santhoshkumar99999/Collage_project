@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from 'react';
@@ -23,6 +24,10 @@ export function Translate({ children }: { children: React.ReactNode }) {
       if (React.isValidElement(child) && typeof child.props.children === 'string') {
         return acc + child.props.children;
       }
+      // Added to handle cases where child.props.children is an array of strings
+      if (React.isValidElement(child) && Array.isArray(child.props.children)) {
+         return acc + child.props.children.join('');
+      }
       return acc;
     }, '');
   }, [children]);
@@ -36,12 +41,18 @@ export function Translate({ children }: { children: React.ReactNode }) {
 
     const translate = async () => {
       const cacheKey = `${language}:${originalText}`;
-      const cached = sessionStorage.getItem(cacheKey);
-
-      if (cached) {
-        setTranslatedText(cached);
-        return;
+      
+      try {
+        const cached = sessionStorage.getItem(cacheKey);
+        if (cached) {
+          setTranslatedText(cached);
+          return;
+        }
+      } catch (error) {
+        // sessionStorage may not be available in all environments (e.g. server-side during pre-rendering)
+        console.warn("sessionStorage is not available. Caching is disabled.");
       }
+
 
       setIsTranslating(true);
       
@@ -57,7 +68,11 @@ export function Translate({ children }: { children: React.ReactNode }) {
       try {
         const response = await requestPromise;
         const translation = response.translation;
-        sessionStorage.setItem(cacheKey, translation);
+        try {
+          sessionStorage.setItem(cacheKey, translation);
+        } catch (error) {
+           // Ignore sessionStorage errors on the server
+        }
         setTranslatedText(translation);
       } catch (error) {
         console.error("Failed to translate content:", error);
