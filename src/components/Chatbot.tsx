@@ -122,7 +122,8 @@ export function Chatbot({ context, flowType }: ChatbotProps) {
 
       setMessages(newMessages);
       
-      await generateAndPlayAudio(response.answer, newIndex);
+      // Don't auto-play audio, let the user click
+      // await generateAndPlayAudio(response.answer, newIndex);
 
 
     } catch (error) {
