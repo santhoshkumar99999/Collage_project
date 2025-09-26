@@ -187,17 +187,17 @@ export function QuizClient({ quiz }: { quiz: Quiz }) {
     <Card className="w-full max-w-2xl mx-auto">
       <CardHeader>
         <div className="mb-4">
-            <Progress value={((currentQuestionIndex + 1) / quiz.questions.length) * 100} className="w-full" />
             <div className="text-sm text-muted-foreground mt-2"><Translate>Question</Translate> {currentQuestionIndex + 1} <Translate>of</Translate> {quiz.questions.length}</div>
+            <Progress value={((currentQuestionIndex + 1) / quiz.questions.length) * 100} className="w-full mt-1" />
         </div>
-        <div className="flex items-center gap-2">
-            <CardTitle className="text-2xl font-headline"><Translate>{currentQuestion.question}</Translate></CardTitle>
+        <div className="flex items-start gap-2">
+            <CardTitle className="text-2xl font-headline flex-1"><Translate>{currentQuestion.question}</Translate></CardTitle>
              <Button
               variant="ghost"
               size="icon"
               onClick={() => handlePlayAudio(currentQuestion.question)}
               disabled={isAudioLoading}
-              className="h-8 w-8"
+              className="h-8 w-8 flex-shrink-0"
             >
               {isAudioLoading ? <LoaderCircle className="animate-spin" /> : <Volume2 />}
               <span className="sr-only">Read question</span>
