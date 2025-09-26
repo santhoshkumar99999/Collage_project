@@ -2,6 +2,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import QRCode from "react-qr-code";
 import { PageHeader } from '@/components/PageHeader';
 import { getUser, updateUser, User } from '@/lib/data';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -12,19 +13,29 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { Edit, Save, X } from 'lucide-react';
+import { Edit, Save, X, QrCode } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+
 
 export default function ProfilePage() {
   const { toast } = useToast();
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState('');
+  const [profileUrl, setProfileUrl] = useState('');
 
   useEffect(() => {
     const user = getUser();
     setCurrentUser(user);
     if (user) {
       setName(user.name);
+      setProfileUrl(`${window.location.origin}/profile/${user.id}`);
     }
   }, []);
 
@@ -75,6 +86,28 @@ export default function ProfilePage() {
   return (
     <>
       <PageHeader title="My Profile">
+        <div className="flex items-center gap-2">
+         <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="outline" size="icon">
+                <QrCode className="h-4 w-4" />
+                <span className="sr-only">Show QR Code</span>
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Share Your Progress</DialogTitle>
+              </DialogHeader>
+              <div className="p-4 bg-white rounded-lg">
+                <QRCode
+                    size={256}
+                    style={{ height: "auto", maxWidth: "100%", width: "100%" }}
+                    value={profileUrl}
+                    viewBox={`0 0 256 256`}
+                />
+              </div>
+            </DialogContent>
+          </Dialog>
         {!isEditing ? (
             <Button variant="outline" onClick={() => setIsEditing(true)}>
                 <Edit className="mr-2 h-4 w-4" /> Edit Profile
@@ -89,6 +122,7 @@ export default function ProfilePage() {
                 </Button>
             </div>
         )}
+        </div>
       </PageHeader>
       <main className="flex-1 p-4 md:p-6">
         <div className="grid gap-6 md:grid-cols-3">
