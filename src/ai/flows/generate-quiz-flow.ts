@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview A flow to generate a quiz on a given subject.
@@ -9,7 +10,6 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
-import { QuizQuestion, Quiz } from '@/lib/types';
 
 
 const GenerateQuizInputSchema = z.object({
