@@ -4,15 +4,15 @@
 import { useState, useEffect } from 'react';
 import { notFound } from 'next/navigation';
 import { PageHeader } from '@/components/PageHeader';
-import { User } from '@/lib/types';
-import { badges, users as initialUsers } from '@/lib/data';
+import { User, Subject } from '@/lib/types';
+import { badges, users as initialUsers, lessons, subjects } from '@/lib/data';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Progress } from '@/components/ui/progress';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Skeleton } from '@/components/ui/skeleton';
 
-function rehydrateUserBadges(user: User): User {
+function rehydrateUser(user: User): User {
     // Ensure badges are objects with an id, not just strings, before finding the full badge object.
     const validBadges = user.badges?.map(badge => {
         // In case the badge is already a full object from initial data
@@ -27,6 +27,7 @@ function rehydrateUserBadges(user: User): User {
     return {
         ...user,
         badges: validBadges || [],
+        completedLessons: user.completedLessons || [],
     };
 }
 
@@ -34,7 +35,7 @@ function rehydrateUserBadges(user: User): User {
 export default function PublicProfilePage({ params }: { params: { userId: string } }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-
+  
   useEffect(() => {
     // This function will only run on the client side.
     const loadUser = () => {
@@ -53,7 +54,7 @@ export default function PublicProfilePage({ params }: { params: { userId: string
       }
       
       if (foundUser) {
-          setUser(rehydrateUserBadges(foundUser));
+          setUser(rehydrateUser(foundUser));
       }
       
       setIsLoading(false);
@@ -62,6 +63,14 @@ export default function PublicProfilePage({ params }: { params: { userId: string
     // Defer loading until the component has mounted on the client
     loadUser();
   }, [params.userId]);
+
+
+  const learnedSubjects: Subject[] = user ? 
+    subjects.filter(subject => 
+        lessons.some(lesson => 
+            user.completedLessons.includes(lesson.id) && lesson.subjectId === subject.id
+        )
+    ) : [];
 
   if (isLoading) {
     return (
@@ -73,6 +82,7 @@ export default function PublicProfilePage({ params }: { params: { userId: string
                         <Skeleton className="h-48 w-full" />
                     </div>
                     <div className="md:col-span-2 space-y-6">
+                        <Skeleton className="h-32 w-full" />
                         <Skeleton className="h-32 w-full" />
                         <Skeleton className="h-32 w-full" />
                     </div>
@@ -126,6 +136,39 @@ export default function PublicProfilePage({ params }: { params: { userId: string
                     </Tooltip>
                   </TooltipProvider>
                 </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle>Learned Subjects</CardTitle>
+                <CardDescription>Subjects where quizzes have been completed.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                 <TooltipProvider>
+                    <div className="flex flex-wrap gap-4">
+                        {learnedSubjects.length > 0 ? (
+                            learnedSubjects.map((subject) => {
+                                const SubjectIcon = subject.icon;
+                                return (
+                                <Tooltip key={subject.id}>
+                                    <TooltipTrigger>
+                                        <div className="flex flex-col items-center gap-2">
+                                            <div className="p-3 rounded-full bg-accent">
+                                                <SubjectIcon className="w-8 h-8 text-primary" />
+                                            </div>
+                                        </div>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p className="font-semibold">{subject.name}</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                                )
+                            })
+                        ) : (
+                            <p className="text-muted-foreground">No subjects learned yet.</p>
+                        )}
+                    </div>
+                </TooltipProvider>
               </CardContent>
             </Card>
             <Card>

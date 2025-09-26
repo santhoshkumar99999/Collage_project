@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
 import { CheckCircle, XCircle, Lightbulb, PartyPopper, Frown, Award } from 'lucide-react';
-import { updateUser, getUser, badges, User } from '@/lib/data';
+import { updateUser, getUser, badges, User, lessons } from '@/lib/data';
 
 export function QuizClient({ quiz }: { quiz: Quiz }) {
   const router = useRouter();
@@ -72,6 +72,11 @@ export function QuizClient({ quiz }: { quiz: Quiz }) {
     let newLevel = currentUser.level;
     let newBadges = [...currentUser.badges];
     let leveledUp = false;
+    let newCompletedLessons = [...(currentUser.completedLessons || [])];
+
+    if (!newCompletedLessons.includes(quiz.lessonId)) {
+      newCompletedLessons.push(quiz.lessonId);
+    }
 
     while (newXp >= currentUser.xpToNextLevel) {
       newXp -= currentUser.xpToNextLevel;
@@ -101,6 +106,7 @@ export function QuizClient({ quiz }: { quiz: Quiz }) {
       xp: newXp, 
       level: newLevel,
       badges: newBadges,
+      completedLessons: newCompletedLessons
     });
 
     toast({

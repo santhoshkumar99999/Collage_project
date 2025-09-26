@@ -38,6 +38,7 @@ export interface User {
   xp: number;
   xpToNextLevel: number;
   badges: Badge[];
+  completedLessons: string[];
 }
 
 export interface Badge {

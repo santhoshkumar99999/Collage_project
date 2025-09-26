@@ -4,7 +4,7 @@
 import { useState, useEffect } from 'react';
 import QRCode from "react-qr-code";
 import { PageHeader } from '@/components/PageHeader';
-import { getUser, updateUser, User } from '@/lib/data';
+import { getUser, updateUser, User, lessons, subjects } from '@/lib/data';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Progress } from '@/components/ui/progress';
@@ -53,6 +53,13 @@ export default function ProfilePage() {
       window.removeEventListener('storage', refreshUser);
     }
   }, []);
+
+  const learnedSubjects = currentUser ? 
+    subjects.filter(subject => 
+        lessons.some(lesson => 
+            currentUser.completedLessons.includes(lesson.id) && lesson.subjectId === subject.id
+        )
+    ) : [];
 
 
   if (!currentUser) {
@@ -166,6 +173,39 @@ export default function ProfilePage() {
                     </Tooltip>
                   </TooltipProvider>
                 </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle>Learned Subjects</CardTitle>
+                <CardDescription>Subjects where you have completed quizzes.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                 <TooltipProvider>
+                    <div className="flex flex-wrap gap-4">
+                        {learnedSubjects.length > 0 ? (
+                            learnedSubjects.map((subject) => {
+                                const SubjectIcon = subject.icon;
+                                return (
+                                <Tooltip key={subject.id}>
+                                    <TooltipTrigger>
+                                        <div className="flex flex-col items-center gap-2">
+                                            <div className="p-3 rounded-full bg-accent">
+                                                <SubjectIcon className="w-8 h-8 text-primary" />
+                                            </div>
+                                        </div>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p className="font-semibold">{subject.name}</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                                )
+                            })
+                        ) : (
+                            <p className="text-muted-foreground">Complete a quiz to see your first learned subject!</p>
+                        )}
+                    </div>
+                </TooltipProvider>
               </CardContent>
             </Card>
             <Card>

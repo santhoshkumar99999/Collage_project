@@ -20,6 +20,7 @@ export let users: User[] = [
     xp: 450,
     xpToNextLevel: 500,
     badges: [badges[0]],
+    completedLessons: ['algebra-basics'],
   },
   {
     id: 'user-2',
@@ -29,6 +30,7 @@ export let users: User[] = [
     xp: 720,
     xpToNextLevel: 800,
     badges: [badges[0], badges[1], badges[2]],
+    completedLessons: ['algebra-basics', 'geometry-intro', 'photosynthesis'],
   },
     {
     id: 'user-3',
@@ -38,9 +40,10 @@ export let users: User[] = [
     xp: 210,
     xpToNextLevel: 300,
     badges: [badges[0]],
+    completedLessons: [],
   },
-  { id: 'user-4', name: 'Saanvi Gupta', avatarUrl: 'https://picsum.photos/seed/user4/100/100', level: 7, xp: 650, xpToNextLevel: 700, badges: [badges[0], badges[1]] },
-  { id: 'user-5', name: 'Arjun Reddy', avatarUrl: 'https://picsum.photos/seed/user5/100/100', level: 6, xp: 550, xpToNextLevel: 600, badges: [badges[0]] },
+  { id: 'user-4', name: 'Saanvi Gupta', avatarUrl: 'https://picsum.photos/seed/user4/100/100', level: 7, xp: 650, xpToNextLevel: 700, badges: [badges[0], badges[1]], completedLessons: ['newtons-laws', 'cell-structure'] },
+  { id: 'user-5', name: 'Arjun Reddy', avatarUrl: 'https://picsum.photos/seed/user5/100/100', level: 6, xp: 550, xpToNextLevel: 600, badges: [badges[0]], completedLessons: ['ml-intro'] },
 ];
 
 // In a real app, this would be a proper user management system.
@@ -51,9 +54,10 @@ function rehydrateUserBadges(user: User): User {
     return {
         ...user,
         badges: user.badges.map(badge => {
-            const fullBadge = badges.find(b => b.id === badge.id);
+            const fullBadge = badges.find(b => b.id === (badge as any).id);
             return fullBadge || badge;
-        })
+        }),
+        completedLessons: user.completedLessons || [],
     };
 }
 
@@ -69,7 +73,7 @@ function getUsers(): User[] {
             }
         }
       }
-      return users;
+      return users.map(rehydrateUserBadges);
 }
 
 export function getUser(): User {
@@ -216,7 +220,7 @@ export const quizzes: Quiz[] = [
     questions: [
       { id: 'q1', question: 'What is the primary pigment used in photosynthesis?', options: ['Melanin', 'Hemoglobin', 'Chlorophyll', 'Carotene'], correctAnswer: 'Chlorophyll' },
       { id: 'q2', question: 'Which gas do plants absorb from the atmosphere?', options: ['Oxygen', 'Nitrogen', 'Carbon Dioxide', 'Hydrogen'], correctAnswer: 'Carbon Dioxide' },
-      { id: 'q3', question: 'What is a byproduct of photosynthesis that is released into the air?', options: ['Water', 'Oxygen', 'Carbon', 'Sunlight'], correctAnswer: 'Oxygen', hint: 'It\'s what we breathe.' },
+      { id: 'q3', 'question': 'What is a byproduct of photosynthesis that is released into the air?', options: ['Water', 'Oxygen', 'Carbon', 'Sunlight'], correctAnswer: 'Oxygen', hint: 'It\'s what we breathe.' },
       { id: 'q4', question: 'Where does photosynthesis primarily occur in a plant cell?', options: ['Nucleus', 'Mitochondria', 'Chloroplast', 'Ribosome'], correctAnswer: 'Chloroplast' },
     ],
   },
