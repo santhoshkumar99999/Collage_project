@@ -149,7 +149,7 @@ export default function PublicProfilePage({ params }: { params: { userId: string
               <CardHeader>
                 <CardTitle><Translate>Learned Subjects</Translate></CardTitle>
                 <CardDescription><Translate>Subjects where quizzes have been completed.</Translate></CardDescription>
-              </CardHeader>
+              </Header>
               <CardContent>
                  <TooltipProvider>
                     <div className="flex flex-wrap gap-4">
