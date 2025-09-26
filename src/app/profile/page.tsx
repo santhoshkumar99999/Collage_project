@@ -141,12 +141,14 @@ export default function ProfilePage() {
                 <TooltipProvider>
                   <div className="flex flex-wrap gap-4">
                     {currentUser.badges.length > 0 ? (
-                      currentUser.badges.map((badge) => (
+                      currentUser.badges.map((badge) => {
+                        const BadgeIcon = badge.icon;
+                        return (
                         <Tooltip key={badge.id}>
                           <TooltipTrigger>
                             <div className="flex flex-col items-center gap-2">
                               <div className={`p-3 rounded-full bg-accent`}>
-                                <badge.icon className={`w-8 h-8 ${badge.color}`} />
+                                <BadgeIcon className={`w-8 h-8 ${badge.color}`} />
                               </div>
                             </div>
                           </TooltipTrigger>
@@ -154,7 +156,7 @@ export default function ProfilePage() {
                             <p className="font-semibold">{badge.name}</p>
                           </TooltipContent>
                         </Tooltip>
-                      ))
+                      )})
                     ) : (
                       <p className="text-muted-foreground">No badges earned yet. Keep playing!</p>
                     )}
