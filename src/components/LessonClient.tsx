@@ -7,7 +7,7 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Gamepad2, LoaderCircle } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
+import imageData from '@/lib/placeholder-images.json';
 import { Chatbot } from '@/components/Chatbot';
 import { useLanguage } from '@/hooks/use-language';
 import { translateText } from '@/ai/flows/translate-flow';
@@ -48,7 +48,7 @@ export function LessonClient({ lesson, subject }: { lesson: Lesson, subject: Sub
     translateLessonContent();
   }, [lesson, language]);
   
-  const placeholder = PlaceHolderImages.find(p => p.id === 'lesson_default');
+  const placeholder = imageData.placeholderImages.find(p => p.id === 'lesson_default');
 
   return (
     <>
