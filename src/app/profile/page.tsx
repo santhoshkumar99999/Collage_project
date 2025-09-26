@@ -136,7 +136,7 @@ export default function ProfilePage() {
               <CardHeader>
                 <CardTitle>My Badges</CardTitle>
                 <CardDescription>Achievements you have unlocked.</CardDescription>
-              </Header>
+              </CardHeader>
               <CardContent>
                 <TooltipProvider>
                   <div className="flex flex-wrap gap-4">
