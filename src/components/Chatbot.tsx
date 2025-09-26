@@ -75,6 +75,13 @@ export function Chatbot({ context, flowType }: ChatbotProps) {
     }
   }, [transcript]);
   
+  const playAudio = (audioUrl: string) => {
+    if (audioRef.current) {
+        audioRef.current.src = audioUrl;
+        audioRef.current.play();
+    }
+  };
+  
   const generateAndPlayAudio = async (text: string, messageIndex: number) => {
     const cacheKey = `${language}:${text}`;
     if (audioCache.has(cacheKey)) {
@@ -147,13 +154,6 @@ export function Chatbot({ context, flowType }: ChatbotProps) {
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       handleSend();
-    }
-  };
-
-  const playAudio = (audioUrl: string) => {
-    if (audioRef.current) {
-        audioRef.current.src = audioUrl;
-        audioRef.current.play();
     }
   };
 
