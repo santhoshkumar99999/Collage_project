@@ -55,6 +55,7 @@ export default function ProfilePage() {
         toast({ title: 'Name cannot be empty', variant: 'destructive' });
         return;
     }
+    if (!currentUser) return;
     const updatedUser = { ...currentUser, name: name };
     updateUser(updatedUser);
     setCurrentUser(updatedUser);
@@ -66,6 +67,7 @@ export default function ProfilePage() {
   };
 
   const handleCancel = () => {
+    if (!currentUser) return;
     setName(currentUser.name);
     setIsEditing(false);
   }
