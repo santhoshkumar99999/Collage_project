@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { LanguageProvider } from '@/hooks/use-language';
+import { TranslationProvider } from '@/hooks/use-translation';
 import { RootLayoutClient } from './RootLayoutClient';
 
 
@@ -31,9 +32,11 @@ export default function RootLayout({
       </head>
       <body className="font-body antialiased">
         <LanguageProvider>
-           <RootLayoutClient>
-                {children}
+          <TranslationProvider>
+            <RootLayoutClient>
+                  {children}
             </RootLayoutClient>
+          </TranslationProvider>
         </LanguageProvider>
         <Toaster />
       </body>
