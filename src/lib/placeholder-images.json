@@ -2,33 +2,33 @@
   "placeholderImages": [
     {
       "id": "mathematics",
-      "description": "An abstract, colorful geometric pattern.",
-      "imageUrl": "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxtYXRoZW1hdGljcyUyMGFic3RyYWN0fGVufDB8fHx8MTc1ODg5ODg4Nnww&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "mathematics abstract"
+      "description": "A person writing complex mathematical formulas on a chalkboard.",
+      "imageUrl": "https://images.unsplash.com/photo-1596495578065-4507432a2424?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxtYXRoZW1hdGljcyUyMGNob2Fsa2JvYXJkfGVufDB8fHx8MTc1ODkwMTU2NHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "mathematics chalkboard"
     },
     {
       "id": "science",
-      "description": "A set of beakers with colorful liquids in a lab.",
-      "imageUrl": "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxzY2llbmNlJTIwbGFifGVufDB8fHx8MTc1ODg5ODkzM3ww&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "science lab"
+      "description": "A microscope in a modern laboratory setting.",
+      "imageUrl": "https://images.unsplash.com/photo-1532187863486-abf9db50b692?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxzY2llbmNlJTIwbGFib3JhdG9yeXxlbnwwfHx8fDE3NTg5MDE2MTJ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "science laboratory"
     },
     {
       "id": "physics",
-      "description": "A glass prism refracting light into a rainbow.",
-      "imageUrl": "https://images.unsplash.com/photo-1517210122415-b0c70b2a09bf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxwaHlzaWNzJTIwbGlnaHR8ZW58MHx8fHwxNzU4ODk4OTgwfDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "physics light"
+      "description": "An illustration of an atom with electrons orbiting the nucleus.",
+      "imageUrl": "https://images.unsplash.com/photo-1599371458826-2eea07f0653c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxwaHlzaWNzJTIwYXRvbXxlbnwwfHx8fDE3NTg5MDE2NDl8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "physics atom"
     },
     {
       "id": "biology",
-      "description": "A digital rendering of a DNA double helix.",
-      "imageUrl": "https://images.unsplash.com/photo-1532153955177-f59af40d64f8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxiaW9sb2d5JTIwRE5BfGVufDB8fHx8MTc1ODg5OTAwN3ww&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "biology dna"
+      "description": "A close-up shot of a lush green leaf, showing its veins.",
+      "imageUrl": "https://images.unsplash.com/photo-1597848212624-a24c3d32d35c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxiaW9sb2d5JTIwbGVhZnxlbnwwfHx8fDE3NTg5MDE2ODR8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "biology leaf"
     },
     {
       "id": "ai",
-      "description": "A glowing blue brain made of digital circuits.",
-      "imageUrl": "https://images.unsplash.com/photo-1526048598681-596041fde5d1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxhcnRpZmljaWFsJTIwaW50ZWxsaWdlbmNlJTIwYnJhaW58ZW58MHx8fHwxNzU4ODk5MDM2fDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "AI brain"
+      "description": "A robot hand and a human hand about to touch.",
+      "imageUrl": "https://images.unsplash.com/photo-1593349480504-84ad8a394953?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxhcnRpZmljaWFsJTIwaW50ZWxsaWdlbmNlJTIwcm9ib3R8ZW58MHx8fHwxNzU4OTAxNzE1fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "ai robot"
     },
     {
       "id": "lesson_default",
