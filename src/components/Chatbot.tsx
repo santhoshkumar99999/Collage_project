@@ -30,6 +30,8 @@ interface ChatbotProps {
     flowType: 'lesson' | 'quiz';
 }
 
+const audioCache = new Map<string, string>();
+
 export function Chatbot({ context, flowType }: ChatbotProps) {
   const { language, setLanguage, supportedLanguages } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
@@ -64,16 +66,21 @@ export function Chatbot({ context, flowType }: ChatbotProps) {
   }, [messages]);
   
   const generateAndPlayAudio = async (text: string, messageIndex: number) => {
+    const cacheKey = `${language}:${text}`;
+    if (audioCache.has(cacheKey)) {
+        const audioUrl = audioCache.get(cacheKey)!;
+        setMessages(prev => prev.map((msg, idx) => idx === messageIndex ? { ...msg, audioUrl, isAudioLoading: false } : msg));
+        playAudio(audioUrl);
+        return;
+    }
+
     setMessages(prev => prev.map((msg, idx) => idx === messageIndex ? { ...msg, isAudioLoading: true } : msg));
     try {
       const audioResponse = await textToSpeech(text);
       const audioUrl = audioResponse.media;
+      audioCache.set(cacheKey, audioUrl);
       setMessages(prev => prev.map((msg, idx) => idx === messageIndex ? { ...msg, audioUrl, isAudioLoading: false } : msg));
-
-      if (audioRef.current) {
-        audioRef.current.src = audioUrl;
-        audioRef.current.play();
-      }
+      playAudio(audioUrl);
 
     } catch (error) {
       console.error("Error generating speech:", error);
@@ -255,3 +262,5 @@ export function Chatbot({ context, flowType }: ChatbotProps) {
     </>
   );
 }
+
+    

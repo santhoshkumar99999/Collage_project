@@ -23,6 +23,8 @@ interface QuizClientProps {
     isTournament?: boolean;
 }
 
+const audioCache = new Map<string, string>();
+
 export function QuizClient({ quiz, isTournament = false }: QuizClientProps) {
   const router = useRouter();
   const { toast } = useToast();
@@ -155,8 +157,19 @@ export function QuizClient({ quiz, isTournament = false }: QuizClientProps) {
             const translationResponse = await translateText({ text, targetLanguage: language });
             textToSpeak = translationResponse.translation;
         }
+        
+        const cacheKey = `${language}:${textToSpeak}`;
+        if (audioCache.has(cacheKey)) {
+            if (audioRef.current) {
+                audioRef.current.src = audioCache.get(cacheKey)!;
+                audioRef.current.play();
+            }
+            return;
+        }
 
         const { media } = await textToSpeech(textToSpeak);
+        audioCache.set(cacheKey, media);
+
         if (audioRef.current) {
             audioRef.current.src = media;
             audioRef.current.play();
@@ -262,3 +275,5 @@ export function QuizClient({ quiz, isTournament = false }: QuizClientProps) {
     </>
   );
 }
+
+    
