@@ -41,8 +41,7 @@ Keep your answers concise and easy to understand for a student.
 
 Here is the conversation history so far:
 {{#each conversationHistory}}
-{{#if (eq role 'user')}}USER: {{content}}{{/if}}
-{{#if (eq role 'model')}}ASSISTANT: {{content}}{{/if}}
+{{role}}: {{content}}
 {{/each}}
 
 LESSON CONTENT:
