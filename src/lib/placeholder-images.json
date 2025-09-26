@@ -3,37 +3,37 @@
     {
       "id": "mathematics",
       "description": "An abstract image of colorful geometric shapes and lines.",
-      "imageUrl": "https://images.unsplash.com/photo-1635776063421-1b775248b6a2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxhYnN0cmFjdCUyMGdlb21ldHJ5fGVufDB8fHx8MTc1OTAwMDQwNnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageUrl": "https://images.unsplash.com/photo-1454117096348-e4abbeba002c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxhYnN0cmFjdCUyMGdlb21ldHJ5fGVufDB8fHx8MTc1ODg2MzcwMXww&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "abstract geometry"
     },
     {
       "id": "science",
       "description": "A microscope in a modern laboratory setting.",
-      "imageUrl": "https://images.unsplash.com/photo-1532187863486-abf9db50b692?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxzY2llbmNlJTIwbGFib3JhdG9yeXxlbnwwfHx8fDE3NTg5MDE2MTJ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageUrl": "https://images.unsplash.com/photo-1614308457932-e16d85c5d053?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8c2NpZW5jZSUyMGxhYm9yYXRvcnl8ZW58MHx8fHwxNzU4Nzk3NTk0fDA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "science laboratory"
     },
     {
       "id": "physics",
       "description": "An illustration of an atom with electrons orbiting the nucleus.",
-      "imageUrl": "https://images.unsplash.com/photo-1599371458826-2eea07f0653c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxwaHlzaWNzJTIwYXRvbXxlbnwwfHx8fDE3NTg5MDE2NDl8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageUrl": "https://images.unsplash.com/photo-1707135719544-fd75c0e66151?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxwaHlzaWNzJTIwYXRvbXxlbnwwfHx8fDE3NTg4NzgxMjd8MA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "physics atom"
     },
     {
       "id": "biology",
       "description": "A close-up shot of a lush green leaf, showing its veins.",
-      "imageUrl": "https://images.unsplash.com/photo-1597848212624-a24c3d32d35c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxiaW9sb2d5JTIwbGVhZnxlbnwwfHx8fDE3NTg5MDE2ODR8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageUrl": "https://images.unsplash.com/photo-1537097712020-7a5927da4482?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxiaW9sb2d5JTIwbGVhZnxlbnwwfHx8fDE3NTg4NzgxMjd8MA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "biology leaf"
     },
     {
       "id": "ai",
       "description": "A robot hand and a human hand about to touch.",
-      "imageUrl": "https://images.unsplash.com/photo-1593349480504-84ad8a394953?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxhcnRpZmljaWFsJTIwaW50ZWxsaWdlbmNlJTIwcm9ib3R8ZW58MHx8fHwxNzU4OTAxNzE1fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageUrl": "https://images.unsplash.com/photo-1737644467636-6b0053476bb2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxhaSUyMHJvYm90fGVufDB8fHx8MTc1ODg3NDAxMXww&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "ai robot"
     },
     {
       "id": "lesson_default",
       "description": "A student studying at a desk.",
-      "imageUrl": "https://images.unsplash.com/photo-1669146894279-509f5de45390?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxzdHVkZW50JTIwc3R1ZHlpbmd8ZW58MHx8fHwxNzU4ODQwNDcwfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageUrl": "https://images.unsplash.com/photo-1741699428220-65f37f3fbbcb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxzdHVkZW50JTIwc3R1ZHlpbmd8ZW58MHx8fHwxNzU4ODQwNDcwfDA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "student studying"
     }
   ]
