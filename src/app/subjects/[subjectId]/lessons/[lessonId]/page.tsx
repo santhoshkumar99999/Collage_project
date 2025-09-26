@@ -18,6 +18,9 @@ export default function LessonPage({ params }: { params: { subjectId: string, le
     notFound();
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { icon, ...serializableSubject } = subject;
+
   return (
     <>
       <PageHeader title={lesson.title}>
@@ -26,7 +29,7 @@ export default function LessonPage({ params }: { params: { subjectId: string, le
             Download for Offline
         </Button>
       </PageHeader>
-      <LessonClient lesson={lesson} subject={subject} />
+      <LessonClient lesson={lesson} subject={serializableSubject} />
     </>
   );
 }
