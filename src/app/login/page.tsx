@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Logo } from "@/components/Logo";
 import Link from "next/link";
 
-export default function AdminLoginPage() {
+export default function StudentLoginPage() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-background">
       <Card className="mx-auto max-w-sm">
@@ -14,9 +14,9 @@ export default function AdminLoginPage() {
             <div className="flex justify-center mb-4">
                 <Logo />
             </div>
-          <CardTitle className="text-2xl font-headline">Teacher Portal Login</CardTitle>
+          <CardTitle className="text-2xl font-headline">Student Portal Login</CardTitle>
           <CardDescription>
-            Enter your email below to login to your account
+            Welcome back! Enter your email to login.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -46,9 +46,9 @@ export default function AdminLoginPage() {
               Login
             </Button>
           </div>
-           <div className="mt-4 text-center text-sm">
+          <div className="mt-4 text-center text-sm">
             Don't have an account?{" "}
-            <Link href="/admin/signup" className="underline">
+            <Link href="/signup" className="underline">
               Sign up
             </Link>
           </div>

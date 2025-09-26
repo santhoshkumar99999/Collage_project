@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Logo } from "@/components/Logo";
 import Link from "next/link";
 
-export default function AdminLoginPage() {
+export default function StudentSignupPage() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-background">
       <Card className="mx-auto max-w-sm">
@@ -14,13 +14,17 @@ export default function AdminLoginPage() {
             <div className="flex justify-center mb-4">
                 <Logo />
             </div>
-          <CardTitle className="text-2xl font-headline">Teacher Portal Login</CardTitle>
+          <CardTitle className="text-2xl font-headline">Create a Student Account</CardTitle>
           <CardDescription>
-            Enter your email below to login to your account
+            Enter your information to create an account
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid gap-4">
+             <div className="grid gap-2">
+                <Label htmlFor="full-name">Full Name</Label>
+                <Input id="full-name" placeholder="Aarav Sharma" required />
+              </div>
             <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -31,25 +35,17 @@ export default function AdminLoginPage() {
               />
             </div>
             <div className="grid gap-2">
-              <div className="flex items-center">
                 <Label htmlFor="password">Password</Label>
-                <Link
-                  href="#"
-                  className="ml-auto inline-block text-sm underline"
-                >
-                  Forgot your password?
-                </Link>
-              </div>
-              <Input id="password" type="password" required />
+                <Input id="password" type="password" required />
             </div>
             <Button type="submit" className="w-full">
-              Login
+              Create Account
             </Button>
           </div>
-           <div className="mt-4 text-center text-sm">
-            Don't have an account?{" "}
-            <Link href="/admin/signup" className="underline">
-              Sign up
+          <div className="mt-4 text-center text-sm">
+            Already have an account?{" "}
+            <Link href="/login" className="underline">
+              Login
             </Link>
           </div>
         </CardContent>

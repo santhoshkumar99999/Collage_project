@@ -1,10 +1,10 @@
 
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
-import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
 import { Toaster } from '@/components/ui/toaster';
-import { AppSidebar } from '@/components/AppSidebar';
 import { LanguageProvider } from '@/hooks/use-language';
+import { RootLayoutClient } from './RootLayoutClient';
+
 
 export const metadata: Metadata = {
   title: 'Vidyagram - Gamified Learning',
@@ -31,12 +31,9 @@ export default function RootLayout({
       </head>
       <body className="font-body antialiased">
         <LanguageProvider>
-          <SidebarProvider>
-              <AppSidebar />
-              <SidebarInset>
-                  {children}
-              </SidebarInset>
-          </SidebarProvider>
+           <RootLayoutClient>
+                {children}
+            </RootLayoutClient>
         </LanguageProvider>
         <Toaster />
       </body>
