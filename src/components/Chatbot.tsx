@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Bot, Send, X, LoaderCircle, Volume2, PlayCircle, Languages } from 'lucide-react';
+import { Bot, Send, X, LoaderCircle, PlayCircle, Languages, Volume2 } from 'lucide-react';
 import { answerQuestion } from '@/ai/flows/lesson-chat-flow';
 import { textToSpeech } from '@/ai/flows/tts-flow';
 import { cn } from '@/lib/utils';
@@ -76,7 +76,7 @@ export function Chatbot({ lessonContent }: { lessonContent: string }) {
       const response = await answerQuestion({
         lessonContent,
         question: input,
-        conversationHistory: messages,
+        conversationHistory: messages.map(({ audioUrl, isAudioLoading, ...rest }) => rest), // Don't send audio data to chat model
         language: language,
       });
       const modelMessage: Message = { role: 'model', content: response.answer, isAudioLoading: false };
@@ -125,18 +125,16 @@ export function Chatbot({ lessonContent }: { lessonContent: string }) {
               <CardTitle className="flex items-center gap-2">
                 <Bot /> Lesson Assistant
               </CardTitle>
-               {language && (
-                 <Select value={language} onValueChange={setLanguage}>
-                    <SelectTrigger className="w-[120px]">
-                    <SelectValue placeholder="Language" />
-                    </SelectTrigger>
-                    <SelectContent>
-                    {supportedLanguages.map(lang => (
-                        <SelectItem key={lang.value} value={lang.value}>{lang.label}</SelectItem>
-                    ))}
-                    </SelectContent>
-                </Select>
-               )}
+               <Select value={language} onValueChange={setLanguage}>
+                  <SelectTrigger className="w-[120px]">
+                  <SelectValue placeholder="Language" />
+                  </SelectTrigger>
+                  <SelectContent>
+                  {supportedLanguages.map(lang => (
+                      <SelectItem key={lang.value} value={lang.value}>{lang.label}</SelectItem>
+                  ))}
+                  </SelectContent>
+              </Select>
             </CardHeader>
             <CardContent className="flex-1 overflow-hidden p-0">
                 { !language ? (
