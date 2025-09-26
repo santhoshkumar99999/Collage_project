@@ -17,7 +17,7 @@ export default function SubjectSelectionPage() {
             const placeholder = PlaceHolderImages.find(p => p.id === subject.imageId);
             return (
               <Link href={`/subjects/${subject.id}`} key={subject.id}>
-                <Card className="h-full transform transition-transform duration-300 hover:-translate-y-1 hover:shadow-xl">
+                <Card className="h-full overflow-hidden transition-transform duration-300 ease-in-out hover:-translate-y-2 hover:shadow-2xl">
                    <CardContent className="p-0">
                     {placeholder && (
                        <Image
