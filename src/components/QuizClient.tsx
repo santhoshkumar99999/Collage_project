@@ -27,6 +27,7 @@ export function QuizClient({ quiz }: { quiz: Quiz }) {
   const [score, setScore] = useState(0);
   const [isFinished, setIsFinished] = useState(false);
   const [isAudioLoading, setIsAudioLoading] = useState(false);
+  const [isHintLoading, setIsHintLoading] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
@@ -113,11 +114,25 @@ export function QuizClient({ quiz }: { quiz: Quiz }) {
     setIsFinished(true);
   }
 
-  const showHint = () => {
-    if (currentQuestion.hint) {
-      toast({ title: 'Hint', description: currentQuestion.hint });
-    } else {
+  const showHint = async () => {
+    if (!currentQuestion.hint) {
       toast({ title: 'No hint available for this question.' });
+      return;
+    }
+    
+    setIsHintLoading(true);
+    try {
+        let hintText = currentQuestion.hint;
+        if (language !== 'English') {
+            const translationResponse = await translateText({ text: hintText, targetLanguage: language });
+            hintText = translationResponse.translation;
+        }
+        toast({ title: 'Hint', description: hintText });
+    } catch (error) {
+        console.error("Error translating hint:", error);
+        toast({ title: 'Could not load hint.', variant: 'destructive' });
+    } finally {
+        setIsHintLoading(false);
     }
   };
 
@@ -202,8 +217,9 @@ export function QuizClient({ quiz }: { quiz: Quiz }) {
         </RadioGroup>
       </CardContent>
       <CardFooter className="justify-between">
-        <Button variant="ghost" onClick={showHint} disabled={!currentQuestion.hint}>
-          <Lightbulb className="mr-2 h-4 w-4" /> <Translate>Hint</Translate>
+        <Button variant="ghost" onClick={showHint} disabled={!currentQuestion.hint || isHintLoading}>
+          {isHintLoading ? <LoaderCircle className="mr-2 h-4 w-4 animate-spin" /> : <Lightbulb className="mr-2 h-4 w-4" />}
+          <Translate>Hint</Translate>
         </Button>
         <Button onClick={handleNext}>
           {currentQuestionIndex === quiz.questions.length - 1 ? <Translate>Finish</Translate> : <Translate>Next</Translate>}
