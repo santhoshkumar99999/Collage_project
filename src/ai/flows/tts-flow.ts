@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview A Text-to-Speech (TTS) flow.
@@ -30,6 +31,11 @@ const ttsFlow = ai.defineFlow(
       outputSchema: TextToSpeechOutputSchema,
     },
     async (query) => {
+      if (!process.env.GEMINI_API_KEY) {
+        throw new Error(
+          'GEMINI_API_KEY is not set. Please set it in your .env file.'
+        );
+      }
       const { media } = await ai.generate({
         model: 'googleai/gemini-2.5-flash-preview-tts',
         config: {
