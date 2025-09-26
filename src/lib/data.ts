@@ -1,4 +1,5 @@
 
+
 import type { Subject, Lesson, Quiz, User, LeaderboardEntry, Badge } from './types';
 import { Calculator, FlaskConical, Atom, Dna, Bot, BookOpen, BrainCircuit, Rocket, Star, Target, Zap } from 'lucide-react';
 
@@ -112,10 +113,10 @@ export function addUser({ name, email, password }: { name: string; email: string
     if (typeof window === 'undefined') {
         throw new Error('This function can only be called on the client-side.');
     }
-      const allUsers = getUsers();
+      const allUsers = getUsers() || [];
       
       // Check if user already exists
-      if (allUsers.some(u => u.email.toLowerCase() === email.toLowerCase())) {
+      if (allUsers.some(u => u && u.email && u.email.toLowerCase() === email.toLowerCase())) {
         throw new Error('A user with this email already exists.');
       }
       
@@ -144,8 +145,8 @@ export function loginUser({ email, password }: { email: string, password?: strin
     if (typeof window === 'undefined') {
         throw new Error('Login can only be performed on the client-side.');
     }
-        const allUsers = getUsers();
-        const userToLogin = allUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
+        const allUsers = getUsers() || [];
+        const userToLogin = allUsers.find(u => u && u.email && u.email.toLowerCase() === email.toLowerCase());
 
         if (!userToLogin) {
             throw new Error('No user found with this email.');
