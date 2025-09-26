@@ -32,25 +32,30 @@ export default function PublicProfilePage({ params }: { params: { userId: string
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    let foundUser: User | undefined;
-    const storedUsers = localStorage.getItem('users');
-    if (storedUsers) {
-        try {
-            const allUsers: User[] = JSON.parse(storedUsers);
-            foundUser = allUsers.find(u => u.id === params.userId);
-        } catch(e) {
-            console.error("Failed to parse users from localStorage, falling back to initial data.", e);
-            foundUser = initialUsers.find(u => u.id === params.userId);
-        }
-    } else {
-        foundUser = initialUsers.find(u => u.id === params.userId);
+    // This function will only run on the client side.
+    const loadUser = () => {
+      let foundUser: User | undefined;
+      const storedUsers = localStorage.getItem('users');
+      if (storedUsers) {
+          try {
+              const allUsers: User[] = JSON.parse(storedUsers);
+              foundUser = allUsers.find(u => u.id === params.userId);
+          } catch(e) {
+              console.error("Failed to parse users from localStorage, falling back to initial data.", e);
+              foundUser = initialUsers.find(u => u.id === params.userId);
+          }
+      } else {
+          foundUser = initialUsers.find(u => u.id === params.userId);
+      }
+      
+      if (foundUser) {
+          setUser(rehydrateUserBadges(foundUser));
+      }
+      
+      setIsLoading(false);
     }
     
-    if (foundUser) {
-        setUser(rehydrateUserBadges(foundUser));
-    }
-    
-    setIsLoading(false);
+    loadUser();
   }, [params.userId]);
 
   if (isLoading) {
