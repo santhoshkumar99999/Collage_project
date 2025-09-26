@@ -14,10 +14,13 @@ import { CheckCircle, XCircle, Lightbulb, PartyPopper, Frown, Award, Volume2, Lo
 import { updateUser, getUser, badges, User, lessons } from '@/lib/data';
 import { Translate } from './Translate';
 import { textToSpeech } from '@/ai/flows/tts-flow';
+import { useLanguage } from '@/hooks/use-language';
+import { translateText } from '@/ai/flows/translate-flow';
 
 export function QuizClient({ quiz }: { quiz: Quiz }) {
   const router = useRouter();
   const { toast } = useToast();
+  const { language } = useLanguage();
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
@@ -121,7 +124,13 @@ export function QuizClient({ quiz }: { quiz: Quiz }) {
   const handlePlayAudio = async (text: string) => {
     setIsAudioLoading(true);
     try {
-        const { media } = await textToSpeech(text);
+        let textToSpeak = text;
+        if (language !== 'English') {
+            const translationResponse = await translateText({ text, targetLanguage: language });
+            textToSpeak = translationResponse.translation;
+        }
+
+        const { media } = await textToSpeech(textToSpeak);
         if (audioRef.current) {
             audioRef.current.src = media;
             audioRef.current.play();
