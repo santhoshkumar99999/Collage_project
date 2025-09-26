@@ -68,20 +68,24 @@ function rehydrateUserBadges(user: User): User {
 }
 
 function getUsers(): User[] {
-    if (typeof window !== 'undefined') {
-        const storedUsers = localStorage.getItem('users');
-        if (storedUsers) {
-            try {
-                const parsedUsers: User[] = JSON.parse(storedUsers);
-                return parsedUsers.map(rehydrateUserBadges);
-            } catch (e) {
-                console.error("Failed to parse users from localStorage", e);
-            }
-        } else {
-             localStorage.setItem('users', JSON.stringify(users));
+    if (typeof window === 'undefined') {
+        return users.map(rehydrateUserBadges);
+    }
+    const storedUsers = localStorage.getItem('users');
+    if (storedUsers) {
+        try {
+            const parsedUsers: User[] = JSON.parse(storedUsers);
+            return parsedUsers.map(rehydrateUserBadges);
+        } catch (e) {
+            console.error("Failed to parse users from localStorage", e);
+             // If parsing fails, fallback to initial data
+            localStorage.setItem('users', JSON.stringify(users));
+            return users.map(rehydrateUserBadges);
         }
-      }
-      return users.map(rehydrateUserBadges);
+    } else {
+        localStorage.setItem('users', JSON.stringify(users));
+        return users.map(rehydrateUserBadges);
+    }
 }
 
 export function getUser(): User | null {
@@ -105,7 +109,9 @@ export function updateUser(updatedUser: User) {
 }
 
 export function addUser({ name, email, password }: { name: string; email: string; password?: string }) {
-    if (typeof window !== 'undefined') {
+    if (typeof window === 'undefined') {
+        throw new Error('This function can only be called on the client-side.');
+    }
       const allUsers = getUsers();
       
       // Check if user already exists
@@ -132,12 +138,12 @@ export function addUser({ name, email, password }: { name: string; email: string
       window.dispatchEvent(new Event("storage"));
       
       return newUser;
-    }
-    throw new Error('This function can only be called on the client-side.');
 }
 
 export function loginUser({ email, password }: { email: string, password?: string }) {
-    if (typeof window !== 'undefined') {
+    if (typeof window === 'undefined') {
+        throw new Error('Login can only be performed on the client-side.');
+    }
         const allUsers = getUsers();
         const userToLogin = allUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
 
@@ -152,8 +158,6 @@ export function loginUser({ email, password }: { email: string, password?: strin
         localStorage.setItem(CURRENT_USER_ID_KEY, userToLogin.id);
         window.dispatchEvent(new Event("storage")); // Notify components of user change
         return userToLogin;
-    }
-    throw new Error('Login can only be performed on the client-side.');
 }
 
 export function logoutUser() {
@@ -360,3 +364,5 @@ function getLeaderboard(): LeaderboardEntry[] {
 }
 
 export const initialLeaderboard: LeaderboardEntry[] = getLeaderboard();
+
+    
