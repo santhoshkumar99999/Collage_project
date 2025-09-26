@@ -20,7 +20,9 @@ const LessonChatInputSchema = z.object({
 });
 export type LessonChatInput = z.infer<typeof LessonChatInputSchema>;
 
-const LessonChatOutputSchema = z.string().describe("The AI's answer to the student's question.");
+const LessonChatOutputSchema = z.object({
+    answer: z.string().describe("The AI's answer to the student's question."),
+});
 export type LessonChatOutput = z.infer<typeof LessonChatOutputSchema>;
 
 

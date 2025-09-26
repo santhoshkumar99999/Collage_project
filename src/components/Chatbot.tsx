@@ -44,7 +44,7 @@ export function Chatbot({ lessonContent }: { lessonContent: string }) {
         question: input,
         conversationHistory: messages
       });
-      const modelMessage: Message = { role: 'model', content: response };
+      const modelMessage: Message = { role: 'model', content: response.answer };
       setMessages((prev) => [...prev, modelMessage]);
     } catch (error) {
       console.error("Error getting answer from AI:", error);
