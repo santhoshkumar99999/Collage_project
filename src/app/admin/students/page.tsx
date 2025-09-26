@@ -38,13 +38,20 @@ export default function AdminStudentsPage() {
       const storedUsers = localStorage.getItem('users');
       if (storedUsers) {
         try {
-            const parsedUsers = JSON.parse(storedUsers).map((user: User) => ({
-                ...user,
-                badges: user.badges.map(badge => {
-                    const fullBadge = badges.find(b => b.id === badge.id);
-                    return fullBadge || badge;
-                })
-            }));
+            const parsedUsers = JSON.parse(storedUsers).map((user: User) => {
+                // Re-hydrate badge objects from the master badges list
+                const hydratedBadges = user.badges?.map(badge => {
+                    const badgeId = typeof badge === 'string' ? badge : (badge as any).id;
+                    return badges.find(b => b.id === badgeId);
+                }).filter(Boolean) as User['badges']; // filter(Boolean) removes any undefineds
+                
+                return {
+                    ...user,
+                    badges: hydratedBadges,
+                    completedLessons: user.completedLessons || [],
+                    completedTournaments: user.completedTournaments || [],
+                };
+            });
             setUsers(parsedUsers);
         } catch (e) {
             console.error("Failed to parse users from localStorage", e);

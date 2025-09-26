@@ -15,12 +15,9 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Translate } from '@/components/Translate';
 
 function rehydrateUser(user: User): User {
-    // Ensure badges are objects with an id, not just strings, before finding the full badge object.
+    // Ensure badges are full objects, not just strings or partial objects
     const validBadges = user.badges?.map(badge => {
-        // In case the badge is already a full object from initial data
-        if (typeof badge === 'object' && badge.id && badge.name) {
-            return badge;
-        }
+        // In case the badge from localStorage is just an ID string
         const badgeId = typeof badge === 'string' ? badge : (badge as any).id;
         const fullBadge = badges.find(b => b.id === badgeId);
         return fullBadge;
