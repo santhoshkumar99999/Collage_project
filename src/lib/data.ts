@@ -21,35 +21,35 @@ let subjects: Subject[] = [
     id: 'mathematics',
     name: 'Mathematics',
     description: 'Explore the world of numbers, shapes, and patterns.',
-    icon: Calculator,
+    icon: 'Calculator',
     imageId: 'mathematics',
   },
   {
     id: 'science',
     name: 'Science',
     description: 'Discover the wonders of the natural world.',
-    icon: FlaskConical,
+    icon: 'FlaskConical',
     imageId: 'science',
   },
   {
     id: 'physics',
     name: 'Physics',
     description: 'Understand the fundamental principles of the universe.',
-    icon: Atom,
+    icon: 'Atom',
     imageId: 'physics',
   },
   {
     id: 'biology',
     name: 'Biology',
     description: 'Learn about living organisms and their vital processes.',
-    icon: Dna,
+    icon: 'Dna',
     imageId: 'biology',
   },
   {
     id: 'ai',
     name: 'Artificial Intelligence',
     description: 'Dive into the basics of AI and machine learning.',
-    icon: Bot,
+    icon: 'Bot',
     imageId: 'ai',
   },
 ];
@@ -201,12 +201,12 @@ const quizzes: Quiz[] = [
 ];
 
 const badges: Badge[] = [
-  { id: 'rookie', name: 'Rookie', icon: Star, color: 'text-yellow-400' },
-  { id: 'scholar', name: 'Scholar', icon: BookOpen, color: 'text-blue-400' },
-  { id: 'genius', name: 'Genius', icon: BrainCircuit, color: 'text-purple-400' },
-  { id: 'explorer', name: 'Explorer', icon: Rocket, color: 'text-red-400' },
-  { id: 'master', name: 'Master', icon: Target, color: 'text-green-400' },
-  { id: 'legend', name: 'Legend', icon: Zap, color: 'text-indigo-400' },
+  { id: 'rookie', name: 'Rookie', icon: 'Star', color: 'text-yellow-400' },
+  { id: 'scholar', name: 'Scholar', icon: 'BookOpen', color: 'text-blue-400' },
+  { id: 'genius', name: 'Genius', icon: 'BrainCircuit', color: 'text-purple-400' },
+  { id: 'explorer', name: 'Explorer', icon: 'Rocket', color: 'text-red-400' },
+  { id: 'master', name: 'Master', icon: 'Target', color: 'text-green-400' },
+  { id: 'legend', name: 'Legend', icon: 'Zap', color: 'text-indigo-400' },
 ];
 
 const AUTH_COOKIE_NAME = 'currentUser_id';
@@ -258,9 +258,8 @@ const initialUsers: User[] = [
 
 // --- Server-safe functions ---
 
-export function getSubjects(): Subject[] {
-  // Replace icon component with string name for serialization
-  return subjects.map(s => ({...s, icon: s.icon.displayName || 'Star' }));
+export function getSubjects(): Omit<Subject, 'icon'>[] {
+  return subjects;
 }
 
 export function getLessons(): Lesson[] {
@@ -271,25 +270,33 @@ export function getQuizzes(): Quiz[] {
   return quizzes;
 }
 
-export function getBadges(): Badge[] {
-  // Replace icon component with string name for serialization
-  return badges.map(b => ({...b, icon: b.icon.displayName || 'Star' }));
+export function getBadges(): Omit<Badge, 'icon'>[] {
+  return badges;
 }
 
 export function getIconMap() {
     return iconMap;
 }
 
-// --- Client-side functions ---
+// --- Client-side only functions ---
 
 const getUsersFromLocalStorage = (): User[] => {
   'use client';
   if (typeof window === 'undefined') return [];
   const usersStr = localStorage.getItem('users');
   if (usersStr) {
-    return JSON.parse(usersStr);
+    try {
+      const parsedUsers = JSON.parse(usersStr);
+      // Basic validation to ensure it's an array
+      if (Array.isArray(parsedUsers)) {
+        return parsedUsers;
+      }
+    } catch (e) {
+      console.error("Failed to parse users from localStorage", e);
+      // Fallback to initial users if parsing fails
+    }
   }
-  // If no users in local storage, initialize with default
+  // If no users in local storage or data is corrupt, initialize with default
   localStorage.setItem('users', JSON.stringify(initialUsers));
   return initialUsers;
 };
@@ -348,7 +355,7 @@ export function addSubject(subject: { name: string, description: string }) {
     const newSubject: Subject = {
         ...subject,
         id: subject.name.toLowerCase().replace(/\s+/g, '-'),
-        icon: BookOpen,
+        icon: 'BookOpen',
         imageId: `custom-${Date.now()}`
     };
     subjects.push(newSubject);

@@ -16,9 +16,9 @@ import { Star } from 'lucide-react';
 
 interface ProfilePageClientProps {
     userId: string;
-    allSubjects: Subject[];
+    allSubjects: Omit<Subject, 'icon'>[];
     allLessons: Lesson[];
-    allBadges: BadgeType[];
+    allBadges: Omit<BadgeType, 'icon'>[];
 }
 
 export function ProfilePageClient({ userId, allSubjects, allLessons, allBadges }: ProfilePageClientProps) {
@@ -202,7 +202,7 @@ export function ProfilePageClient({ userId, allSubjects, allLessons, allBadges }
                   <div className="flex flex-wrap gap-4">
                     {userBadges.length > 0 ? (
                       userBadges.map((badge) => {
-                        const BadgeIcon = badge.icon;
+                        const BadgeIcon = badge.icon as React.ElementType;
                         return (
                         <Tooltip key={badge.id}>
                           <TooltipTrigger>

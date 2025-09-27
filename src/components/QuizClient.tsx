@@ -3,7 +3,7 @@
 
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { Quiz, QuizQuestion, Badge as BadgeType, User, Subject } from '@/lib/types';
+import { Quiz, QuizQuestion, Badge as BadgeType, User } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
@@ -177,10 +177,11 @@ export function QuizClient({ quiz, isTournament = false }: QuizClientProps) {
                 audioRef.current.src = audioCache.get(cacheKey)!;
                 audioRef.current.play();
             }
+            setIsAudioLoading(false); // finish loading
             return;
         }
 
-        const { media } = await textToSpeech(textToSpeak);
+        const { media } = await textToSpeech({ prompt: textToSpeak });
         audioCache.set(cacheKey, media);
 
         if (audioRef.current) {
@@ -264,8 +265,8 @@ export function QuizClient({ quiz, isTournament = false }: QuizClientProps) {
       <CardContent>
         <RadioGroup onValueChange={setSelectedAnswer} value={selectedAnswer ?? undefined}>
           <div className="space-y-4">
-            {currentQuestion.options.map((option) => (
-              <div key={option} className="flex items-center space-x-2">
+            {currentQuestion.options.map((option, index) => (
+              <div key={`${currentQuestion.id}-option-${index}`} className="flex items-center space-x-2">
                 <RadioGroupItem value={option} id={option} />
                 <Label htmlFor={option} className="text-base flex-1 cursor-pointer"><Translate>{option}</Translate></Label>
               </div>
@@ -282,7 +283,7 @@ export function QuizClient({ quiz, isTournament = false }: QuizClientProps) {
           {currentQuestionIndex === quiz.questions.length - 1 ? <Translate>Finish</Translate> : <Translate>Next</Translate>}
         </Button>
       </CardFooter>
-      <audio ref={audioRef} className="hidden" />
+      <audio ref={audioRef} className="hidden" onEnded={() => setIsAudioLoading(false)} />
     </Card>
     <Chatbot context={chatbotContext} flowType="quiz" />
     </>

@@ -3,6 +3,8 @@ import { notFound } from 'next/navigation';
 import { getSubjects, getLessons, getIconMap } from '@/lib/data';
 import { SubjectPageClient } from './SubjectPageClient';
 import { Star } from 'lucide-react';
+import type { Subject } from '@/lib/types';
+
 
 export function generateStaticParams() {
   const subjects = getSubjects();
@@ -26,7 +28,7 @@ export default function SubjectPage({ params }: { params: { subjectId: string } 
   
   // Re-hydrate the icon component from its name
   const IconComponent = iconMap[subjectData.icon as keyof typeof iconMap] || Star;
-  const subject = { ...subjectData, icon: IconComponent };
+  const subject = { ...subjectData, icon: IconComponent } as Subject;
 
   return <SubjectPageClient subject={subject} subjectLessons={subjectLessons} />;
 }

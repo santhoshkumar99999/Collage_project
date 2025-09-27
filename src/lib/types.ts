@@ -3,9 +3,8 @@ export interface Subject {
   id: string;
   name: string;
   description: string;
-  icon: React.ElementType; 
+  icon: React.ElementType | string; 
   imageId: string;
-  iconName?: string;
 }
 
 export interface Lesson {

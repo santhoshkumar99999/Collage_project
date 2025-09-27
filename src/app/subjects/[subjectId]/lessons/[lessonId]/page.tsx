@@ -5,7 +5,7 @@ import { PageHeader } from '@/components/PageHeader';
 import { Button } from '@/components/ui/button';
 import { Download } from 'lucide-react';
 import { LessonClient } from '@/components/LessonClient';
-import type { Subject, Lesson } from '@/lib/types';
+import type { Subject } from '@/lib/types';
 
 export function generateStaticParams() {
   const lessons = getLessons();
@@ -26,8 +26,8 @@ export default function LessonPage({ params }: { params: { subjectId: string, le
     notFound();
   }
   
-  // Exclude non-serializable 'icon' prop before passing to client component
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // The 'icon' prop is a component which cannot be passed to a Client Component.
+  // We only pass the serializable parts of the subject.
   const { icon, ...serializableSubject } = subject;
 
   return (
@@ -38,7 +38,7 @@ export default function LessonPage({ params }: { params: { subjectId: string, le
             Download for Offline
         </Button>
       </PageHeader>
-      <LessonClient lesson={lesson} subject={serializableSubject as Subject} />
+      <LessonClient lesson={lesson} subject={serializableSubject as Omit<Subject, 'icon'>} />
     </>
   );
 }

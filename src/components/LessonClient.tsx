@@ -14,7 +14,7 @@ import { translateText } from '@/ai/flows/translate-flow';
 import type { Lesson, Subject } from '@/lib/types';
 import { Translate } from './Translate';
 
-export function LessonClient({ lesson, subject }: { lesson: Lesson, subject: Subject }) {
+export function LessonClient({ lesson, subject }: { lesson: Lesson, subject: Omit<Subject, 'icon'> }) {
   const { language } = useLanguage();
   const [translatedContent, setTranslatedContent] = useState(lesson.content);
   const [translatedDescription, setTranslatedDescription] = useState(lesson.description);
