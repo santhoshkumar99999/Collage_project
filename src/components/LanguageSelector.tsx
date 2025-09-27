@@ -10,10 +10,15 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
+import { Skeleton } from './ui/skeleton';
 
 
 export function LanguageSelector({ className }: { className?: string }) {
-    const { language, setLanguage, supportedLanguages } = useLanguage();
+    const { language, setLanguage, supportedLanguages, isInitialized } = useLanguage();
+
+    if (!isInitialized) {
+        return <Skeleton className={cn("w-[140px] h-10", className)} />;
+    }
 
     return (
         <Select value={language} onValueChange={setLanguage}>

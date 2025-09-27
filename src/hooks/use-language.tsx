@@ -1,12 +1,13 @@
 
 "use client";
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 
 type LanguageContextType = {
   language: string;
   setLanguage: (language: string) => void;
   supportedLanguages: { value: string; label: string }[];
+  isInitialized: boolean;
 };
 
 const supportedLanguages = [
@@ -22,23 +23,27 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   const [language, setLanguageState] = useState('English');
+  const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
     const storedLanguage = localStorage.getItem('language');
     if (storedLanguage && supportedLanguages.some(l => l.value === storedLanguage)) {
       setLanguageState(storedLanguage);
+      document.documentElement.lang = supportedLanguages.find(l => l.value === storedLanguage)?.label.substring(0,2).toLowerCase() || 'en';
     }
+    setIsInitialized(true);
   }, []);
 
-  const setLanguage = (newLanguage: string) => {
+  const setLanguage = useCallback((newLanguage: string) => {
     if (supportedLanguages.some(l => l.value === newLanguage)) {
       localStorage.setItem('language', newLanguage);
       setLanguageState(newLanguage);
+      document.documentElement.lang = supportedLanguages.find(l => l.value === newLanguage)?.label.substring(0,2).toLowerCase() || 'en';
     }
-  };
+  }, []);
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, supportedLanguages }}>
+    <LanguageContext.Provider value={{ language, setLanguage, supportedLanguages, isInitialized }}>
       {children}
     </LanguageContext.Provider>
   );

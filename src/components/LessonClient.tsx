@@ -10,36 +10,33 @@ import { Card, CardContent } from '@/components/ui/card';
 import imageData from '@/lib/placeholder-images.json';
 import { Chatbot } from '@/components/Chatbot';
 import { useLanguage } from '@/hooks/use-language';
-import { translateText } from '@/ai/flows/translate-flow';
+import { translateBatch } from '@/ai/flows/translate-batch-flow';
 import type { Lesson, Subject } from '@/lib/types';
 import { Translate } from './Translate';
 
 export function LessonClient({ lesson, subject }: { lesson: Lesson, subject: Omit<Subject, 'icon'> }) {
   const { language } = useLanguage();
   const [translatedContent, setTranslatedContent] = useState(lesson.content);
-  const [translatedDescription, setTranslatedDescription] = useState(lesson.description);
   const [isTranslating, setIsTranslating] = useState(false);
 
   useEffect(() => {
     if (!lesson || !language || language === 'English') {
-      setTranslatedContent(lesson?.content || '');
-      setTranslatedDescription(lesson?.description || '');
+      setTranslatedContent(lesson.content);
       return;
     }
 
     const translateLessonContent = async () => {
       setIsTranslating(true);
       try {
-        const [contentResponse, descriptionResponse] = await Promise.all([
-            translateText({ text: lesson.content, targetLanguage: language }),
-            translateText({ text: lesson.description, targetLanguage: language })
-        ]);
-        setTranslatedContent(contentResponse.translation);
-        setTranslatedDescription(descriptionResponse.translation);
+        const textsToTranslate = [lesson.content, lesson.description];
+        const response = await translateBatch({ texts: textsToTranslate, targetLanguage: language });
+        
+        // Use a local variable to store translated description if needed elsewhere, 
+        // as the component now uses <Translate> for the description.
+        setTranslatedContent(response.translations[0] || lesson.content);
       } catch (error) {
         console.error("Failed to translate content:", error);
         setTranslatedContent(lesson.content); // Fallback to original content on error
-        setTranslatedDescription(lesson.description);
       } finally {
         setIsTranslating(false);
       }
@@ -71,7 +68,9 @@ export function LessonClient({ lesson, subject }: { lesson: Lesson, subject: Omi
             <Card>
                 <CardContent className="p-6">
                 <article className="prose dark:prose-invert max-w-none">
-                    <p className="text-lg text-muted-foreground">{translatedDescription}</p>
+                    <p className="text-lg text-muted-foreground">
+                        <Translate>{lesson.description}</Translate>
+                    </p>
                     <div className="mt-4 text-base leading-relaxed">
                     {isTranslating ? (
                         <div className="flex items-center gap-2 text-muted-foreground">
