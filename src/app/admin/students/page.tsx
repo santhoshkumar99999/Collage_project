@@ -83,8 +83,8 @@ export default function AdminStudentsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {users.map((user) => (
-                  <TableRow key={user.id}>
+                {users.map((user, index) => (
+                  <TableRow key={`${user.id}-${index}`}>
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <Avatar>

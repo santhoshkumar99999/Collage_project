@@ -66,8 +66,8 @@ export default function LeaderboardPage() {
                         </TableRow>
                     ))
                 ) : (
-                    leaderboard.map((entry) => (
-                    <TableRow key={entry.rank} className={entry.rank <= 3 ? 'bg-primary/5' : ''}>
+                    leaderboard.map((entry, index) => (
+                    <TableRow key={`${entry.rank}-${index}`} className={entry.rank <= 3 ? 'bg-primary/5' : ''}>
                         <TableCell className="font-medium text-lg">
                         <div className="flex items-center gap-2">
                             {entry.rank === 1 && <Trophy className="w-6 h-6 text-yellow-400" />}

@@ -21,6 +21,7 @@ export default function PublicProfilePage({ params }: { params: { userId: string
   const [lessons, setLessons] = useState<any[]>([]);
   const [allBadges, setAllBadges] = useState<BadgeType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [iconMap, setIconMap] = useState<any>({});
   
   useEffect(() => {
     setIsLoading(true);
@@ -28,24 +29,16 @@ export default function PublicProfilePage({ params }: { params: { userId: string
     const subjectsData = getSubjects();
     const lessonsData = getLessons();
     const badgesData = getBadges();
-    const iconMap = getIconMap();
+    const icons = getIconMap();
 
     if (userData) {
         setUser(userData);
     }
-    const badgesWithIcons = badgesData.map(badge => ({
-        ...badge,
-        icon: iconMap[badge.icon as keyof typeof iconMap] || Star
-    }));
-
-    const subjectsWithIcons = subjectsData.map(subject => ({
-        ...subject,
-        icon: iconMap[subject.icon as keyof typeof iconMap] || Star,
-    }));
-
-    setSubjects(subjectsWithIcons);
+    
+    setIconMap(icons);
+    setSubjects(subjectsData);
     setLessons(lessonsData);
-    setAllBadges(badgesWithIcons);
+    setAllBadges(badgesData);
     setIsLoading(false);
   }, [params.userId]);
 
@@ -140,7 +133,7 @@ export default function PublicProfilePage({ params }: { params: { userId: string
                     <div className="flex flex-wrap gap-4">
                         {learnedSubjects.length > 0 ? (
                             learnedSubjects.map((subject) => {
-                                const SubjectIcon = subject.icon;
+                                const SubjectIcon = iconMap[subject.icon as keyof typeof iconMap] || Star;
                                 return (
                                 <Tooltip key={subject.id}>
                                     <TooltipTrigger>
@@ -173,7 +166,7 @@ export default function PublicProfilePage({ params }: { params: { userId: string
                     <div className="flex flex-wrap gap-4">
                         {tournamentSubjects.length > 0 ? (
                             tournamentSubjects.map((subject) => {
-                                const SubjectIcon = subject.icon;
+                                const SubjectIcon = iconMap[subject.icon as keyof typeof iconMap] || Star;
                                 return (
                                 <Tooltip key={subject.id}>
                                     <TooltipTrigger>
@@ -206,7 +199,7 @@ export default function PublicProfilePage({ params }: { params: { userId: string
                   <div className="flex flex-wrap gap-4">
                     {userBadges.length > 0 ? (
                       userBadges.map((badge) => {
-                        const BadgeIcon = badge.icon;
+                        const BadgeIcon = iconMap[badge.icon as keyof typeof iconMap] || Star;
                         return (
                         <Tooltip key={badge.id}>
                           <TooltipTrigger>
