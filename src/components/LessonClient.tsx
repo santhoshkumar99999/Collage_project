@@ -79,7 +79,9 @@ export function LessonClient({ lesson, subject }: { lesson: Lesson, subject: Omi
                         <span><Translate>Translating to</Translate> {language}...</span>
                         </div>
                     ) : (
-                        translatedContent.split('\n').map((paragraph, i) => <p key={i}>{paragraph}</p>)
+                        <div>
+                            {translatedContent.split('\n').map((paragraph, i) => <p key={i}>{paragraph}</p>)}
+                        </div>
                     )}
                     </div>
                 </article>
