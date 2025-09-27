@@ -7,16 +7,17 @@ import { QuizClient } from '@/components/QuizClient';
 export function generateStaticParams() {
   const quizzes = getQuizzes();
   const lessons = getLessons();
+  
   return quizzes.map((quiz) => {
     const lesson = lessons.find((l) => l.id === quiz.lessonId);
     return {
       subjectId: lesson?.subjectId,
       lessonId: quiz.lessonId,
     };
-  }).filter(params => params.subjectId);
+  }).filter(params => params.subjectId && params.lessonId) as { subjectId: string; lessonId: string; }[];
 }
 
-export default function QuizPage({ params }: { params: { lessonId: string } }) {
+export default function QuizPage({ params }: { params: { lessonId: string, subjectId: string } }) {
   const quizzes = getQuizzes();
   const quiz = quizzes.find((q) => q.lessonId === params.lessonId);
 
