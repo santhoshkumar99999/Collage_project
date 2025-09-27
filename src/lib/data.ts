@@ -1,6 +1,4 @@
 
-'use client';
-
 import type { Subject, Lesson, Quiz, User, LeaderboardEntry, Badge } from './types';
 import { Calculator, FlaskConical, Atom, Dna, Bot, BookOpen, Star, BrainCircuit, Rocket, Target, Zap } from 'lucide-react';
 
@@ -213,70 +211,56 @@ const badges: Badge[] = [
 
 const AUTH_COOKIE_NAME = 'currentUser_id';
 
-const getUsersFromLocalStorage = (): User[] => {
-  if (typeof window === 'undefined') return [];
-  const usersStr = localStorage.getItem('users');
-  return usersStr ? JSON.parse(usersStr) : [];
-};
+const initialUsers: User[] = [
+    {
+        id: 'user-1',
+        name: 'Aarav Sharma',
+        email: 'student@example.com',
+        password: 'password',
+        avatarUrl: 'https://picsum.photos/seed/user1/100/100',
+        level: 5,
+        xp: 450,
+        xpToNextLevel: 500,
+        badgeIds: ['rookie'],
+        completedLessons: ['algebra-basics'],
+        completedTournaments: ['mathematics'],
+    },
+    {
+        id: 'user-2',
+        name: 'Priya Patel',
+        email: 'priya@example.com',
+        password: 'password',
+        avatarUrl: 'https://picsum.photos/seed/user2/100/100',
+        level: 8,
+        xp: 720,
+        xpToNextLevel: 800,
+        badgeIds: ['rookie', 'scholar', 'genius'],
+        completedLessons: ['algebra-basics', 'geometry-intro', 'photosynthesis'],
+        completedTournaments: ['mathematics', 'science'],
+    },
+    {
+        id: 'user-3',
+        name: 'Rohan Singh',
+        email: 'rohan@example.com',
+        password: 'password',
+        avatarUrl: 'https://picsum.photos/seed/user3/100/100',
+        level: 3,
+        xp: 210,
+        xpToNextLevel: 300,
+        badgeIds: ['rookie'],
+        completedLessons: [],
+        completedTournaments: [],
+    },
+    { id: 'user-4', name: 'Saanvi Gupta', email: 'saanvi@example.com', password: 'password', avatarUrl: 'https://picsum.photos/seed/user4/100/100', level: 7, xp: 650, xpToNextLevel: 700, badgeIds: ['rookie', 'scholar'], completedLessons: ['newtons-laws', 'cell-structure'], completedTournaments: ['physics'] },
+    { id: 'user-5', name: 'Arjun Reddy', email: 'arjun@example.com', password: 'password', avatarUrl: 'https://picsum.photos/seed/user5/100/100', level: 6, xp: 550, xpToNextLevel: 600, badgeIds: ['rookie'], completedLessons: ['ml-intro'], completedTournaments: ['ai'] },
+    { id: 'user-teacher', name: 'Teacher', email: 'teacher@example.com', password: 'password', avatarUrl: 'https://picsum.photos/seed/teacher/100/100', level: 99, xp: 9999, xpToNextLevel: 10000, badgeIds: badges.map(b => b.id), completedLessons: [], completedTournaments: [] },
+];
 
-const saveUsersToLocalStorage = (users: User[]) => {
-    if (typeof window === 'undefined') return;
-    localStorage.setItem('users', JSON.stringify(users));
-};
-
-// Initialize localStorage with initial users if it's empty
-if (typeof window !== 'undefined' && !localStorage.getItem('users')) {
-    const initialUsers: User[] = [
-        {
-            id: 'user-1',
-            name: 'Aarav Sharma',
-            email: 'student@example.com',
-            password: 'password',
-            avatarUrl: 'https://picsum.photos/seed/user1/100/100',
-            level: 5,
-            xp: 450,
-            xpToNextLevel: 500,
-            badgeIds: ['rookie'],
-            completedLessons: ['algebra-basics'],
-            completedTournaments: ['mathematics'],
-        },
-        {
-            id: 'user-2',
-            name: 'Priya Patel',
-            email: 'priya@example.com',
-            password: 'password',
-            avatarUrl: 'https://picsum.photos/seed/user2/100/100',
-            level: 8,
-            xp: 720,
-            xpToNextLevel: 800,
-            badgeIds: ['rookie', 'scholar', 'genius'],
-            completedLessons: ['algebra-basics', 'geometry-intro', 'photosynthesis'],
-            completedTournaments: ['mathematics', 'science'],
-        },
-        {
-            id: 'user-3',
-            name: 'Rohan Singh',
-            email: 'rohan@example.com',
-            password: 'password',
-            avatarUrl: 'https://picsum.photos/seed/user3/100/100',
-            level: 3,
-            xp: 210,
-            xpToNextLevel: 300,
-            badgeIds: ['rookie'],
-            completedLessons: [],
-            completedTournaments: [],
-        },
-        { id: 'user-4', name: 'Saanvi Gupta', email: 'saanvi@example.com', password: 'password', avatarUrl: 'https://picsum.photos/seed/user4/100/100', level: 7, xp: 650, xpToNextLevel: 700, badgeIds: ['rookie', 'scholar'], completedLessons: ['newtons-laws', 'cell-structure'], completedTournaments: ['physics'] },
-        { id: 'user-5', name: 'Arjun Reddy', email: 'arjun@example.com', password: 'password', avatarUrl: 'https://picsum.photos/seed/user5/100/100', level: 6, xp: 550, xpToNextLevel: 600, badgeIds: ['rookie'], completedLessons: ['ml-intro'], completedTournaments: ['ai'] },
-        { id: 'user-teacher', name: 'Teacher', email: 'teacher@example.com', password: 'password', avatarUrl: 'https://picsum.photos/seed/teacher/100/100', level: 99, xp: 9999, xpToNextLevel: 10000, badgeIds: badges.map(b => b.id), completedLessons: [], completedTournaments: [] },
-    ];
-    saveUsersToLocalStorage(initialUsers);
-}
-
-// --- Data Functions ---
+// --- Server-safe functions ---
 
 export function getSubjects(): Subject[] {
-  return subjects;
+  // Replace icon component with string name for serialization
+  return subjects.map(s => ({...s, icon: s.icon.displayName || 'Star' }));
 }
 
 export function getLessons(): Lesson[] {
@@ -288,23 +272,48 @@ export function getQuizzes(): Quiz[] {
 }
 
 export function getBadges(): Badge[] {
-  return badges;
-}
-
-export function getUsers(): User[] {
-  return getUsersFromLocalStorage();
+  // Replace icon component with string name for serialization
+  return badges.map(b => ({...b, icon: b.icon.displayName || 'Star' }));
 }
 
 export function getIconMap() {
     return iconMap;
 }
 
+// --- Client-side functions ---
+
+const getUsersFromLocalStorage = (): User[] => {
+  'use client';
+  if (typeof window === 'undefined') return [];
+  const usersStr = localStorage.getItem('users');
+  if (usersStr) {
+    return JSON.parse(usersStr);
+  }
+  // If no users in local storage, initialize with default
+  localStorage.setItem('users', JSON.stringify(initialUsers));
+  return initialUsers;
+};
+
+const saveUsersToLocalStorage = (users: User[]) => {
+    'use client';
+    if (typeof window === 'undefined') return;
+    localStorage.setItem('users', JSON.stringify(users));
+};
+
+export function getUsers(): User[] {
+  'use client';
+  return getUsersFromLocalStorage();
+}
+
+
 export function getUser(userId: string): User | null {
+  'use client';
   const users = getUsersFromLocalStorage();
   return users.find(u => u.id === userId) || null;
 }
 
 export function getLeaderboard(): LeaderboardEntry[] {
+  'use client';
   const users = getUsersFromLocalStorage();
   const sortedUsers = [...users].sort((a, b) => b.xp - a.xp);
   return sortedUsers.map((user, index) => ({
@@ -315,6 +324,7 @@ export function getLeaderboard(): LeaderboardEntry[] {
 }
 
 export function updateUser(updatedUser: User) {
+  'use client';
   if (!updatedUser || !updatedUser.id) return;
   let users = getUsersFromLocalStorage();
   users = users.map(u => u.id === updatedUser.id ? updatedUser : u);
@@ -322,17 +332,20 @@ export function updateUser(updatedUser: User) {
 }
 
 export function getAuthenticatedUserId(): string | null {
+    'use client';
     if (typeof window === 'undefined') return null;
     return localStorage.getItem(AUTH_COOKIE_NAME);
 }
 
 export function logoutUser() {
+    'use client';
     if (typeof window === 'undefined') return;
     localStorage.removeItem(AUTH_COOKIE_NAME);
 }
 
 export function addSubject(subject: { name: string, description: string }) {
-    const newSubject = {
+    'use client';
+    const newSubject: Subject = {
         ...subject,
         id: subject.name.toLowerCase().replace(/\s+/g, '-'),
         icon: BookOpen,
@@ -343,6 +356,7 @@ export function addSubject(subject: { name: string, description: string }) {
 }
 
 export function addUser({ name, email, password }: { name: string; email: string; password?: string }): User {
+    'use client';
     const users = getUsersFromLocalStorage();
     const existingUser = users.find(u => u.email.toLowerCase() === email.toLowerCase());
     if (existingUser) {
@@ -368,6 +382,7 @@ export function addUser({ name, email, password }: { name: string; email: string
 }
 
 export function loginUserAction(credentials: { email: string, password?: string }): { success: boolean; message: string; userId?: string } {
+    'use client';
     if (typeof window === 'undefined') {
         return { success: false, message: 'Login can only be performed on the client.' };
     }

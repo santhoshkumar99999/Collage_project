@@ -1,7 +1,8 @@
 
 import { notFound } from 'next/navigation';
-import { getSubjects, getLessons } from '@/lib/data';
+import { getSubjects, getLessons, getIconMap } from '@/lib/data';
 import { SubjectPageClient } from './SubjectPageClient';
+import { Star } from 'lucide-react';
 
 export function generateStaticParams() {
   const subjects = getSubjects();
@@ -13,13 +14,19 @@ export function generateStaticParams() {
 export default function SubjectPage({ params }: { params: { subjectId: string } }) {
   const subjects = getSubjects();
   const lessons = getLessons();
-  const subject = subjects.find((s) => s.id === params.subjectId);
+  const iconMap = getIconMap();
+
+  const subjectData = subjects.find((s) => s.id === params.subjectId);
   
-  if (!subject) {
+  if (!subjectData) {
     notFound();
   }
   
   const subjectLessons = lessons.filter((l) => l.subjectId === params.subjectId);
+  
+  // Re-hydrate the icon component from its name
+  const IconComponent = iconMap[subjectData.icon as keyof typeof iconMap] || Star;
+  const subject = { ...subjectData, icon: IconComponent };
 
   return <SubjectPageClient subject={subject} subjectLessons={subjectLessons} />;
 }

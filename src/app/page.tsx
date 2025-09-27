@@ -4,18 +4,30 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
-import { getSubjects } from '@/lib/data';
+import { getSubjects, getIconMap } from '@/lib/data';
 import type { Subject } from '@/lib/types';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { PageHeader } from '@/components/PageHeader';
 import imageData from '@/lib/placeholder-images.json';
 import { Translate } from '@/components/Translate';
+import { Star } from 'lucide-react';
 
 export default function SubjectSelectionPage() {
   const [subjects, setSubjects] = useState<Subject[]>([]);
+  const [iconMap, setIconMap] = useState<any>(null);
 
   useEffect(() => {
-    setSubjects(getSubjects());
+    // These functions can be called on the client.
+    const subjectData = getSubjects();
+    const icons = getIconMap();
+    setIconMap(icons);
+
+    // Re-hydrate the icon component on the client
+    const subjectsWithIcons = subjectData.map(s => {
+        const IconComponent = icons[s.icon as keyof typeof icons] || Star;
+        return {...s, icon: IconComponent};
+    });
+    setSubjects(subjectsWithIcons);
   }, []);
 
   return (
