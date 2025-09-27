@@ -1,8 +1,7 @@
 
 import { notFound } from 'next/navigation';
-import { getSubjects, getLessons, getIconMap } from '@/lib/data';
+import { getSubjects, getLessons } from '@/lib/data';
 import { SubjectPageClient } from './SubjectPageClient';
-import { Star } from 'lucide-react';
 import type { Subject } from '@/lib/types';
 
 
@@ -16,7 +15,6 @@ export function generateStaticParams() {
 export default function SubjectPage({ params }: { params: { subjectId: string } }) {
   const subjects = getSubjects();
   const lessons = getLessons();
-  const iconMap = getIconMap();
 
   const subjectData = subjects.find((s) => s.id === params.subjectId);
   
@@ -25,10 +23,8 @@ export default function SubjectPage({ params }: { params: { subjectId: string } 
   }
   
   const subjectLessons = lessons.filter((l) => l.subjectId === params.subjectId);
-  
-  // Re-hydrate the icon component from its name
-  const IconComponent = iconMap[subjectData.icon as keyof typeof iconMap] || Star;
-  const subject = { ...subjectData, icon: IconComponent } as Subject;
 
-  return <SubjectPageClient subject={subject} subjectLessons={subjectLessons} />;
+  // Pass the raw, serializable subject data to the client component.
+  // The client will handle resolving the icon component.
+  return <SubjectPageClient subject={subjectData as Omit<Subject, 'icon'>} subjectLessons={subjectLessons} />;
 }

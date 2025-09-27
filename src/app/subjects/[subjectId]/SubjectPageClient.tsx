@@ -2,14 +2,28 @@
 "use client";
 
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 import type { Subject, Lesson } from '@/lib/types';
 import { PageHeader } from '@/components/PageHeader';
 import { Card, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { BookOpen, Gamepad2 } from 'lucide-react';
+import { BookOpen, Gamepad2, Star } from 'lucide-react';
 import { Translate } from '@/components/Translate';
+import { getIconMap } from '@/lib/data';
 
-export function SubjectPageClient({ subject, subjectLessons }: { subject: Subject, subjectLessons: Lesson[] }) {
+export function SubjectPageClient({ subject: rawSubject, subjectLessons }: { subject: Omit<Subject, 'icon'>, subjectLessons: Lesson[] }) {
+  const [subject, setSubject] = useState<Subject | null>(null);
+
+  useEffect(() => {
+    const iconMap = getIconMap();
+    const IconComponent = iconMap[rawSubject.icon as keyof typeof iconMap] || Star;
+    setSubject({ ...rawSubject, icon: IconComponent });
+  }, [rawSubject]);
+
+  if (!subject) {
+    return <PageHeader title="Loading..." />;
+  }
+  
   return (
     <>
       <PageHeader title={subject.name} />
