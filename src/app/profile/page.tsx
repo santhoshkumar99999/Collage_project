@@ -255,7 +255,7 @@ export default function ProfilePage() {
               <CardContent>
                 <TooltipProvider>
                   <div className="flex flex-wrap gap-4">
-                    {userBadges.length >
+                    {userBadges && userBadges.length >
  0 ? (
                       userBadges.map((badge) => {
                         const BadgeIcon = badge.icon;

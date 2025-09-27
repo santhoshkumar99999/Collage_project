@@ -33,13 +33,6 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  experimental: {
-    turbo: {
-      resolve: {
-        externals: ['async_hooks'],
-      },
-    },
-  },
 };
 
 export default nextConfig;
