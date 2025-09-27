@@ -73,7 +73,19 @@ const generateQuizFlow = ai.defineFlow(
     outputSchema: GenerateQuizOutputSchema,
   },
   async (input) => {
-    const {output} = await prompt(input);
-    return output!;
+    try {
+      const {output} = await prompt(input);
+      if (!output) {
+        throw new Error('AI failed to generate a valid quiz.');
+      }
+      return output;
+    } catch (e: any) {
+      console.error(`Error generating quiz for subject "${input.subject}":`, e);
+      // Re-throw a more user-friendly error to be caught by the client
+      if (e.message && e.message.includes('503')) {
+        throw new Error('The AI service is temporarily unavailable. Please try again in a few moments.');
+      }
+      throw new Error('Could not create a tournament quiz. Please try again.');
+    }
   }
 );

@@ -42,7 +42,18 @@ const generateSubjectDescriptionFlow = ai.defineFlow(
     outputSchema: GenerateSubjectDescriptionOutputSchema,
   },
   async (input) => {
-    const {output} = await prompt(input);
-    return output!;
+    try {
+        const {output} = await prompt(input);
+        if (!output) {
+            throw new Error("AI failed to generate a description.");
+        }
+        return output;
+    } catch (e: any) {
+        console.error(`Error generating description for subject "${input.subjectName}":`, e);
+        if (e.message && e.message.includes('503')) {
+            throw new Error('The AI service is temporarily unavailable. Please write a description manually.');
+        }
+        throw new Error('Could not generate a description. Please write one manually.');
+    }
   }
 );

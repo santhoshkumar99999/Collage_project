@@ -80,7 +80,18 @@ const lessonChatFlow = ai.defineFlow(
     outputSchema: LessonChatOutputSchema,
   },
   async (input) => {
-    const {output} = await prompt(input);
-    return output!;
+    try {
+        const {output} = await prompt(input);
+        if (!output) {
+            throw new Error("AI failed to generate an answer.");
+        }
+        return output;
+    } catch (e: any) {
+        console.error("Error in lesson chat flow: ", e);
+        if (e.message && e.message.includes('503')) {
+            return { answer: "I'm sorry, but the AI service is temporarily unavailable. Please try again in a few moments." };
+        }
+        return { answer: "I'm sorry, I encountered an unexpected error. Please try asking your question again." };
+    }
   }
 );

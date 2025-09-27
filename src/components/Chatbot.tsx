@@ -170,7 +170,7 @@ export function Chatbot({ context, flowType }: ChatbotProps) {
       setMessages((prev) => [...prev, modelMessage]);
       
       // Then generate audio. This ensures messages array is up-to-date.
-      if (autoPlay) {
+      if (autoPlay && !response.answer.includes("I'm sorry")) {
           generateAndPlayAudio(response.answer, currentMessageIndex);
       }
 
@@ -295,7 +295,7 @@ export function Chatbot({ context, flowType }: ChatbotProps) {
                                 )}
                             >
                                 {message.content}
-                                {message.role === 'model' && (
+                                {message.role === 'model' && !message.content.includes("I'm sorry") && (
                                     <div className="mt-2">
                                     {message.isAudioLoading && <LoaderCircle className="animate-spin h-4 w-4 text-muted-foreground" />}
                                     {message.audioUrl && !message.isAudioLoading && (

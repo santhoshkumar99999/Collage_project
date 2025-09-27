@@ -49,13 +49,9 @@ export default function TournamentPage() {
             }
         } catch (error: any) {
             console.error("Failed to generate quiz:", error);
-            const description = error.message && error.message.includes('503') 
-                ? "The AI service is temporarily unavailable. Please try again in a few moments."
-                : "Could not create a tournament quiz. Please try again.";
-
             toast({
                 title: "Error Generating Quiz",
-                description: description,
+                description: error.message || "An unexpected error occurred. Please try again.",
                 variant: "destructive",
             });
             setSelectedSubject(null); // Reset selection on error
