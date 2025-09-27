@@ -50,7 +50,14 @@ const translateFlow = ai.defineFlow(
     if (input.targetLanguage.toLowerCase() === 'english') {
       return { translation: input.text };
     }
-    const {output} = await prompt(input);
-    return output!;
+    
+    try {
+      const {output} = await prompt(input);
+      return output!;
+    } catch (error) {
+      console.error("Error during single text translation, returning original text.", error);
+      // Fallback to original text on any API error.
+      return { translation: input.text };
+    }
   }
 );
