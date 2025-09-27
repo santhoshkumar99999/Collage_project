@@ -27,6 +27,12 @@ import { useToast } from "@/hooks/use-toast";
 import type { User } from '@/lib/types';
 import { Translate } from './Translate';
 
+// Client-side session management
+function getAuthenticatedUserId(): string | null {
+    if (typeof window === 'undefined') return null;
+    return localStorage.getItem('currentUser_id');
+}
+
 
 export function FeedbackDialog({ children }: { children: React.ReactNode }) {
     const { toast } = useToast();
@@ -36,7 +42,21 @@ export function FeedbackDialog({ children }: { children: React.ReactNode }) {
     const [isOpen, setIsOpen] = useState(false);
 
     useEffect(() => {
-        setUser(getUser());
+        const fetchUser = async () => {
+            const userId = getAuthenticatedUserId();
+            if (isOpen && userId) {
+                try {
+                    const userData = await getUser(userId);
+                    setUser(userData);
+                } catch(error) {
+                    console.error("Failed to fetch user for feedback dialog", error);
+                    setUser(null);
+                }
+            } else if (!userId) {
+                setUser(null);
+            }
+        };
+        fetchUser();
     }, [isOpen]);
 
     const handleSubmit = (e: React.FormEvent) => {

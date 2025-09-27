@@ -20,6 +20,11 @@ import { LanguageSelector } from './LanguageSelector';
 import { useSpeechRecognition } from '@/hooks/use-speech-recognition';
 import { audioCache } from '@/services/audio-cache';
 
+// Client-side session management
+function getAuthenticatedUserId(): string | null {
+    if (typeof window === 'undefined') return null;
+    return localStorage.getItem('currentUser_id');
+}
 
 interface Message {
   role: 'user' | 'model';
@@ -49,7 +54,18 @@ export function Chatbot({ context, flowType }: ChatbotProps) {
   const { isListening, transcript, startListening, stopListening, isSupported } = useSpeechRecognition();
 
   useEffect(() => {
-    setCurrentUser(getUser());
+    const fetchUser = async () => {
+        const userId = getAuthenticatedUserId();
+        if(userId) {
+            try {
+                const user = await getUser(userId);
+                setCurrentUser(user);
+            } catch (error) {
+                console.error("Failed to fetch user for chatbot", error);
+            }
+        }
+    }
+    fetchUser();
     const storedLanguage = localStorage.getItem('language');
     if (storedLanguage) {
       setHasSelectedLanguage(true);

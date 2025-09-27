@@ -1,7 +1,10 @@
 
+'use server';
 
 import type { Subject, Lesson, Quiz, User, LeaderboardEntry, Badge } from './types';
 import { Calculator, FlaskConical, Atom, Dna, Bot, BookOpen, BrainCircuit, Rocket, Star, Target, Zap } from 'lucide-react';
+import clientPromise from './mongodb';
+import { Collection, Db } from 'mongodb';
 
 export const badges: Badge[] = [
   { id: 'rookie', name: 'Rookie', icon: Star, color: 'text-yellow-400' },
@@ -12,7 +15,7 @@ export const badges: Badge[] = [
   { id: 'legend', name: 'Legend', icon: Zap, color: 'text-indigo-400' },
 ];
 
-export let users: User[] = [
+const initialUsers: Omit<User, '_id'>[] = [
   {
     id: 'user-1',
     name: 'Aarav Sharma',
@@ -59,113 +62,61 @@ export let users: User[] = [
 
 const CURRENT_USER_ID_KEY = 'currentUser_id';
 
-function rehydrateUserBadges(user: User): User {
-    return {
-        ...user,
-        badges: user.badges.map(badge => {
-            if (typeof badge === 'string') return badges.find(b => b.id === badge) || badge;
-            const fullBadge = badges.find(b => b.id === (badge as any).id);
-            return fullBadge || badge;
-        }).filter(Boolean) as Badge[],
-        completedLessons: user.completedLessons || [],
-        completedTournaments: user.completedTournaments || [],
-    };
+// --- Database Connection ---
+let db: Db;
+let usersCollection: Collection<User>;
+let subjectsCollection: Collection<Subject>;
+
+async function getDb() {
+    if (db) return db;
+    const client = await clientPromise;
+    db = client.db('vidyagram');
+    return db;
 }
 
-function getUsers(): User[] {
-    if (typeof window === 'undefined') {
-        return users.map(rehydrateUserBadges);
+async function getUsersCollection() {
+    if (usersCollection) return usersCollection;
+    const db = await getDb();
+    usersCollection = db.collection<User>('users');
+    return usersCollection;
+}
+
+async function getSubjectsCollection() {
+    if (subjectsCollection) return subjectsCollection;
+    const db = await getDb();
+    subjectsCollection = db.collection<Subject>('subjects');
+    return subjectsCollection;
+}
+
+// --- Data Seeding ---
+async function seedData() {
+    const users = await getUsersCollection();
+    const count = await users.countDocuments();
+    if (count === 0) {
+        console.log("No users found, seeding initial data...");
+        // Important: In a real app, hash passwords before inserting!
+        await users.insertMany(initialUsers as User[]);
     }
-    const storedUsers = localStorage.getItem('users');
-    if (storedUsers) {
-        try {
-            const parsedUsers: User[] = JSON.parse(storedUsers);
-            // Ensure the returned users have full badge objects
-            return parsedUsers.map(rehydrateUserBadges);
-        } catch (e) {
-            console.error("Failed to parse users from localStorage", e);
-             // If parsing fails, fallback to initial data
-            localStorage.setItem('users', JSON.stringify(users));
-            return users.map(rehydrateUserBadges);
-        }
-    } else {
-        localStorage.setItem('users', JSON.stringify(users));
-        return users.map(rehydrateUserBadges);
+    const subjects = await getSubjectsCollection();
+    const subjectsCount = await subjects.countDocuments();
+    if(subjectsCount === 0){
+        console.log("No subjects found, seeding initial data...");
+        await subjects.insertMany(initialSubjects as Subject[]);
     }
 }
 
+// Run seedData on startup.
+// This will run when the first server action from this file is called.
+// It's not ideal but works for a demo. A better approach is a separate seeding script.
+seedData().catch(console.error);
 
-export function getUser(): User | null {
+
+// --- User Functions (now using localStorage for session, and DB for data) ---
+
+// This remains a client-side utility. It will be moved to components that need it.
+export function getAuthenticatedUserId(): string | null {
     if (typeof window === 'undefined') return null;
-    const currentUserId = localStorage.getItem(CURRENT_USER_ID_KEY);
-    if (!currentUserId) return null;
-    return getUsers().find(u => u.id === currentUserId) || null;
-}
-
-export function updateUser(updatedUser: User) {
-  if (typeof window !== 'undefined') {
-    const allUsers = getUsers();
-    const index = allUsers.findIndex(u => u.id === updatedUser.id);
-    if (index !== -1) {
-      allUsers[index] = updatedUser;
-      localStorage.setItem('users', JSON.stringify(allUsers));
-      // Dispatch a storage event to notify other components (like the leaderboard)
-      window.dispatchEvent(new Event("storage"));
-    }
-  }
-}
-
-export function addUser({ name, email, password }: { name: string; email: string; password?: string }) {
-    if (typeof window === 'undefined') {
-        throw new Error('This function can only be called on the client-side.');
-    }
-      const allUsers = getUsers();
-      
-      // Check if user already exists, ensuring user object and email property exist
-      if (allUsers.some(u => u && u.email && u.email.toLowerCase() === email.toLowerCase())) {
-        throw new Error('A user with this email already exists.');
-      }
-      
-      const userId = `user-${Date.now()}`;
-      const newUser: User = {
-        id: userId,
-        name,
-        email,
-        password,
-        avatarUrl: `https://picsum.photos/seed/${userId}/100/100`,
-        level: 1,
-        xp: 0,
-        xpToNextLevel: 100,
-        badges: [],
-        completedLessons: [],
-        completedTournaments: [],
-      };
-      
-      const updatedUsers = [...allUsers, newUser];
-      localStorage.setItem('users', JSON.stringify(updatedUsers));
-      window.dispatchEvent(new Event("storage"));
-      
-      return newUser;
-}
-
-export function loginUser({ email, password }: { email: string, password?: string }) {
-    if (typeof window === 'undefined') {
-        throw new Error('Login can only be performed on the client-side.');
-    }
-        const allUsers = getUsers();
-        const userToLogin = allUsers.find(u => u && u.email && u.email.toLowerCase() === email.toLowerCase());
-
-        if (!userToLogin) {
-            throw new Error('No user found with this email.');
-        }
-
-        if (userToLogin.password !== password) {
-            throw new Error('Incorrect password.');
-        }
-        
-        localStorage.setItem(CURRENT_USER_ID_KEY, userToLogin.id);
-        window.dispatchEvent(new Event("storage")); // Notify components of user change
-        return userToLogin;
+    return localStorage.getItem(CURRENT_USER_ID_KEY);
 }
 
 export function logoutUser() {
@@ -175,46 +126,91 @@ export function logoutUser() {
     }
 }
 
+export async function getUsers(): Promise<User[]> {
+    const collection = await getUsersCollection();
+    // Exclude password from the data sent to the client
+    const usersArray = await collection.find({}, { projection: { password: 0 } }).toArray();
+    // MongoDB returns plain objects, so we need to ensure _id is a string if it exists
+    return usersArray.map(user => ({ ...user, _id: user._id?.toString() })) as unknown as User[];
+}
 
-const initialSubjects: Subject[] = [
-  {
-    id: 'mathematics',
-    name: 'Mathematics',
-    description: 'Explore the world of numbers, shapes, and patterns.',
-    icon: Calculator,
-    imageId: 'mathematics',
-  },
-  {
-    id: 'science',
-    name: 'Science',
-    description: 'Discover the wonders of the natural world.',
-    icon: FlaskConical,
-    imageId: 'science',
-  },
-  {
-    id: 'physics',
-    name: 'Physics',
-    description: 'Understand the fundamental principles of the universe.',
-    icon: Atom,
-    imageId: 'physics',
-  },
-  {
-    id: 'biology',
-    name: 'Biology',
-    description: 'Learn about living organisms and their vital processes.',
-    icon: Dna,
-    imageId: 'biology',
-  },
-  {
-    id: 'ai',
-    name: 'Artificial Intelligence',
-    description: 'Dive into the basics of AI and machine learning.',
-    icon: Bot,
-    imageId: 'ai',
-  },
-];
+export async function getUser(userId: string): Promise<User | null> {
+    const collection = await getUsersCollection();
+    const user = await collection.findOne({ id: userId }, { projection: { password: 0 } });
+    if (!user) return null;
+    // The data from mongo is plain JSON, re-hydrate badge icons
+    const rehydratedUser = {
+        ...user,
+        badges: user.badges?.map(badge => {
+            const badgeId = typeof badge === 'string' ? badge : (badge as any).id;
+            return badges.find(b => b.id === badgeId);
+        }).filter(Boolean) as Badge[] || [],
+    }
+    return JSON.parse(JSON.stringify(rehydratedUser));
+}
 
-const iconMap = {
+export async function updateUser(updatedUser: User) {
+  if (!updatedUser || !updatedUser.id) return;
+  const collection = await getUsersCollection();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { id, _id, ...dataToUpdate } = updatedUser;
+  await collection.updateOne({ id: updatedUser.id }, { $set: dataToUpdate });
+
+  // Client-side refresh is handled by router.refresh() or state updates in components
+}
+
+export async function addUser({ name, email, password }: { name: string; email: string; password?: string }) {
+    const collection = await getUsersCollection();
+    
+    const existingUser = await collection.findOne({ email: email.toLowerCase() });
+    if (existingUser) {
+      throw new Error('A user with this email already exists.');
+    }
+    
+    const userId = `user-${Date.now()}`;
+    const newUser: Omit<User, '_id'> = {
+      id: userId,
+      name,
+      email,
+      password, // In a real app, this should be hashed!
+      avatarUrl: `https://picsum.photos/seed/${userId}/100/100`,
+      level: 1,
+      xp: 0,
+      xpToNextLevel: 100,
+      badges: [],
+      completedLessons: [],
+      completedTournaments: [],
+    };
+    
+    const result = await collection.insertOne(newUser as User);
+    if (!result.acknowledged) {
+        throw new Error('Failed to create user.');
+    }
+
+    return JSON.parse(JSON.stringify(newUser));
+}
+
+export async function loginUserAction(credentials: { email: string, password?: string }): Promise<{ success: boolean; message: string; userId?: string }> {
+    const { email, password } = credentials;
+    const collection = await getUsersCollection();
+    const user = await collection.findOne({ email: email.toLowerCase() });
+
+    if (!user) {
+        return { success: false, message: 'No user found with this email.' };
+    }
+
+    if (user.password !== password) {
+        // This is a simple comparison. In a real app, you'd use bcrypt.compare()
+        return { success: false, message: 'Incorrect password.' };
+    }
+    
+    // On the client, we'll use this ID to set the session
+    return { success: true, message: 'Login successful!', userId: user.id };
+}
+
+// --- Subject Functions ---
+
+export const iconMap = {
     Calculator,
     FlaskConical,
     Atom,
@@ -223,42 +219,71 @@ const iconMap = {
     BookOpen,
 };
 
-function getSubjects(): Subject[] {
-    if (typeof window === 'undefined') {
-        return initialSubjects;
-    }
-    const storedSubjects = localStorage.getItem('subjects');
-    if (storedSubjects) {
-        try {
-            const parsedSubjects: (Subject & { iconName: keyof typeof iconMap })[] = JSON.parse(storedSubjects);
-            return parsedSubjects.map(s => ({...s, icon: iconMap[s.iconName] || BookOpen }));
-        } catch (e) {
-            localStorage.setItem('subjects', JSON.stringify(initialSubjects.map(s => ({...s, iconName: s.icon.displayName }))));
-            return initialSubjects;
-        }
-    } else {
-        localStorage.setItem('subjects', JSON.stringify(initialSubjects.map(s => ({...s, iconName: Object.keys(iconMap).find(key => iconMap[key as keyof typeof iconMap] === s.icon)}))));
-        return initialSubjects;
-    }
+const initialSubjects: Omit<Subject, '_id'>[] = [
+  {
+    id: 'mathematics',
+    name: 'Mathematics',
+    description: 'Explore the world of numbers, shapes, and patterns.',
+    iconName: 'Calculator',
+    imageId: 'mathematics',
+  },
+  {
+    id: 'science',
+    name: 'Science',
+    description: 'Discover the wonders of the natural world.',
+    iconName: 'FlaskConical',
+    imageId: 'science',
+  },
+  {
+    id: 'physics',
+    name: 'Physics',
+    description: 'Understand the fundamental principles of the universe.',
+    iconName: 'Atom',
+    imageId: 'physics',
+  },
+  {
+    id: 'biology',
+    name: 'Biology',
+    description: 'Learn about living organisms and their vital processes.',
+    iconName: 'Dna',
+    imageId: 'biology',
+  },
+  {
+    id: 'ai',
+    name: 'Artificial Intelligence',
+    description: 'Dive into the basics of AI and machine learning.',
+    iconName: 'Bot',
+    imageId: 'ai',
+  },
+];
+
+export async function getSubjects(): Promise<Subject[]> {
+    const collection = await getSubjectsCollection();
+    const dbSubjects = await collection.find({}).toArray();
+    // We don't return the icon component itself from the server action
+    const serializableSubjects = dbSubjects.map(s => ({...s, _id: s._id.toString()}));
+    return JSON.parse(JSON.stringify(serializableSubjects));
 }
 
-export const subjects: Subject[] = getSubjects();
-
-export function addSubject(subject: Omit<Subject, 'id' | 'icon' | 'imageId'>) {
-    if (typeof window !== 'undefined') {
-        const currentSubjects = getSubjects();
-        const newSubject: Subject = {
-            ...subject,
-            id: subject.name.toLowerCase().replace(/\s+/g, '-'),
-            icon: BookOpen,
-            iconName: 'BookOpen',
-            imageId: `custom-${Date.now()}` // Needs a corresponding entry in placeholder-images.json or a default
-        };
-        const updatedSubjects = [...currentSubjects, newSubject];
-        localStorage.setItem('subjects', JSON.stringify(updatedSubjects.map(s => ({...s, icon: undefined, iconName: (s as any).iconName || 'BookOpen' }))));
-        window.dispatchEvent(new Event("storage"));
+export async function addSubject(subject: { name: string, description: string }): Promise<Subject> {
+    const collection = await getSubjectsCollection();
+    const newSubject: Omit<Subject, 'id' | 'icon' | '_id'> & {id: string, iconName: string} = {
+        ...subject,
+        id: subject.name.toLowerCase().replace(/\s+/g, '-'),
+        iconName: 'BookOpen',
+        imageId: `custom-${Date.now()}`
+    };
+    
+    const result = await collection.insertOne(newSubject as Subject);
+     if (!result.acknowledged) {
+        throw new Error('Failed to create subject.');
     }
+
+    return JSON.parse(JSON.stringify(newSubject));
 }
+
+
+// --- Static Data (for now) ---
 
 export const lessons: Lesson[] = [
   {
@@ -349,7 +374,7 @@ export const quizzes: Quiz[] = [
     questions: [
       { id: 'q1', question: 'What is the primary pigment used in photosynthesis?', options: ['Melanin', 'Hemoglobin', 'Chlorophyll', 'Carotene'], correctAnswer: 'Chlorophyll', hint: 'This pigment is what gives plants their green color.' },
       { id: 'q2', question: 'Which gas do plants absorb from the atmosphere?', options: ['Oxygen', 'Nitrogen', 'Carbon Dioxide', 'Hydrogen'], correctAnswer: 'Carbon Dioxide', hint: 'This is the gas that humans and animals breathe out.' },
-      { id: 'q3', 'question': 'What is a byproduct of photosynthesis that is released into the air?', options: ['Water', 'Oxygen', 'Carbon', 'Sunlight'], correctAnswer: 'Oxygen', hint: 'This gas is essential for most animals, including humans, to breathe.' },
+      { id: 'q3', question: 'What is a byproduct of photosynthesis that is released into the air?', options: ['Water', 'Oxygen', 'Carbon', 'Sunlight'], correctAnswer: 'Oxygen', hint: 'This gas is essential for most animals, including humans, to breathe.' },
       { id: 'q4', question: 'Where does photosynthesis primarily occur in a plant cell?', options: ['Nucleus', 'Mitochondria', 'Chloroplast', 'Ribosome'], correctAnswer: 'Chloroplast', hint: 'This organelle contains the green pigment from the first question.' },
     ],
   },
@@ -407,8 +432,8 @@ export const quizzes: Quiz[] = [
 ];
 
 
-function getLeaderboard(): LeaderboardEntry[] {
-    const allUsers = getUsers();
+export async function getLeaderboard(): Promise<LeaderboardEntry[]> {
+    const allUsers = await getUsers();
     const sortedUsers = [...allUsers].sort((a, b) => b.xp - a.xp);
     return sortedUsers.map((user, index) => ({
         rank: index + 1,
@@ -416,7 +441,3 @@ function getLeaderboard(): LeaderboardEntry[] {
         xp: user.xp,
     }));
 }
-
-export const initialLeaderboard: LeaderboardEntry[] = getLeaderboard();
-
-    

@@ -3,8 +3,8 @@
 
 import { useEffect, useState } from 'react';
 import { PageHeader } from '@/components/PageHeader';
-import { initialLeaderboard } from '@/lib/data';
-import type { LeaderboardEntry, User } from '@/lib/types';
+import { getLeaderboard } from '@/lib/data';
+import type { LeaderboardEntry } from '@/lib/types';
 import {
   Table,
   TableBody,
@@ -24,49 +24,20 @@ export default function LeaderboardPage() {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const refreshLeaderboard = () => {
-      setIsLoading(true);
-    // In a real app with a backend, you'd fetch the latest leaderboard.
-    // We use a timeout to simulate a fetch and ensure localStorage is available.
-    setTimeout(() => {
-        const usersJSON = localStorage.getItem('users');
-        if (usersJSON) {
-            try {
-                const users = JSON.parse(usersJSON) as User[];
-                const sortedUsers = [...users].sort((a, b) => b.xp - a.xp);
-                const newLeaderboard = sortedUsers.map((user, index) => ({
-                    rank: index + 1,
-                    user: user,
-                    xp: user.xp,
-                }));
-                setLeaderboard(newLeaderboard);
-            } catch (e) {
-                console.error("Failed to parse users, falling back to initial data.", e);
-                setLeaderboard(initialLeaderboard);
-            }
-        } else {
-             // Fallback to initial data if localStorage is empty
-            import('@/lib/data').then(mod => {
-                const users = mod.users;
-                const sortedUsers = [...users].sort((a, b) => b.xp - a.xp);
-                const newLeaderboard = sortedUsers.map((user, index) => ({
-                    rank: index + 1,
-                    user: user,
-                    xp: user.xp,
-                }));
-                setLeaderboard(newLeaderboard);
-            });
-        }
+  const refreshLeaderboard = async () => {
+    setIsLoading(true);
+    try {
+        const newLeaderboard = await getLeaderboard();
+        setLeaderboard(newLeaderboard);
+    } catch (e) {
+        console.error("Failed to fetch leaderboard.", e);
+    } finally {
         setIsLoading(false);
-    }, 0);
+    }
   }
 
   useEffect(() => {
     refreshLeaderboard();
-    window.addEventListener('storage', refreshLeaderboard);
-    return () => {
-        window.removeEventListener('storage', refreshLeaderboard);
-    }
   }, []);
 
   return (

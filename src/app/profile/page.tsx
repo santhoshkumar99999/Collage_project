@@ -5,7 +5,8 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import QRCode from "react-qr-code";
 import { PageHeader } from '@/components/PageHeader';
-import { getUser, updateUser, User, lessons, subjects } from '@/lib/data';
+import { getUser, updateUser, getAuthenticatedUserId, lessons, getSubjects, iconMap } from '@/lib/data';
+import { User, Subject } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Progress } from '@/components/ui/progress';
@@ -14,7 +15,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { Edit, Save, X, QrCode } from 'lucide-react';
+import { Edit, Save, X, QrCode, LoaderCircle, BookOpen } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -29,24 +30,46 @@ export default function ProfilePage() {
   const { toast } = useToast();
   const router = useRouter();
   const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [subjects, setSubjects] = useState<Subject[]>([]);
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState('');
   const [profileUrl, setProfileUrl] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
 
-  const refreshUser = () => {
-    const user = getUser();
-     if (user) {
-      setCurrentUser(user);
-      setName(user.name);
-      setProfileUrl(`${window.location.origin}/profile/${user.id}`);
+  const refreshUser = async () => {
+    setIsLoading(true);
+    const userId = getAuthenticatedUserId();
+     if (userId) {
+      try {
+        const user = await getUser(userId);
+        if (user) {
+          setCurrentUser(user);
+          setName(user.name);
+          setProfileUrl(`${window.location.origin}/profile/${user.id}`);
+        } else {
+          router.push('/login');
+        }
+      } catch (error) {
+        console.error("Failed to fetch user", error);
+        router.push('/login');
+      } finally {
+        setIsLoading(false);
+      }
     } else {
-      // If no user is logged in, redirect to login
       router.push('/login');
     }
   };
 
   useEffect(() => {
     refreshUser();
+    getSubjects().then(s => {
+        const subjectsWithIcons = s.map(subject => ({
+            ...subject,
+            icon: iconMap[subject.iconName as keyof typeof iconMap] || BookOpen
+        }));
+        setSubjects(subjectsWithIcons);
+    });
+    
     window.addEventListener('storage', refreshUser);
     return () => {
       window.removeEventListener('storage', refreshUser);
@@ -62,21 +85,25 @@ export default function ProfilePage() {
     ) : [];
 
 
-  if (!currentUser) {
-    return null; // Or a loading spinner
+  if (isLoading || !currentUser) {
+    return (
+        <div className="flex items-center justify-center h-full">
+            <LoaderCircle className="w-12 h-12 animate-spin text-primary" />
+        </div>
+    );
   }
 
   const xpPercentage = (currentUser.xp / currentUser.xpToNextLevel) * 100;
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!name.trim()) {
         toast({ title: 'Name cannot be empty', variant: 'destructive' });
         return;
     }
     if (!currentUser) return;
     const updatedUser = { ...currentUser, name: name };
-    updateUser(updatedUser);
-    setCurrentUser(updatedUser);
+    await updateUser(updatedUser);
+    await refreshUser(); // Re-fetch from server to confirm
     setIsEditing(false);
     toast({
         title: "Profile Updated",
@@ -191,7 +218,7 @@ export default function ProfilePage() {
                                     <TooltipTrigger>
                                         <div className="flex flex-col items-center gap-2">
                                             <div className="p-3 rounded-full bg-accent">
-                                                <SubjectIcon className="w-8 h-8 text-primary" />
+                                                {SubjectIcon && <SubjectIcon className="w-8 h-8 text-primary" />}
                                             </div>
                                         </div>
                                     </TooltipTrigger>

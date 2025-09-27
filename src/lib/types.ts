@@ -1,6 +1,9 @@
 
 
+import type { ObjectId } from 'mongodb';
+
 export interface Subject {
+  _id?: ObjectId;
   id: string;
   name: string;
   description: string;
@@ -33,6 +36,7 @@ export interface Quiz {
 }
 
 export interface User {
+  _id?: ObjectId;
   id: string;
   name: string;
   email: string;

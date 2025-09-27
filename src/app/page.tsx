@@ -4,31 +4,28 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
-import { subjects as getSubjectsFromData } from '@/lib/data';
+import { getSubjects, iconMap } from '@/lib/data';
 import type { Subject } from '@/lib/types';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { PageHeader } from '@/components/PageHeader';
 import imageData from '@/lib/placeholder-images.json';
 import { Translate } from '@/components/Translate';
+import { BookOpen } from 'lucide-react';
 
 export default function SubjectSelectionPage() {
   const [subjects, setSubjects] = useState<Subject[]>([]);
 
   useEffect(() => {
-    // A bit of a trick to re-run the function from data.ts on the client
-    const allSubjects = getSubjectsFromData; 
-    setSubjects(allSubjects);
-
-    const handleStorageChange = () => {
-        // This is a bit of a hack. We need to get the latest subjects.
-        // We can't re-import, so we'll reload the page. A proper state manager would fix this.
-        window.location.reload();
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-    };
+    const fetchSubjects = async () => {
+        const allSubjects = await getSubjects(); 
+        const subjectsWithIcons = allSubjects.map(subject => ({
+            ...subject,
+            icon: iconMap[subject.iconName as keyof typeof iconMap] || BookOpen
+        }));
+        setSubjects(subjectsWithIcons);
+    }
+    
+    fetchSubjects();
   }, []);
 
   return (
@@ -57,7 +54,7 @@ export default function SubjectSelectionPage() {
                   </CardContent>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2 font-headline">
-                      <SubjectIcon className="w-6 h-6 text-primary" />
+                      {SubjectIcon && <SubjectIcon className="w-6 h-6 text-primary" />}
                       <Translate>{subject.name}</Translate>
                     </CardTitle>
                     <CardDescription><Translate>{subject.description}</Translate></CardDescription>

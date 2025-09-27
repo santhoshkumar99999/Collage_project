@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Logo } from "./Logo";
 import { Separator } from "./ui/separator";
-import { getUser, logoutUser } from "@/lib/data";
+import { getUser } from "@/lib/data";
 import { useEffect, useState } from "react";
 import type { User as UserType } from "@/lib/types";
 import {
@@ -40,6 +40,19 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { FeedbackDialog } from "./FeedbackDialog";
 
+// Client-side session management
+function getAuthenticatedUserId(): string | null {
+    if (typeof window === 'undefined') return null;
+    return localStorage.getItem('currentUser_id');
+}
+
+function logoutUser() {
+    if (typeof window !== 'undefined') {
+        localStorage.removeItem('currentUser_id');
+        window.dispatchEvent(new Event("storage"));
+    }
+}
+
 const menuItems = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
   { href: "/tournament", label: "Tournament", icon: Swords },
@@ -51,8 +64,19 @@ export function AppSidebar() {
   const pathname = usePathname();
   const [currentUser, setCurrentUser] = useState<UserType | null>(null);
 
-  const refreshUser = () => {
-    setCurrentUser(getUser());
+  const refreshUser = async () => {
+    const userId = getAuthenticatedUserId();
+    if (userId) {
+        try {
+            const user = await getUser(userId);
+            setCurrentUser(user);
+        } catch (error) {
+            console.error("Failed to fetch user in sidebar", error);
+            setCurrentUser(null);
+        }
+    } else {
+        setCurrentUser(null);
+    }
   }
 
   useEffect(() => {

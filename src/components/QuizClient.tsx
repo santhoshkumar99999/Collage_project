@@ -11,13 +11,19 @@ import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
 import { CheckCircle, XCircle, Lightbulb, PartyPopper, Frown, Award, Volume2, LoaderCircle } from 'lucide-react';
-import { updateUser, getUser, badges, User, lessons, subjects } from '@/lib/data';
+import { updateUser, getUser, badges, User, lessons } from '@/lib/data';
 import { Translate } from './Translate';
 import { textToSpeech } from '@/ai/flows/tts-flow';
 import { useLanguage } from '@/hooks/use-language';
 import { translateText } from '@/ai/flows/translate-flow';
 import { Chatbot } from './Chatbot';
 import { audioCache } from '@/services/audio-cache';
+
+// Client-side session management
+function getAuthenticatedUserId(): string | null {
+    if (typeof window === 'undefined') return null;
+    return localStorage.getItem('currentUser_id');
+}
 
 interface QuizClientProps {
     quiz: Quiz;
@@ -38,13 +44,21 @@ export function QuizClient({ quiz, isTournament = false }: QuizClientProps) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
-    const user = getUser();
-    if (user) {
-      setCurrentUser(user);
-    } else {
-      // Redirect to login if no user is found
-      router.push('/login');
-    }
+    const fetchUser = async () => {
+        const userId = getAuthenticatedUserId();
+        if (userId) {
+            try {
+                const user = await getUser(userId);
+                setCurrentUser(user);
+            } catch (error) {
+                console.error("Failed to fetch user for quiz", error);
+                router.push('/login');
+            }
+        } else {
+            router.push('/login');
+        }
+    };
+    fetchUser();
   }, [router]);
 
   const currentQuestion = quiz.questions[currentQuestionIndex];
@@ -73,7 +87,7 @@ export function QuizClient({ quiz, isTournament = false }: QuizClientProps) {
     }
   };
 
-  const handleFinish = (finalScore = score) => {
+  const handleFinish = async (finalScore = score) => {
     if(!currentUser) return;
     const xpGained = finalScore * 10;
     let newXp = currentUser.xp + xpGained;
@@ -118,7 +132,7 @@ export function QuizClient({ quiz, isTournament = false }: QuizClientProps) {
       }
     }
     
-    updateUser({ 
+    await updateUser({ 
       ...currentUser, 
       xp: newXp, 
       level: newLevel,
@@ -283,5 +297,3 @@ export function QuizClient({ quiz, isTournament = false }: QuizClientProps) {
     </>
   );
 }
-
-    

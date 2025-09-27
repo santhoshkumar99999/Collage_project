@@ -1,67 +1,50 @@
 
-
 "use client";
 
 import { useState, useEffect } from 'react';
 import { notFound } from 'next/navigation';
 import { PageHeader } from '@/components/PageHeader';
 import { User, Subject } from '@/lib/types';
-import { badges, users as initialUsers, lessons, subjects } from '@/lib/data';
+import { lessons, getSubjects, getUser, iconMap } from '@/lib/data';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Progress } from '@/components/ui/progress';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Translate } from '@/components/Translate';
-
-function rehydrateUser(user: User): User {
-    // Ensure badges are full objects, not just strings or partial objects
-    const validBadges = user.badges?.map(badge => {
-        // In case the badge from localStorage is just an ID string
-        const badgeId = typeof badge === 'string' ? badge : (badge as any).id;
-        const fullBadge = badges.find(b => b.id === badgeId);
-        return fullBadge;
-    }).filter(Boolean) as User['badges']; // filter(Boolean) removes any undefineds if a badge wasn't found
-
-    return {
-        ...user,
-        badges: validBadges || [],
-        completedLessons: user.completedLessons || [],
-        completedTournaments: user.completedTournaments || [],
-    };
-}
+import { BookOpen } from 'lucide-react';
 
 
 export default function PublicProfilePage({ params }: { params: { userId: string } }) {
   const [user, setUser] = useState<User | null>(null);
+  const [subjects, setSubjects] = useState<Subject[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   
   useEffect(() => {
-    // This function will only run on the client side.
-    const loadUser = () => {
-      let foundUser: User | undefined;
-      const storedUsers = localStorage.getItem('users');
-      if (storedUsers) {
-          try {
-              const allUsers: User[] = JSON.parse(storedUsers);
-              foundUser = allUsers.find(u => u.id === params.userId);
-          } catch(e) {
-              console.error("Failed to parse users from localStorage, falling back to initial data.", e);
-              foundUser = initialUsers.find(u => u.id === params.userId);
-          }
-      } else {
-          foundUser = initialUsers.find(u => u.id === params.userId);
-      }
-      
-      if (foundUser) {
-          setUser(rehydrateUser(foundUser));
-      }
-      
-      setIsLoading(false);
+    const loadData = async () => {
+        setIsLoading(true);
+        try {
+            const [userData, subjectsData] = await Promise.all([
+                getUser(params.userId),
+                getSubjects()
+            ]);
+
+            if (userData) {
+                setUser(userData);
+            }
+             const subjectsWithIcons = subjectsData.map(subject => ({
+                ...subject,
+                icon: iconMap[subject.iconName as keyof typeof iconMap] || BookOpen
+            }));
+            setSubjects(subjectsWithIcons);
+        } catch (e) {
+            console.error("Failed to load profile data.", e);
+        } finally {
+            setIsLoading(false);
+        }
     }
     
-    // Defer loading until the component has mounted on the client
-    loadUser();
+    loadData();
   }, [params.userId]);
 
 
@@ -158,7 +141,7 @@ export default function PublicProfilePage({ params }: { params: { userId: string
                                     <TooltipTrigger>
                                         <div className="flex flex-col items-center gap-2">
                                             <div className="p-3 rounded-full bg-secondary">
-                                                <SubjectIcon className="w-8 h-8 text-secondary-foreground" />
+                                                {SubjectIcon && <SubjectIcon className="w-8 h-8 text-secondary-foreground" />}
                                             </div>
                                         </div>
                                     </TooltipTrigger>
@@ -191,7 +174,7 @@ export default function PublicProfilePage({ params }: { params: { userId: string
                                     <TooltipTrigger>
                                         <div className="flex flex-col items-center gap-2">
                                             <div className="p-3 rounded-full bg-primary/10">
-                                                <SubjectIcon className="w-8 h-8 text-primary" />
+                                                {SubjectIcon && <SubjectIcon className="w-8 h-8 text-primary" />}
                                             </div>
                                         </div>
                                     </TooltipTrigger>

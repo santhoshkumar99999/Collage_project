@@ -11,48 +11,52 @@ import { Logo } from "@/components/Logo";
 import Link from "next/link";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { loginUser } from "@/lib/data";
+import { loginUserAction } from "@/lib/data";
+import { LoaderCircle } from "lucide-react";
 
 export default function UnifiedLoginPage() {
   const router = useRouter();
   const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
 
   const [studentEmail, setStudentEmail] = useState('');
   const [studentPassword, setStudentPassword] = useState('');
   const [teacherEmail, setTeacherEmail] = useState('');
   const [teacherPassword, setTeacherPassword] = useState('');
 
-  const handleStudentLogin = () => {
-    try {
-      loginUser({ email: studentEmail, password: studentPassword });
-      toast({
-        title: "Login Successful",
-        description: "Welcome back!",
-      });
-      router.push('/');
-    } catch (error: any) {
-      toast({
-        title: "Login Failed",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
-  };
+  const handleLogin = async (role: 'student' | 'teacher') => {
+    setIsLoading(true);
+    const email = role === 'student' ? studentEmail : teacherEmail;
+    const password = role === 'student' ? studentPassword : teacherPassword;
 
-  const handleTeacherLogin = () => {
-     try {
-      loginUser({ email: teacherEmail, password: teacherPassword });
-      toast({
-        title: "Login Successful",
-        description: "Welcome back, Teacher!",
-      });
-      router.push('/admin/dashboard');
+    try {
+      const result = await loginUserAction({ email, password });
+      if (result.success && result.userId) {
+        // Store user ID in localStorage to manage session
+        localStorage.setItem('currentUser_id', result.userId);
+        window.dispatchEvent(new Event("storage"));
+        
+        toast({
+          title: "Login Successful",
+          description: `Welcome back${role === 'teacher' ? ', Teacher' : ''}!`,
+        });
+
+        if (role === 'teacher') {
+          router.push('/admin/dashboard');
+        } else {
+          router.push('/');
+        }
+      } else {
+        throw new Error(result.message);
+      }
     } catch (error: any) {
       toast({
         title: "Login Failed",
         description: error.message,
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -105,8 +109,9 @@ export default function UnifiedLoginPage() {
                         onChange={(e) => setStudentPassword(e.target.value)}
                     />
                     </div>
-                    <Button onClick={handleStudentLogin} className="w-full">
-                    Student Login
+                    <Button onClick={() => handleLogin('student')} className="w-full" disabled={isLoading}>
+                      {isLoading && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
+                      Student Login
                     </Button>
                 </div>
                 <div className="mt-4 text-center text-sm">
@@ -149,8 +154,9 @@ export default function UnifiedLoginPage() {
                             onChange={(e) => setTeacherPassword(e.target.value)}
                         />
                         </div>
-                        <Button onClick={handleTeacherLogin} className="w-full">
-                         Teacher Login
+                        <Button onClick={() => handleLogin('teacher')} className="w-full" disabled={isLoading}>
+                            {isLoading && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
+                            Teacher Login
                         </Button>
                     </div>
                     <div className="mt-4 text-center text-sm">

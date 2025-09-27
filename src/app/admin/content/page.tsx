@@ -17,7 +17,7 @@ import {
     SelectTrigger,
     SelectValue,
   } from '@/components/ui/select';
-import { lessons as initialLessons, addSubject, subjects as getSubjectsFromData } from '@/lib/data';
+import { lessons as initialLessons, addSubject, getSubjects } from '@/lib/data';
 import type { Lesson, Subject } from '@/lib/types';
 import {
     Table,
@@ -48,18 +48,13 @@ export default function AdminContentPage() {
   const [subjectName, setSubjectName] = useState('');
   const [subjectDescription, setSubjectDescription] = useState('');
   
-  const refreshSubjects = () => {
-    // This is a trick to get client-side data
-    const currentSubjects = getSubjectsFromData;
+  const refreshSubjects = async () => {
+    const currentSubjects = await getSubjects();
     setSubjects(currentSubjects);
   }
 
   useEffect(() => {
     refreshSubjects();
-    window.addEventListener('storage', refreshSubjects);
-    return () => {
-        window.removeEventListener('storage', refreshSubjects);
-    }
   }, []);
 
 
@@ -138,14 +133,14 @@ export default function AdminContentPage() {
         }
       }
 
-      addSubject({ name: subjectName, description: descriptionToSave });
+      await addSubject({ name: subjectName, description: descriptionToSave });
       toast({
           title: 'Subject Added',
           description: `"${subjectName}" has been successfully added.`,
       });
       setSubjectName('');
       setSubjectDescription('');
-      // The `storage` event listener will handle re-rendering the subjects list
+      refreshSubjects(); // Re-fetch subjects from DB
   }
 
   return (
@@ -276,5 +271,3 @@ export default function AdminContentPage() {
     </>
   );
 }
-
-    
