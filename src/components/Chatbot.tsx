@@ -20,6 +20,7 @@ import { LanguageSelector } from './LanguageSelector';
 import { useSpeechRecognition } from '@/hooks/use-speech-recognition';
 import { audioCache } from '@/services/audio-cache';
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from './ui/tooltip';
+import { useToast } from '@/hooks/use-toast';
 
 interface Message {
   role: 'user' | 'model';
@@ -34,6 +35,7 @@ interface ChatbotProps {
 }
 
 export function Chatbot({ context, flowType }: ChatbotProps) {
+  const { toast } = useToast();
   const { language } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -110,8 +112,15 @@ export function Chatbot({ context, flowType }: ChatbotProps) {
         playAudio(audioUrl);
       }
 
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error generating speech:", error);
+       if (error.message === 'RATE_LIMIT_EXCEEDED') {
+        toast({
+          title: "Audio Limit Reached",
+          description: "You've exceeded the daily quota for audio playback. The feature will be available again tomorrow.",
+          variant: "destructive"
+        });
+      }
       setMessages(prev => prev.map((msg, idx) => idx === messageIndex ? { ...msg, isAudioLoading: false } : msg));
     }
   };

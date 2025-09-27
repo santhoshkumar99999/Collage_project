@@ -188,9 +188,17 @@ export function QuizClient({ quiz, isTournament = false }: QuizClientProps) {
             audioRef.current.src = media;
             audioRef.current.play();
         }
-    } catch (error) {
+    } catch (error: any) {
         console.error("Error generating speech:", error);
-        toast({ title: "Could not play audio", variant: "destructive" });
+        if (error.message === 'RATE_LIMIT_EXCEEDED') {
+          toast({
+            title: "Audio Limit Reached",
+            description: "You've exceeded the daily quota for audio playback. The feature will be available again tomorrow.",
+            variant: "destructive"
+          });
+        } else {
+            toast({ title: "Could not play audio", variant: "destructive" });
+        }
     } finally {
         setIsAudioLoading(false);
     }

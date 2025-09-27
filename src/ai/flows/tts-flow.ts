@@ -61,25 +61,33 @@ const ttsFlow = ai.defineFlow(
             },
         };
 
-      const { media } = await ai.generate({
-        model: 'googleai/gemini-2.5-flash-preview-tts',
-        config: {
-          responseModalities: ['AUDIO'],
-          speechConfig,
-        },
-        prompt: input.prompt,
-      });
+        try {
+            const { media } = await ai.generate({
+                model: 'googleai/gemini-2.5-flash-preview-tts',
+                config: {
+                responseModalities: ['AUDIO'],
+                speechConfig,
+                },
+                prompt: input.prompt,
+            });
 
-      if (!media) {
-        throw new Error('no media returned');
-      }
-      const audioBuffer = Buffer.from(
-        media.url.substring(media.url.indexOf(',') + 1),
-        'base64'
-      );
-      return {
-        media: 'data:audio/wav;base64,' + (await toWav(audioBuffer)),
-      };
+            if (!media) {
+                throw new Error('no media returned');
+            }
+            const audioBuffer = Buffer.from(
+                media.url.substring(media.url.indexOf(',') + 1),
+                'base64'
+            );
+            return {
+                media: 'data:audio/wav;base64,' + (await toWav(audioBuffer)),
+            };
+        } catch(e: any) {
+            if (e.message && e.message.includes('429 Too Many Requests')) {
+                throw new Error('RATE_LIMIT_EXCEEDED');
+            }
+            // Re-throw original error if it's not a rate limit issue
+            throw e;
+        }
     }
   );
 
