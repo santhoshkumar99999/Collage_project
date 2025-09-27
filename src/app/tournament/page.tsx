@@ -3,13 +3,13 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { getSubjects } from '@/lib/data';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
+import { getSubjects, getIconMap } from '@/lib/data';
+import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card';
 import { PageHeader } from '@/components/PageHeader';
 import imageData from '@/lib/placeholder-images.json';
 import { Translate } from '@/components/Translate';
 import { Button } from '@/components/ui/button';
-import { LoaderCircle, Swords } from 'lucide-react';
+import { LoaderCircle, Swords, Star } from 'lucide-react';
 import { generateQuiz } from '@/ai/flows/generate-quiz-flow';
 import { QuizClient } from '@/components/QuizClient';
 import type { Quiz, Subject } from '@/lib/types';
@@ -21,9 +21,18 @@ export default function TournamentPage() {
     const [selectedSubject, setSelectedSubject] = useState<Subject | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [generatedQuiz, setGeneratedQuiz] = useState<Quiz | null>(null);
+    const [iconMap, setIconMap] = useState<any>(null);
 
     useEffect(() => {
-        setSubjects(getSubjects());
+        const subjectData = getSubjects();
+        const icons = getIconMap();
+        setIconMap(icons);
+        
+        const subjectsWithIcons = subjectData.map(s => {
+            const IconComponent = icons[s.icon as keyof typeof icons] || Star;
+            return {...s, icon: IconComponent};
+        });
+        setSubjects(subjectsWithIcons);
     }, []);
     
     const handleSelectSubject = async (subject: Subject) => {
