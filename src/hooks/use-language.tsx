@@ -1,7 +1,7 @@
 
 "use client";
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import * as React from 'react';
 
 type LanguageContextType = {
   language: string;
@@ -18,12 +18,12 @@ const supportedLanguages = [
     { value: 'Odia', label: 'ଓଡିଆ' },
 ];
 
-const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+const LanguageContext = React.createContext<LanguageContextType | undefined>(undefined);
 
-export const LanguageProvider = ({ children }: { children: ReactNode }) => {
-  const [language, setLanguageState] = useState('English');
+export const LanguageProvider = ({ children }: { children: React.ReactNode }) => {
+  const [language, setLanguageState] = React.useState('English');
 
-  useEffect(() => {
+  React.useEffect(() => {
     const storedLanguage = localStorage.getItem('language');
     if (storedLanguage && supportedLanguages.some(l => l.value === storedLanguage)) {
       setLanguageState(storedLanguage);
@@ -45,7 +45,7 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
 };
 
 export const useLanguage = () => {
-  const context = useContext(LanguageContext);
+  const context = React.useContext(LanguageContext);
   if (context === undefined) {
     throw new Error('useLanguage must be used within a LanguageProvider');
   }
