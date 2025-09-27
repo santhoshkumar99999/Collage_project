@@ -10,8 +10,8 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
-import { CheckCircle, XCircle, Lightbulb, PartyPopper, Frown, Award, Volume2, LoaderCircle } from 'lucide-react';
-import { updateUser, getUser, badges, getLessons, getAuthenticatedUserId } from '@/lib/data';
+import { CheckCircle, XCircle, Lightbulb, PartyPopper, Frown, Award, Volume2, LoaderCircle, Star, BookOpen, BrainCircuit, Rocket, Target, Zap } from 'lucide-react';
+import { updateUser, getUser, getLessons, getAuthenticatedUserId, getBadges } from '@/lib/data';
 import { Translate } from './Translate';
 import { textToSpeech } from '@/ai/flows/tts-flow';
 import { useLanguage } from '@/hooks/use-language';
@@ -20,6 +20,14 @@ import { Chatbot } from './Chatbot';
 import { audioCache } from '@/services/audio-cache';
 import type { User } from '@/lib/types';
 
+const badgeIconMap = {
+    Star,
+    BookOpen,
+    BrainCircuit,
+    Rocket,
+    Target,
+    Zap
+};
 
 interface QuizClientProps {
     quiz: Quiz;
@@ -85,7 +93,7 @@ export function QuizClient({ quiz, isTournament = false }: QuizClientProps) {
 
   const handleFinish = async (finalScore = score) => {
     if(!currentUser) return;
-    const lessons = await getLessons();
+    const [lessons, allBadges] = await Promise.all([getLessons(), getBadges()]);
     const xpGained = finalScore * 10;
     let newXp = currentUser.xp + xpGained;
     let newLevel = currentUser.level;
@@ -114,15 +122,16 @@ export function QuizClient({ quiz, isTournament = false }: QuizClientProps) {
     // Add Scholar badge if they get a perfect score
     const hasScholarBadge = currentUser.badgeIds.some(b => b === 'scholar');
     if(finalScore === quiz.questions.length && !hasScholarBadge){
-      const scholarBadge = badges.find(b => b.id === 'scholar');
+      const scholarBadge = allBadges.find(b => b.id === 'scholar');
       if (scholarBadge) {
         newBadgeIds.push(scholarBadge.id);
+        const BadgeIcon = badgeIconMap[scholarBadge.icon as keyof typeof badgeIconMap] || Award;
         toast({
           title: "Badge Unlocked!",
           description: `You've earned the ${scholarBadge.name} badge!`,
           action: (
             <div className="p-2 rounded-full bg-accent">
-                <Award className={`w-8 h-8 ${scholarBadge.color}`} />
+                <BadgeIcon className={`w-8 h-8 ${scholarBadge.color}`} />
             </div>
           )
         });

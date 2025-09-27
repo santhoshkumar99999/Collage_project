@@ -5,30 +5,54 @@ import { useState, useEffect } from 'react';
 import { notFound } from 'next/navigation';
 import { PageHeader } from '@/components/PageHeader';
 import { User, Subject, Badge as BadgeType } from '@/lib/types';
-import { getLessons, getSubjects, getUser, iconMap, badges } from '@/lib/data';
+import { getLessons, getSubjects, getUser, getBadges } from '@/lib/data';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Progress } from '@/components/ui/progress';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Translate } from '@/components/Translate';
-import { BookOpen } from 'lucide-react';
+import { BookOpen, Calculator, FlaskConical, Atom, Dna, Bot, Star, BrainCircuit, Rocket, Target, Zap } from 'lucide-react';
 
+const iconMap = {
+    Calculator,
+    FlaskConical,
+    Atom,
+    Dna,
+    Bot,
+    BookOpen,
+    Star,
+    BrainCircuit,
+    Rocket,
+    Target,
+    Zap,
+};
+
+const badgeIconMap = {
+    Star,
+    BookOpen,
+    BrainCircuit,
+    Rocket,
+    Target,
+    Zap
+};
 
 export default function PublicProfilePage({ params }: { params: { userId: string } }) {
   const [user, setUser] = useState<User | null>(null);
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [lessons, setLessons] = useState<any[]>([]);
+  const [allBadges, setAllBadges] = useState<BadgeType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   
   useEffect(() => {
     const loadData = async () => {
         setIsLoading(true);
         try {
-            const [userData, subjectsData, lessonsData] = await Promise.all([
+            const [userData, subjectsData, lessonsData, badgesData] = await Promise.all([
                 getUser(params.userId),
                 getSubjects(),
-                getLessons()
+                getLessons(),
+                getBadges()
             ]);
 
             if (userData) {
@@ -38,8 +62,14 @@ export default function PublicProfilePage({ params }: { params: { userId: string
                 ...subject,
                 icon: iconMap[subject.iconName as keyof typeof iconMap] || BookOpen
             }));
+            const badgesWithIcons = badgesData.map(badge => ({
+                ...badge,
+                icon: badgeIconMap[badge.icon as keyof typeof badgeIconMap] || Star
+            }));
+
             setSubjects(subjectsWithIcons);
             setLessons(lessonsData);
+            setAllBadges(badgesWithIcons);
         } catch (e) {
             console.error("Failed to load profile data.", e);
         } finally {
@@ -62,7 +92,7 @@ export default function PublicProfilePage({ params }: { params: { userId: string
     subjects.filter(subject => user.completedTournaments!.includes(subject.id))
     : [];
     
-  const userBadges: BadgeType[] = user ? user.badgeIds.map(badgeId => badges.find(b => b.id === badgeId)).filter(b => b !== undefined) as BadgeType[] : [];
+  const userBadges: BadgeType[] = user ? user.badgeIds.map(badgeId => allBadges.find(b => b.id === badgeId)).filter(b => b !== undefined) as BadgeType[] : [];
 
 
   if (isLoading) {

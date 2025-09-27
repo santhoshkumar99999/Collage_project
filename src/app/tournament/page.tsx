@@ -3,18 +3,31 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { getSubjects, iconMap } from '@/lib/data';
+import { getSubjects } from '@/lib/data';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { PageHeader } from '@/components/PageHeader';
 import imageData from '@/lib/placeholder-images.json';
 import { Translate } from '@/components/Translate';
 import { Button } from '@/components/ui/button';
-import { LoaderCircle, Swords, BookOpen } from 'lucide-react';
+import { LoaderCircle, Swords, BookOpen, Calculator, FlaskConical, Atom, Dna, Bot, Star, BrainCircuit, Rocket, Target, Zap } from 'lucide-react';
 import { generateQuiz } from '@/ai/flows/generate-quiz-flow';
 import { QuizClient } from '@/components/QuizClient';
 import type { Quiz, Subject } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 
+const iconMap = {
+    Calculator,
+    FlaskConical,
+    Atom,
+    Dna,
+    Bot,
+    BookOpen,
+    Star,
+    BrainCircuit,
+    Rocket,
+    Target,
+    Zap,
+};
 
 export default function TournamentPage() {
     const { toast } = useToast();

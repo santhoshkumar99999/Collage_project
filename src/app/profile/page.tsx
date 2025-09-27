@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import QRCode from "react-qr-code";
 import { PageHeader } from '@/components/PageHeader';
-import { getUser, updateUser, getAuthenticatedUserId, getLessons, getSubjects, iconMap, badges } from '@/lib/data';
+import { getUser, updateUser, getAuthenticatedUserId, getLessons, getSubjects, getBadges } from '@/lib/data';
 import { User, Subject, Lesson, Badge as BadgeType } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
@@ -15,7 +15,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { Edit, Save, X, QrCode, LoaderCircle, BookOpen } from 'lucide-react';
+import { Edit, Save, X, QrCode, LoaderCircle, BookOpen, Calculator, FlaskConical, Atom, Dna, Bot, Star, BrainCircuit, Rocket, Target, Zap } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -25,6 +25,28 @@ import {
 } from "@/components/ui/dialog"
 import { Translate } from '@/components/Translate';
 
+const iconMap = {
+    Calculator,
+    FlaskConical,
+    Atom,
+    Dna,
+    Bot,
+    BookOpen,
+    Star,
+    BrainCircuit,
+    Rocket,
+    Target,
+    Zap,
+};
+
+const badgeIconMap = {
+    Star,
+    BookOpen,
+    BrainCircuit,
+    Rocket,
+    Target,
+    Zap
+};
 
 export default function ProfilePage() {
   const { toast } = useToast();
@@ -32,6 +54,7 @@ export default function ProfilePage() {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [lessons, setLessons] = useState<Lesson[]>([]);
+  const [allBadges, setAllBadges] = useState<BadgeType[]>([]);
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState('');
   const [profileUrl, setProfileUrl] = useState('');
@@ -66,16 +89,22 @@ export default function ProfilePage() {
 
   useEffect(() => {
       const fetchRelatedData = async () => {
-        const [subjectsData, lessonsData] = await Promise.all([
+        const [subjectsData, lessonsData, badgesData] = await Promise.all([
             getSubjects(),
-            getLessons()
+            getLessons(),
+            getBadges()
         ]);
         const subjectsWithIcons = subjectsData.map(subject => ({
             ...subject,
             icon: iconMap[subject.iconName as keyof typeof iconMap] || BookOpen
         }));
+         const badgesWithIcons = badgesData.map(badge => ({
+            ...badge,
+            icon: badgeIconMap[badge.icon as keyof typeof badgeIconMap] || Star
+        }));
         setSubjects(subjectsWithIcons);
         setLessons(lessonsData);
+        setAllBadges(badgesWithIcons);
       }
       fetchRelatedData();
   }, []);
@@ -88,7 +117,7 @@ export default function ProfilePage() {
         )
     ) : [];
   
-  const userBadges: BadgeType[] = currentUser ? currentUser.badgeIds.map(badgeId => badges.find(b => b.id === badgeId)).filter(b => b !== undefined) as BadgeType[] : [];
+  const userBadges: BadgeType[] = currentUser ? currentUser.badgeIds.map(badgeId => allBadges.find(b => b.id === badgeId)).filter(b => b !== undefined) as BadgeType[] : [];
 
 
   if (isLoading || !currentUser) {

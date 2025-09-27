@@ -1,12 +1,26 @@
 
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { getSubjects, getLessons, iconMap } from '@/lib/data';
+import { getSubjects, getLessons } from '@/lib/data';
 import { PageHeader } from '@/components/PageHeader';
 import { Card, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { BookOpen, Gamepad2 } from 'lucide-react';
+import { BookOpen, Gamepad2, Calculator, FlaskConical, Atom, Dna, Bot, Star, BrainCircuit, Rocket, Target, Zap } from 'lucide-react';
 import { Translate } from '@/components/Translate';
+
+const iconMap = {
+    Calculator,
+    FlaskConical,
+    Atom,
+    Dna,
+    Bot,
+    BookOpen,
+    Star,
+    BrainCircuit,
+    Rocket,
+    Target,
+    Zap,
+};
 
 export default async function SubjectPage({ params }: { params: { subjectId: string } }) {
   const subjects = await getSubjects();

@@ -4,13 +4,27 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
-import { getSubjects, iconMap } from '@/lib/data';
+import { getSubjects } from '@/lib/data';
 import type { Subject } from '@/lib/types';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { PageHeader } from '@/components/PageHeader';
 import imageData from '@/lib/placeholder-images.json';
 import { Translate } from '@/components/Translate';
-import { BookOpen } from 'lucide-react';
+import { BookOpen, Calculator, FlaskConical, Atom, Dna, Bot, Star, BrainCircuit, Rocket, Target, Zap } from 'lucide-react';
+
+const iconMap = {
+    Calculator,
+    FlaskConical,
+    Atom,
+    Dna,
+    Bot,
+    BookOpen,
+    Star,
+    BrainCircuit,
+    Rocket,
+    Target,
+    Zap,
+};
 
 export default function SubjectSelectionPage() {
   const [subjects, setSubjects] = useState<Subject[]>([]);

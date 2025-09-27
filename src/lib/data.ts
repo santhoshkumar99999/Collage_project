@@ -1,4 +1,3 @@
-
 'use server';
 
 import type { Subject, Lesson, Quiz, User, LeaderboardEntry, Badge } from './types';
@@ -7,8 +6,9 @@ import clientPromise from './mongodb';
 import { Collection, Db, ObjectId } from 'mongodb';
 import { cookies } from 'next/headers';
 
-// This data is now client-side, as it contains non-serializable components
-export const iconMap = {
+// --- Client-side Data ---
+// This data is now defined here but only exposed via async functions
+const iconMap = {
     Calculator,
     FlaskConical,
     Atom,
@@ -22,8 +22,7 @@ export const iconMap = {
     Zap,
 };
 
-// This data is now client-side
-export const badges: Badge[] = [
+const badges: Badge[] = [
   { id: 'rookie', name: 'Rookie', icon: Star, color: 'text-yellow-400' },
   { id: 'scholar', name: 'Scholar', icon: BookOpen, color: 'text-blue-400' },
   { id: 'genius', name: 'Genius', icon: BrainCircuit, color: 'text-purple-400' },
@@ -32,91 +31,34 @@ export const badges: Badge[] = [
   { id: 'legend', name: 'Legend', icon: Zap, color: 'text-indigo-400' },
 ];
 
+export async function getIconMap() {
+    // This seems odd, but it's to make a client-side object available from a server-only file.
+    // In a real app, this might be handled differently, but it resolves the export issue.
+    const serializableIconMap = Object.keys(iconMap).reduce((acc, key) => {
+        acc[key] = key; // Just sending the name
+        return acc;
+    }, {} as {[key: string]: string});
+    return serializableIconMap;
+}
 
-const initialUsers: Omit<User, '_id'>[] = [
-  {
-    id: 'user-1',
-    name: 'Aarav Sharma',
-    email: 'student@example.com',
-    password: 'password',
-    avatarUrl: 'https://picsum.photos/seed/user1/100/100',
-    level: 5,
-    xp: 450,
-    xpToNextLevel: 500,
-    badgeIds: ['rookie'],
-    completedLessons: ['algebra-basics'],
-    completedTournaments: ['mathematics'],
-  },
-  {
-    id: 'user-2',
-    name: 'Priya Patel',
-    email: 'priya@example.com',
-    password: 'password',
-    avatarUrl: 'https://picsum.photos/seed/user2/100/100',
-    level: 8,
-    xp: 720,
-    xpToNextLevel: 800,
-    badgeIds: ['rookie', 'scholar', 'genius'],
-    completedLessons: ['algebra-basics', 'geometry-intro', 'photosynthesis'],
-    completedTournaments: ['mathematics', 'science'],
-  },
-    {
-    id: 'user-3',
-    name: 'Rohan Singh',
-    email: 'rohan@example.com',
-    password: 'password',
-    avatarUrl: 'https://picsum.photos/seed/user3/100/100',
-    level: 3,
-    xp: 210,
-    xpToNextLevel: 300,
-    badgeIds: ['rookie'],
-    completedLessons: [],
-    completedTournaments: [],
-  },
-  { id: 'user-4', name: 'Saanvi Gupta', email: 'saanvi@example.com', password: 'password', avatarUrl: 'https://picsum.photos/seed/user4/100/100', level: 7, xp: 650, xpToNextLevel: 700, badgeIds: ['rookie', 'scholar'], completedLessons: ['newtons-laws', 'cell-structure'], completedTournaments: ['physics'] },
-  { id: 'user-5', name: 'Arjun Reddy', email: 'arjun@example.com', password: 'password', avatarUrl: 'https://picsum.photos/seed/user5/100/100', level: 6, xp: 550, xpToNextLevel: 600, badgeIds: ['rookie'], completedLessons: ['ml-intro'], completedTournaments: ['ai'] },
-  { id: 'user-teacher', name: 'Teacher', email: 'teacher@example.com', password: 'password', avatarUrl: 'https://picsum.photos/seed/teacher/100/100', level: 99, xp: 9999, xpToNextLevel: 10000, badgeIds: badges.map(b => b.id), completedLessons: [], completedTournaments: [] },
-];
+export async function getBadges() {
+    const serializableBadges = badges.map(badge => ({
+        ...badge,
+        icon: badge.icon.displayName || badge.icon.name, // Serialize component to a name
+    }));
+    return serializableBadges;
+}
 
-const initialSubjects: Omit<Subject, '_id'>[] = [
-  {
-    id: 'mathematics',
-    name: 'Mathematics',
-    description: 'Explore the world of numbers, shapes, and patterns.',
-    iconName: 'Calculator',
-    imageId: 'mathematics',
-  },
-  {
-    id: 'science',
-    name: 'Science',
-    description: 'Discover the wonders of the natural world.',
-    iconName: 'FlaskConical',
-    imageId: 'science',
-  },
-  {
-    id: 'physics',
-    name: 'Physics',
-    description: 'Understand the fundamental principles of the universe.',
-    iconName: 'Atom',
-    imageId: 'physics',
-  },
-  {
-    id: 'biology',
-    name: 'Biology',
-    description: 'Learn about living organisms and their vital processes.',
-    iconName: 'Dna',
-    imageId: 'biology',
-  },
-  {
-    id: 'ai',
-    name: 'Artificial Intelligence',
-    description: 'Dive into the basics of AI and machine learning.',
-    iconName: 'Bot',
-    imageId: 'ai',
-  },
-];
 
-// Static data that is NOT exported, but used by exported functions
+const rehydrateSubjectIcon = (subject: Subject) => {
+    // This is a client-side utility
+    // @ts-ignore
+    const IconComponent = iconMap[subject.iconName as keyof typeof iconMap] || BookOpen;
+    return { ...subject, icon: IconComponent };
+};
+
+
+// --- Internal Static Data ---
 const lessons: Lesson[] = [
   {
     id: 'algebra-basics',
@@ -260,6 +202,90 @@ const quizzes: Quiz[] = [
       { id: 'q2', question: 'The process of adjusting a neural network\'s parameters is called...?', options: ['Running', 'Training', 'Thinking', 'Computing'], correctAnswer: 'Training', hint: 'This is how the network "learns" from data to make better predictions.' },
       { id: 'q3', question: 'What is the name for the individual nodes within a neural network layer?', options: ['Points', 'Cells', 'Neurons', 'Units'], correctAnswer: 'Neurons', hint: 'These are named after the cells in the human brain that they are designed to mimic.' },
     ],
+  },
+];
+
+
+const initialUsers: Omit<User, '_id'>[] = [
+  {
+    id: 'user-1',
+    name: 'Aarav Sharma',
+    email: 'student@example.com',
+    password: 'password',
+    avatarUrl: 'https://picsum.photos/seed/user1/100/100',
+    level: 5,
+    xp: 450,
+    xpToNextLevel: 500,
+    badgeIds: ['rookie'],
+    completedLessons: ['algebra-basics'],
+    completedTournaments: ['mathematics'],
+  },
+  {
+    id: 'user-2',
+    name: 'Priya Patel',
+    email: 'priya@example.com',
+    password: 'password',
+    avatarUrl: 'https://picsum.photos/seed/user2/100/100',
+    level: 8,
+    xp: 720,
+    xpToNextLevel: 800,
+    badgeIds: ['rookie', 'scholar', 'genius'],
+    completedLessons: ['algebra-basics', 'geometry-intro', 'photosynthesis'],
+    completedTournaments: ['mathematics', 'science'],
+  },
+    {
+    id: 'user-3',
+    name: 'Rohan Singh',
+    email: 'rohan@example.com',
+    password: 'password',
+    avatarUrl: 'https://picsum.photos/seed/user3/100/100',
+    level: 3,
+    xp: 210,
+    xpToNextLevel: 300,
+    badgeIds: ['rookie'],
+    completedLessons: [],
+    completedTournaments: [],
+  },
+  { id: 'user-4', name: 'Saanvi Gupta', email: 'saanvi@example.com', password: 'password', avatarUrl: 'https://picsum.photos/seed/user4/100/100', level: 7, xp: 650, xpToNextLevel: 700, badgeIds: ['rookie', 'scholar'], completedLessons: ['newtons-laws', 'cell-structure'], completedTournaments: ['physics'] },
+  { id: 'user-5', name: 'Arjun Reddy', email: 'arjun@example.com', password: 'password', avatarUrl: 'https://picsum.photos/seed/user5/100/100', level: 6, xp: 550, xpToNextLevel: 600, badgeIds: ['rookie'], completedLessons: ['ml-intro'], completedTournaments: ['ai'] },
+  { id: 'user-teacher', name: 'Teacher', email: 'teacher@example.com', password: 'password', avatarUrl: 'https://picsum.photos/seed/teacher/100/100', level: 99, xp: 9999, xpToNextLevel: 10000, badgeIds: badges.map(b => b.id), completedLessons: [], completedTournaments: [] },
+];
+
+const initialSubjects: Omit<Subject, '_id'>[] = [
+  {
+    id: 'mathematics',
+    name: 'Mathematics',
+    description: 'Explore the world of numbers, shapes, and patterns.',
+    iconName: 'Calculator',
+    imageId: 'mathematics',
+  },
+  {
+    id: 'science',
+    name: 'Science',
+    description: 'Discover the wonders of the natural world.',
+    iconName: 'FlaskConical',
+    imageId: 'science',
+  },
+  {
+    id: 'physics',
+    name: 'Physics',
+    description: 'Understand the fundamental principles of the universe.',
+    iconName: 'Atom',
+    imageId: 'physics',
+  },
+  {
+    id: 'biology',
+    name: 'Biology',
+    description: 'Learn about living organisms and their vital processes.',
+    iconName: 'Dna',
+    imageId: 'biology',
+  },
+  {
+    id: 'ai',
+    name: 'Artificial Intelligence',
+    description: 'Dive into the basics of AI and machine learning.',
+    iconName: 'Bot',
+    imageId: 'ai',
   },
 ];
 
