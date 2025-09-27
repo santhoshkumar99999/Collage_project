@@ -33,13 +33,13 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  webpack: (
-    config,
-    { buildId, dev, isServer, defaultLoaders, nextRuntime, webpack }
-  ) => {
-    // Important: return the modified config
-    config.externals.push("async_hooks");
-    return config
+  // This is the correct way to configure external modules for Turbopack
+  experimental: {
+    turbo: {
+      resolve: {
+        externals: ["async_hooks"],
+      },
+    },
   },
 };
 
