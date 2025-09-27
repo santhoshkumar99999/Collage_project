@@ -85,7 +85,10 @@ const ttsFlow = ai.defineFlow(
             if (e.message && e.message.includes('429 Too Many Requests')) {
                 throw new Error('RATE_LIMIT_EXCEEDED');
             }
-            // Re-throw original error if it's not a rate limit issue
+            if (e.message && e.message.includes('503 Service Unavailable')) {
+                throw new Error('SERVICE_UNAVAILABLE');
+            }
+            // Re-throw original error if it's not a handled one
             throw e;
         }
     }

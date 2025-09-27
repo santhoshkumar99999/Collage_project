@@ -195,6 +195,12 @@ export function QuizClient({ quiz, isTournament = false }: QuizClientProps) {
             description: "You've exceeded the daily quota for audio playback. The feature will be available again tomorrow.",
             variant: "destructive"
           });
+        } else if (error.message === 'SERVICE_UNAVAILABLE') {
+            toast({
+              title: "Audio Service Unavailable",
+              description: "The text-to-speech service is temporarily down. Please try again later.",
+              variant: "destructive"
+            });
         } else {
             console.error("Error generating speech:", error);
             toast({ title: "Could not play audio", variant: "destructive" });
@@ -297,5 +303,3 @@ export function QuizClient({ quiz, isTournament = false }: QuizClientProps) {
     </>
   );
 }
-
-    

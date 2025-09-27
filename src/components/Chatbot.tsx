@@ -119,6 +119,12 @@ export function Chatbot({ context, flowType }: ChatbotProps) {
           description: "You've exceeded the daily quota for audio playback. The feature will be available again tomorrow.",
           variant: "destructive"
         });
+      } else if (error.message === 'SERVICE_UNAVAILABLE') {
+        toast({
+          title: "Audio Service Unavailable",
+          description: "The text-to-speech service is temporarily down. Please try again later.",
+          variant: "destructive"
+        });
       } else {
         console.error("Error generating speech:", error);
       }
@@ -362,5 +368,3 @@ export function Chatbot({ context, flowType }: ChatbotProps) {
     </>
   );
 }
-
-    
