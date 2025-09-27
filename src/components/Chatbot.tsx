@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Bot, Send, X, LoaderCircle, PlayCircle, Languages, Volume2, Mic, MicOff, Paperclip, XCircle } from 'lucide-react';
+import { Bot, Send, X, LoaderCircle, PlayCircle, Languages, Volume2, Mic, MicOff, Paperclip, XCircle, VolumeX } from 'lucide-react';
 import { answerQuestion as answerLessonQuestion } from '@/ai/flows/lesson-chat-flow';
 import { answerQuizQuestion } from '@/ai/flows/quiz-chat-flow';
 import { textToSpeech } from '@/ai/flows/tts-flow';
@@ -19,6 +19,7 @@ import { useLanguage } from '@/hooks/use-language';
 import { LanguageSelector } from './LanguageSelector';
 import { useSpeechRecognition } from '@/hooks/use-speech-recognition';
 import { audioCache } from '@/services/audio-cache';
+import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from './ui/tooltip';
 
 interface Message {
   role: 'user' | 'model';
@@ -44,6 +45,7 @@ export function Chatbot({ context, flowType }: ChatbotProps) {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [hasSelectedLanguage, setHasSelectedLanguage] = useState(false);
+  const [autoPlay, setAutoPlay] = useState(true);
 
   const { isListening, transcript, startListening, stopListening, isSupported } = useSpeechRecognition();
 
@@ -116,6 +118,7 @@ export function Chatbot({ context, flowType }: ChatbotProps) {
     setMessages((prev) => [...prev, userMessage]);
     setInput('');
     setIsBotLoading(true);
+    const currentMessageIndex = messages.length + 1; // Index of the upcoming model message
 
     try {
       let response;
@@ -143,6 +146,10 @@ export function Chatbot({ context, flowType }: ChatbotProps) {
       const newMessages = [...messages, userMessage, modelMessage];
 
       setMessages(newMessages);
+      
+      if (autoPlay) {
+          generateAndPlayAudio(response.answer, currentMessageIndex);
+      }
 
     } catch (error) {
       console.error("Error getting answer from AI:", error);
@@ -207,7 +214,21 @@ export function Chatbot({ context, flowType }: ChatbotProps) {
               <CardTitle className="flex items-center gap-2">
                 <Bot /> {flowType === 'quiz' ? 'Quiz Helper' : 'Lesson Assistant'}
               </CardTitle>
-               <LanguageSelector />
+                <div className="flex items-center gap-1">
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setAutoPlay(!autoPlay)}>
+                                    {autoPlay ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>{autoPlay ? "Disable" : "Enable"} Auto-play Audio</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+                    <LanguageSelector />
+                </div>
             </CardHeader>
             <CardContent className="flex-1 overflow-hidden p-0">
                 { !hasSelectedLanguage ? (
