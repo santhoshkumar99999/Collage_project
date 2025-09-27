@@ -15,7 +15,7 @@ export function generateStaticParams() {
   }));
 }
 
-export default function LessonPage({ params }: { params: { subjectId: string, lessonId: string } }) {
+export default async function LessonPage({ params }: { params: { subjectId: string, lessonId: string } }) {
   const subjects = getSubjects();
   const lessons = getLessons();
 

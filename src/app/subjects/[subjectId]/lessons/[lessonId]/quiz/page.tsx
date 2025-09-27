@@ -17,7 +17,7 @@ export function generateStaticParams() {
   }).filter(params => params.subjectId && params.lessonId) as { subjectId: string; lessonId: string; }[];
 }
 
-export default function QuizPage({ params }: { params: { lessonId: string, subjectId: string } }) {
+export default async function QuizPage({ params }: { params: { lessonId: string, subjectId: string } }) {
   const quizzes = getQuizzes();
   const quiz = quizzes.find((q) => q.lessonId === params.lessonId);
 

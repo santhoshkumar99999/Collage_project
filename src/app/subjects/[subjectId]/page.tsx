@@ -12,7 +12,7 @@ export function generateStaticParams() {
   }));
 }
 
-export default function SubjectPage({ params }: { params: { subjectId: string } }) {
+export default async function SubjectPage({ params }: { params: { subjectId: string } }) {
   const subjects = getSubjects();
   const lessons = getLessons();
 
