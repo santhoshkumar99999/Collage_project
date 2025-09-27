@@ -113,13 +113,14 @@ export function Chatbot({ context, flowType }: ChatbotProps) {
       }
 
     } catch (error: any) {
-      console.error("Error generating speech:", error);
-       if (error.message === 'RATE_LIMIT_EXCEEDED') {
+      if (error.message === 'RATE_LIMIT_EXCEEDED') {
         toast({
           title: "Audio Limit Reached",
           description: "You've exceeded the daily quota for audio playback. The feature will be available again tomorrow.",
           variant: "destructive"
         });
+      } else {
+        console.error("Error generating speech:", error);
       }
       setMessages(prev => prev.map((msg, idx) => idx === messageIndex ? { ...msg, isAudioLoading: false } : msg));
     }
@@ -361,3 +362,5 @@ export function Chatbot({ context, flowType }: ChatbotProps) {
     </>
   );
 }
+
+    

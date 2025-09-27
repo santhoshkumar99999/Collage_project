@@ -189,7 +189,6 @@ export function QuizClient({ quiz, isTournament = false }: QuizClientProps) {
             audioRef.current.play();
         }
     } catch (error: any) {
-        console.error("Error generating speech:", error);
         if (error.message === 'RATE_LIMIT_EXCEEDED') {
           toast({
             title: "Audio Limit Reached",
@@ -197,6 +196,7 @@ export function QuizClient({ quiz, isTournament = false }: QuizClientProps) {
             variant: "destructive"
           });
         } else {
+            console.error("Error generating speech:", error);
             toast({ title: "Could not play audio", variant: "destructive" });
         }
     } finally {
@@ -297,3 +297,5 @@ export function QuizClient({ quiz, isTournament = false }: QuizClientProps) {
     </>
   );
 }
+
+    
