@@ -103,7 +103,7 @@ export default function AdminStudentsPage() {
                             <span className="text-xs text-muted-foreground">{Math.round((user.xp / user.xpToNextLevel) * 100)}%</span>
                         </div>
                     </TableCell>
-                    <TableCell className="text-right">{user.badges.length}</TableCell>
+                    <TableCell className="text-right">{user.badgeIds.length}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
