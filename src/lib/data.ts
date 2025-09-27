@@ -1,3 +1,4 @@
+
 'use server';
 
 import type { Subject, Lesson, Quiz, User, LeaderboardEntry, Badge } from './types';
@@ -337,7 +338,20 @@ async function seedData() {
         console.error("Error during seeding:", e);
     }
 }
-seedData().catch(console.error);
+// Run seedData only once
+(async () => {
+  try {
+    // A single ping to check connection before attempting to seed.
+    const client = await clientPromise;
+    await client.db("admin").command({ ping: 1 });
+    console.log("MongoDB connection successful. Seeding data if necessary.");
+    await seedData();
+  } catch (e) {
+    console.warn(
+      "Could not connect to MongoDB. Skipping data seeding. Please ensure your database is running and the connection string is correct."
+    );
+  }
+})();
 
 // --- Helper Functions ---
 function serializeDocument<T extends { _id?: ObjectId }>(doc: T | null): T | null {
