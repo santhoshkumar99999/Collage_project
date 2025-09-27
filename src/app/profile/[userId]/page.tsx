@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { notFound } from 'next/navigation';
 import { PageHeader } from '@/components/PageHeader';
 import { User, Subject, Badge as BadgeType } from '@/lib/types';
-import { getLessons, getSubjects, getUser, getBadges, getIconMap } from '@/lib/data';
+import { getLessons, getSubjects, getUser, getBadges, getIconMap, getUsers } from '@/lib/data';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Progress } from '@/components/ui/progress';
@@ -14,6 +14,12 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Translate } from '@/components/Translate';
 import { Star } from 'lucide-react';
 
+export function generateStaticParams() {
+  const users = getUsers();
+  return users.map((user) => ({
+    userId: user.id,
+  }));
+}
 
 export default function PublicProfilePage({ params }: { params: { userId: string } }) {
   const [user, setUser] = useState<User | null>(null);
@@ -54,7 +60,7 @@ export default function PublicProfilePage({ params }: { params: { userId: string
     subjects.filter(subject => user.completedTournaments!.includes(subject.id))
     : [];
     
-  const userBadges: BadgeType[] = user ? user.badgeIds.map(badgeId => allBadges.find(b => b.id === badgeId)).filter(b => b !== undefined) as BadgeType[] : [];
+  const userBadges: BadgeType[] = user && user.badgeIds ? user.badgeIds.map(badgeId => allBadges.find(b => b.id === badgeId)).filter(b => b !== undefined) as BadgeType[] : [];
 
 
   if (isLoading) {

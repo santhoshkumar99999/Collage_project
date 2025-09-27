@@ -3,11 +3,23 @@
 
 import { notFound } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import { getQuizzes } from '@/lib/data';
+import { getQuizzes, getLessons } from '@/lib/data';
 import type { Quiz } from '@/lib/types';
 import { PageHeader } from '@/components/PageHeader';
 import { QuizClient } from '@/components/QuizClient';
 import { LoaderCircle } from 'lucide-react';
+
+export function generateStaticParams() {
+  const quizzes = getQuizzes();
+  const lessons = getLessons();
+  return quizzes.map((quiz) => {
+    const lesson = lessons.find((l) => l.id === quiz.lessonId);
+    return {
+      subjectId: lesson?.subjectId,
+      lessonId: quiz.lessonId,
+    };
+  }).filter(params => params.subjectId);
+}
 
 export default function QuizPage({ params }: { params: { lessonId: string } }) {
   const [quiz, setQuiz] = useState<Quiz | null>(null);

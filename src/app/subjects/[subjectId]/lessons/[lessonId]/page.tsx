@@ -11,6 +11,13 @@ import { Download } from 'lucide-react';
 import { LessonClient } from '@/components/LessonClient';
 import { LoaderCircle } from 'lucide-react';
 
+export function generateStaticParams() {
+  const lessons = getLessons();
+  return lessons.map((lesson) => ({
+    subjectId: lesson.subjectId,
+    lessonId: lesson.id,
+  }));
+}
 
 export default function LessonPage({ params }: { params: { subjectId: string, lessonId: string } }) {
   const [subject, setSubject] = useState<Subject | null>(null);

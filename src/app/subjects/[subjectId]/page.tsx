@@ -12,6 +12,13 @@ import { Button } from '@/components/ui/button';
 import { BookOpen, Gamepad2 } from 'lucide-react';
 import { Translate } from '@/components/Translate';
 
+export function generateStaticParams() {
+  const subjects = getSubjects();
+  return subjects.map((subject) => ({
+    subjectId: subject.id,
+  }));
+}
+
 export default function SubjectPage({ params }: { params: { subjectId: string } }) {
   const [subject, setSubject] = useState<Subject | null>(null);
   const [subjectLessons, setSubjectLessons] = useState<Lesson[]>([]);
