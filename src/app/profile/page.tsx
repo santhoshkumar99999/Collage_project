@@ -87,7 +87,7 @@ export default function ProfilePage() {
         )
     ) : [];
   
-  const userBadges: BadgeType[] = currentUser ? currentUser.badgeIds.map(badgeId => allBadges.find(b => b.id === badgeId)).filter(b => b !== undefined) as BadgeType[] : [];
+  const userBadges: BadgeType[] = (currentUser && currentUser.badgeIds) ? currentUser.badgeIds.map(badgeId => allBadges.find(b => b.id === badgeId)).filter(b => b !== undefined) as BadgeType[] : [];
 
 
   if (isLoading || !currentUser) {
