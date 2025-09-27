@@ -98,7 +98,7 @@ export function ProfilePageClient({ userId, allSubjects, allLessons, allBadges }
                 <AvatarFallback className="text-3xl">{user.name.charAt(0)}</AvatarFallback>
               </Avatar>
               <h2 className="text-2xl font-bold font-headline">{user.name}</h2>
-              <p className="text-muted-foreground"><Translate>Level</Translate> {user.level}</p>
+              <div className="text-muted-foreground"><Translate>Level</Translate> {user.level}</div>
             </Card>
           </div>
           <div className="md:col-span-2 space-y-6">
@@ -153,7 +153,7 @@ export function ProfilePageClient({ userId, allSubjects, allLessons, allBadges }
                                 )
                             })
                         ) : (
-                            <p className="text-muted-foreground"><Translate>No subjects learned yet.</Translate></p>
+                            <div className="text-muted-foreground"><Translate>No subjects learned yet.</Translate></div>
                         )}
                     </div>
                 </TooltipProvider>
@@ -186,7 +186,7 @@ export function ProfilePageClient({ userId, allSubjects, allLessons, allBadges }
                                 )
                             })
                         ) : (
-                            <p className="text-muted-foreground"><Translate>No tournaments attempted yet.</Translate></p>
+                            <div className="text-muted-foreground"><Translate>No tournaments attempted yet.</Translate></div>
                         )}
                     </div>
                 </TooltipProvider>
@@ -218,7 +218,7 @@ export function ProfilePageClient({ userId, allSubjects, allLessons, allBadges }
                         </Tooltip>
                       )})
                     ) : (
-                      <p className="text-muted-foreground"><Translate>No badges earned yet.</Translate></p>
+                      <div className="text-muted-foreground"><Translate>No badges earned yet.</Translate></div>
                     )}
                   </div>
                 </TooltipProvider>

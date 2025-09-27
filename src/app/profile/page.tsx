@@ -186,7 +186,7 @@ export default function ProfilePage() {
               ) : (
                 <h2 className="text-2xl font-bold font-headline">{currentUser.name}</h2>
               )}
-              <p className="text-muted-foreground"><Translate>Level</Translate> {currentUser.level}</p>
+              <div className="text-muted-foreground"><Translate>Level</Translate> {currentUser.level}</div>
             </Card>
           </div>
           <div className="md:col-span-2 space-y-6">
@@ -241,7 +241,7 @@ export default function ProfilePage() {
                                 )
                             })
                         ) : (
-                            <p className="text-muted-foreground"><Translate>Complete a quiz to see your first learned subject!</Translate></p>
+                            <div className="text-muted-foreground"><Translate>Complete a quiz to see your first learned subject!</Translate></div>
                         )}
                     </div>
                 </TooltipProvider>
@@ -255,7 +255,8 @@ export default function ProfilePage() {
               <CardContent>
                 <TooltipProvider>
                   <div className="flex flex-wrap gap-4">
-                    {userBadges.length > 0 ? (
+                    {userBadges.length >
+ 0 ? (
                       userBadges.map((badge) => {
                         const BadgeIcon = badge.icon;
                         return (
@@ -273,7 +274,7 @@ export default function ProfilePage() {
                         </Tooltip>
                       )})
                     ) : (
-                      <p className="text-muted-foreground"><Translate>No badges earned yet. Keep playing!</Translate></p>
+                      <div className="text-muted-foreground"><Translate>No badges earned yet. Keep playing!</Translate></div>
                     )}
                   </div>
                 </TooltipProvider>

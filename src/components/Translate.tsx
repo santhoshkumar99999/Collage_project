@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from 'react';
@@ -31,7 +30,7 @@ export function Translate({ children }: { children: React.ReactNode }) {
 
   if (isTranslating(originalText)) {
       const width = Math.min(150, originalText.length * 8) + 'px';
-      return <Skeleton className="h-5 rounded-md inline-block" style={{ width }} />;
+      return <Skeleton className="h-5" style={{ width }} />;
   }
 
   return <>{translatedText}</>;
