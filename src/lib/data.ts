@@ -297,61 +297,49 @@ const AUTH_COOKIE_NAME = 'currentUser_id';
 let db: Db;
 let usersCollection: Collection<User>;
 let subjectsCollection: Collection<Subject>;
+let dbReady = false;
 
 async function getDb() {
-    if (db) return db;
+  if (db) return db;
+  try {
     const client = await clientPromise;
     db = client.db('vidyagram');
+    dbReady = true;
     return db;
+  } catch (e) {
+    console.error("Failed to connect to MongoDB", e);
+    throw new Error("Could not connect to the database.");
+  }
 }
 
 async function getUsersCollection() {
     if (usersCollection) return usersCollection;
     const db = await getDb();
-    usersCollection = db.collection<User>('users');
+    const collection = db.collection<User>('users');
+    // Lazy seeding
+    const count = await collection.countDocuments();
+    if (count === 0) {
+        console.log("No users found, seeding initial user data...");
+        await collection.insertMany(initialUsers as any[]);
+    }
+    usersCollection = collection;
     return usersCollection;
 }
 
 async function getSubjectsCollection() {
     if (subjectsCollection) return subjectsCollection;
     const db = await getDb();
-    subjectsCollection = db.collection<Subject>('subjects');
+    const collection = db.collection<Subject>('subjects');
+     // Lazy seeding
+    const count = await collection.countDocuments();
+    if (count === 0) {
+        console.log("No subjects found, seeding initial subject data...");
+        await collection.insertMany(initialSubjects as any[]);
+    }
+    subjectsCollection = collection;
     return subjectsCollection;
 }
 
-// --- Data Seeding ---
-async function seedData() {
-    try {
-        const users = await getUsersCollection();
-        const count = await users.countDocuments();
-        if (count === 0) {
-            console.log("No users found, seeding initial data...");
-            await users.insertMany(initialUsers as any[]);
-        }
-        const subjects = await getSubjectsCollection();
-        const subjectsCount = await subjects.countDocuments();
-        if(subjectsCount === 0){
-            console.log("No subjects found, seeding initial data...");
-            await subjects.insertMany(initialSubjects as any[]);
-        }
-    } catch (e) {
-        console.error("Error during seeding:", e);
-    }
-}
-// Run seedData only once
-(async () => {
-  try {
-    // A single ping to check connection before attempting to seed.
-    const client = await clientPromise;
-    await client.db("admin").command({ ping: 1 });
-    console.log("MongoDB connection successful. Seeding data if necessary.");
-    await seedData();
-  } catch (e) {
-    console.warn(
-      "Could not connect to MongoDB. Skipping data seeding. Please ensure your database is running and the connection string is correct."
-    );
-  }
-})();
 
 // --- Helper Functions ---
 function serializeDocument<T extends { _id?: ObjectId }>(doc: T | null): T | null {
