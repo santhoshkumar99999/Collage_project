@@ -12,7 +12,7 @@ type TranslationCache = {
 };
 
 type TranslationContextType = {
-  getTranslation: (key: string) => string;
+  getTranslation: (key: string) => string | null;
   isTranslating: (key: string) => boolean;
   registerKeys: (keys: string[]) => void;
 };
@@ -61,7 +61,7 @@ export const TranslationProvider = ({ children }: { children: ReactNode }) => {
        setTranslations(prev => {
         const newLangCache = { ...(prev[targetLanguage] || {}) };
         keysToFetch.forEach(key => {
-            if (!newLangCache[key]) newLangCache[key] = key;
+            if (!newLangCache[key]) newLangCache[key] = key; // Fallback to original
         });
         return { ...prev, [targetLanguage]: newLangCache };
       });
@@ -97,16 +97,16 @@ export const TranslationProvider = ({ children }: { children: ReactNode }) => {
     });
   }, [language, translations]);
 
-  const getTranslation = useCallback((key: string): string => {
+  const getTranslation = useCallback((key: string): string | null => {
     if (language.toLowerCase() === 'english') {
       return key;
     }
-    return translations[language]?.[key] || key;
+    return translations[language]?.[key] || null;
   }, [language, translations]);
 
   const isTranslating = useCallback((key: string): boolean => {
     if (language.toLowerCase() === 'english') return false;
-    return !translations[language]?.[key] && pendingKeys.has(key);
+    return translations[language]?.[key] === undefined && pendingKeys.has(key);
   }, [pendingKeys, translations, language]);
 
 

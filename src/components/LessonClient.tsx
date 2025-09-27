@@ -20,7 +20,7 @@ export function LessonClient({ lesson, subject }: { lesson: Lesson, subject: Omi
   const [isTranslating, setIsTranslating] = useState(false);
 
   useEffect(() => {
-    if (!lesson || !language || language === 'English') {
+    if (!lesson || !language || language.toLowerCase() === 'english') {
       setTranslatedContent(lesson.content);
       return;
     }
@@ -28,11 +28,7 @@ export function LessonClient({ lesson, subject }: { lesson: Lesson, subject: Omi
     const translateLessonContent = async () => {
       setIsTranslating(true);
       try {
-        const textsToTranslate = [lesson.content, lesson.description];
-        const response = await translateBatch({ texts: textsToTranslate, targetLanguage: language });
-        
-        // Use a local variable to store translated description if needed elsewhere, 
-        // as the component now uses <Translate> for the description.
+        const response = await translateBatch({ texts: [lesson.content], targetLanguage: language });
         setTranslatedContent(response.translations[0] || lesson.content);
       } catch (error) {
         console.error("Failed to translate content:", error);

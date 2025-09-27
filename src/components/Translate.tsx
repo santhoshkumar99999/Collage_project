@@ -8,7 +8,7 @@ import { useLanguage } from '@/hooks/use-language';
 
 export function Translate({ children }: { children: React.ReactNode }) {
   const { getTranslation, isTranslating, registerKeys } = useTranslation();
-  const { language } = useLanguage();
+  const { language, isInitialized } = useLanguage();
 
   const originalText = React.useMemo(() => {
     return React.Children.toArray(children).reduce((acc: string, child) => {
@@ -20,16 +20,16 @@ export function Translate({ children }: { children: React.ReactNode }) {
   }, [children]);
   
   React.useEffect(() => {
-    if (originalText && language !== 'English') {
+    if (originalText && isInitialized && language.toLowerCase() !== 'english') {
       registerKeys([originalText]);
     }
-  }, [originalText, registerKeys, language]);
+  }, [originalText, registerKeys, language, isInitialized]);
 
-  if (!originalText) {
+  if (!originalText || !isInitialized) {
     return <>{children}</>;
   }
   
-  if (language === 'English') {
+  if (language.toLowerCase() === 'english') {
     return <>{originalText}</>;
   }
 
@@ -40,5 +40,5 @@ export function Translate({ children }: { children: React.ReactNode }) {
       return <Skeleton className="h-5" style={{ width }} />;
   }
 
-  return <>{translatedText}</>;
+  return <>{translatedText || originalText}</>;
 }

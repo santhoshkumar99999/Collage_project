@@ -21,6 +21,18 @@ const supportedLanguages = [
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
+const getLangCode = (lang: string) => {
+    const map: { [key: string]: string } = {
+        'English': 'en',
+        'Hindi': 'hi',
+        'Telugu': 'te',
+        'Kannada': 'kn',
+        'Tamil': 'ta',
+        'Odia': 'or',
+    };
+    return map[lang] || 'en';
+}
+
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   const [language, setLanguageState] = useState('English');
   const [isInitialized, setIsInitialized] = useState(false);
@@ -29,7 +41,9 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
     const storedLanguage = localStorage.getItem('language');
     if (storedLanguage && supportedLanguages.some(l => l.value === storedLanguage)) {
       setLanguageState(storedLanguage);
-      document.documentElement.lang = supportedLanguages.find(l => l.value === storedLanguage)?.label.substring(0,2).toLowerCase() || 'en';
+      document.documentElement.lang = getLangCode(storedLanguage);
+    } else {
+      document.documentElement.lang = 'en';
     }
     setIsInitialized(true);
   }, []);
@@ -38,12 +52,14 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
     if (supportedLanguages.some(l => l.value === newLanguage)) {
       localStorage.setItem('language', newLanguage);
       setLanguageState(newLanguage);
-      document.documentElement.lang = supportedLanguages.find(l => l.value === newLanguage)?.label.substring(0,2).toLowerCase() || 'en';
+      document.documentElement.lang = getLangCode(newLanguage);
     }
   }, []);
 
+  const value = { language, setLanguage, supportedLanguages, isInitialized };
+
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, supportedLanguages, isInitialized }}>
+    <LanguageContext.Provider value={value}>
       {children}
     </LanguageContext.Provider>
   );
