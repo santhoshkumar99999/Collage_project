@@ -5,23 +5,15 @@ import { useState, useEffect } from 'react';
 import { notFound } from 'next/navigation';
 import { PageHeader } from '@/components/PageHeader';
 import { User, Subject, Badge as BadgeType } from '@/lib/types';
-import { getLessons, getSubjects, getUser, getBadges } from '@/lib/data';
+import { getLessons, getSubjects, getUser, getBadges, getIconMap } from '@/lib/data';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Progress } from '@/components/ui/progress';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Translate } from '@/components/Translate';
-import { BookOpen, Calculator, FlaskConical, Atom, Dna, Bot, Star, BrainCircuit, Rocket, Target, Zap } from 'lucide-react';
+import { Star } from 'lucide-react';
 
-const badgeIconMap = {
-    Star,
-    BookOpen,
-    BrainCircuit,
-    Rocket,
-    Target,
-    Zap
-};
 
 export default function PublicProfilePage({ params }: { params: { userId: string } }) {
   const [user, setUser] = useState<User | null>(null);
@@ -36,16 +28,22 @@ export default function PublicProfilePage({ params }: { params: { userId: string
     const subjectsData = getSubjects();
     const lessonsData = getLessons();
     const badgesData = getBadges();
+    const iconMap = getIconMap();
 
     if (userData) {
         setUser(userData);
     }
     const badgesWithIcons = badgesData.map(badge => ({
         ...badge,
-        icon: badgeIconMap[badge.icon as keyof typeof badgeIconMap] || Star
+        icon: iconMap[badge.icon as keyof typeof iconMap] || Star
     }));
 
-    setSubjects(subjectsData);
+    const subjectsWithIcons = subjectsData.map(subject => ({
+        ...subject,
+        icon: iconMap[subject.icon as keyof typeof iconMap] || Star,
+    }));
+
+    setSubjects(subjectsWithIcons);
     setLessons(lessonsData);
     setAllBadges(badgesWithIcons);
     setIsLoading(false);

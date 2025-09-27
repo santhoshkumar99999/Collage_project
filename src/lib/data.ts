@@ -1,4 +1,6 @@
 
+'use client';
+
 import type { Subject, Lesson, Quiz, User, LeaderboardEntry, Badge } from './types';
 import { Calculator, FlaskConical, Atom, Dna, Bot, BookOpen, Star, BrainCircuit, Rocket, Target, Zap } from 'lucide-react';
 
@@ -16,7 +18,7 @@ const iconMap = {
     Zap,
 };
 
-const subjects: Subject[] = [
+let subjects: Subject[] = [
   {
     id: 'mathematics',
     name: 'Mathematics',
@@ -294,26 +296,8 @@ export function getUsers(): User[] {
 }
 
 export function getIconMap() {
-    // This seems odd, but it's to make a client-side object available from a server-only file.
-    // In a real app, this might be handled differently, but it resolves the export issue.
-    const serializableIconMap = Object.keys(iconMap).reduce((acc, key) => {
-        acc[key] = key; // Just sending the name
-        return acc;
-    }, {} as {[key: string]: string});
-    return serializableIconMap;
+    return iconMap;
 }
-
-export function getSubjectsWithIcons(subjects: Subject[]): Subject[] {
-    return subjects.map(rehydrateSubjectIcon);
-}
-
-const rehydrateSubjectIcon = (subject: Subject) => {
-    // This is a client-side utility
-    // @ts-ignore
-    const IconComponent = iconMap[subject.iconName as keyof typeof iconMap] || BookOpen;
-    return { ...subject, icon: IconComponent };
-};
-
 
 export function getUser(userId: string): User | null {
   const users = getUsersFromLocalStorage();

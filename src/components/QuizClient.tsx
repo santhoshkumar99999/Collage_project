@@ -3,31 +3,21 @@
 
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { Quiz, QuizQuestion } from '@/lib/types';
+import { Quiz, QuizQuestion, Badge as BadgeType, User, Subject } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
-import { CheckCircle, XCircle, Lightbulb, PartyPopper, Frown, Award, Volume2, LoaderCircle, Star, BookOpen, BrainCircuit, Rocket, Target, Zap } from 'lucide-react';
-import { updateUser, getUser, getLessons, getAuthenticatedUserId, getBadges } from '@/lib/data';
+import { CheckCircle, XCircle, Lightbulb, PartyPopper, Frown, Award, Volume2, LoaderCircle, Star } from 'lucide-react';
+import { updateUser, getUser, getLessons, getAuthenticatedUserId, getBadges, getIconMap } from '@/lib/data';
 import { Translate } from './Translate';
 import { textToSpeech } from '@/ai/flows/tts-flow';
 import { useLanguage } from '@/hooks/use-language';
 import { translateText } from '@/ai/flows/translate-flow';
 import { Chatbot } from './Chatbot';
 import { audioCache } from '@/services/audio-cache';
-import type { User } from '@/lib/types';
-
-const badgeIconMap = {
-    Star,
-    BookOpen,
-    BrainCircuit,
-    Rocket,
-    Target,
-    Zap
-};
 
 interface QuizClientProps {
     quiz: Quiz;
@@ -87,6 +77,8 @@ export function QuizClient({ quiz, isTournament = false }: QuizClientProps) {
     if(!currentUser) return;
     const lessons = getLessons();
     const allBadges = getBadges();
+    const iconMap = getIconMap();
+
     const xpGained = finalScore * 10;
     let newXp = currentUser.xp + xpGained;
     let newLevel = currentUser.level;
@@ -118,7 +110,7 @@ export function QuizClient({ quiz, isTournament = false }: QuizClientProps) {
       const scholarBadge = allBadges.find(b => b.id === 'scholar');
       if (scholarBadge) {
         newBadgeIds.push(scholarBadge.id);
-        const BadgeIcon = badgeIconMap[scholarBadge.icon as keyof typeof badgeIconMap] || Award;
+        const BadgeIcon = iconMap[scholarBadge.icon as keyof typeof iconMap] || Award;
         toast({
           title: "Badge Unlocked!",
           description: `You've earned the ${scholarBadge.name} badge!`,

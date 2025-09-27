@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import QRCode from "react-qr-code";
 import { PageHeader } from '@/components/PageHeader';
-import { getUser, updateUser, getAuthenticatedUserId, getLessons, getSubjects, getBadges } from '@/lib/data';
+import { getUser, updateUser, getAuthenticatedUserId, getLessons, getSubjects, getBadges, getIconMap } from '@/lib/data';
 import { User, Subject, Lesson, Badge as BadgeType } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
@@ -15,7 +15,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { Edit, Save, X, QrCode, LoaderCircle, BookOpen, Calculator, FlaskConical, Atom, Dna, Bot, Star, BrainCircuit, Rocket, Target, Zap } from 'lucide-react';
+import { Edit, Save, X, QrCode, LoaderCircle, Star } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -24,15 +24,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Translate } from '@/components/Translate';
-
-const badgeIconMap = {
-    Star,
-    BookOpen,
-    BrainCircuit,
-    Rocket,
-    Target,
-    Zap
-};
 
 export default function ProfilePage() {
   const { toast } = useToast();
@@ -71,12 +62,19 @@ export default function ProfilePage() {
     const subjectsData = getSubjects();
     const lessonsData = getLessons();
     const badgesData = getBadges();
+    const iconMap = getIconMap();
 
      const badgesWithIcons = badgesData.map(badge => ({
         ...badge,
-        icon: badgeIconMap[badge.icon as keyof typeof badgeIconMap] || Star
+        icon: iconMap[badge.icon as keyof typeof iconMap] || Star
     }));
-    setSubjects(subjectsData);
+
+     const subjectsWithIcons = subjectsData.map(subject => ({
+        ...subject,
+        icon: iconMap[subject.icon as keyof typeof iconMap] || Star
+    }));
+
+    setSubjects(subjectsWithIcons);
     setLessons(lessonsData);
     setAllBadges(badgesWithIcons);
   }, []);
