@@ -181,7 +181,7 @@ export function QuizClient({ quiz, isTournament = false }: QuizClientProps) {
             return;
         }
 
-        const { media } = await textToSpeech({ prompt: textToSpeak });
+        const { media } = await textToSpeech({ prompt: textToSpeak, speakers: 1 });
         audioCache.set(cacheKey, media);
 
         if (audioRef.current) {
