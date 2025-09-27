@@ -18,6 +18,7 @@ import { useLanguage } from '@/hooks/use-language';
 import { translateText } from '@/ai/flows/translate-flow';
 import { Chatbot } from './Chatbot';
 import { audioCache } from '@/services/audio-cache';
+import { cn } from '@/lib/utils';
 
 interface QuizClientProps {
     quiz: Quiz;
@@ -37,6 +38,9 @@ export function QuizClient({ quiz, isTournament = false }: QuizClientProps) {
   const [isHintLoading, setIsHintLoading] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
+  const [isAnswered, setIsAnswered] = useState(false);
+  const [answerStatus, setAnswerStatus] = useState<'correct' | 'incorrect' | null>(null);
+
   useEffect(() => {
     const userId = getAuthenticatedUserId();
     if (userId) {
@@ -54,24 +58,34 @@ export function QuizClient({ quiz, isTournament = false }: QuizClientProps) {
     return `Question: "${currentQuestion.question}"\nOptions: ${currentQuestion.options.join(', ')}\nCorrect Answer: ${currentQuestion.correctAnswer}`;
   }, [currentQuestion]);
 
-  const handleNext = () => {
+  const handleSubmitAnswer = () => {
     if (selectedAnswer === null) {
       toast({ title: 'Please select an answer.', variant: 'destructive' });
       return;
     }
 
-    if (selectedAnswer === currentQuestion.correctAnswer) {
+    const isCorrect = selectedAnswer === currentQuestion.correctAnswer;
+    if (isCorrect) {
       setScore(score + 1);
+      setAnswerStatus('correct');
+    } else {
+      setAnswerStatus('incorrect');
     }
     
+    setIsAnswered(true);
+  };
+  
+  const handleNextQuestion = () => {
+    setIsAnswered(false);
+    setAnswerStatus(null);
     setSelectedAnswer(null);
 
     if (currentQuestionIndex < quiz.questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     } else {
-      handleFinish(score + (selectedAnswer === currentQuestion.correctAnswer ? 1 : 0));
+      handleFinish();
     }
-  };
+  }
 
   const handleFinish = (finalScore = score) => {
     if(!currentUser) return;
@@ -254,6 +268,16 @@ export function QuizClient({ quiz, isTournament = false }: QuizClientProps) {
     )
   }
 
+  const getOptionClass = (option: string) => {
+    if (!isAnswered) return '';
+    const isCorrect = option === currentQuestion.correctAnswer;
+    const isSelected = option === selectedAnswer;
+
+    if (isCorrect) return 'bg-green-100 dark:bg-green-900 border-green-500';
+    if (isSelected && !isCorrect) return 'bg-red-100 dark:bg-red-900 border-red-500';
+    return 'opacity-60';
+  }
+
   return (
     <>
     <Card className="w-full max-w-2xl mx-auto">
@@ -277,14 +301,28 @@ export function QuizClient({ quiz, isTournament = false }: QuizClientProps) {
         </div>
       </CardHeader>
       <CardContent>
-        <RadioGroup onValueChange={setSelectedAnswer} value={selectedAnswer ?? undefined}>
+        <RadioGroup onValueChange={setSelectedAnswer} value={selectedAnswer ?? undefined} disabled={isAnswered}>
           <div className="space-y-4">
-            {currentQuestion.options.map((option, index) => (
-              <div key={`${currentQuestion.id}-option-${index}`} className="flex items-center space-x-2">
-                <RadioGroupItem value={option} id={option} />
-                <Label htmlFor={option} className="text-base flex-1 cursor-pointer"><Translate>{option}</Translate></Label>
-              </div>
-            ))}
+            {currentQuestion.options.map((option, index) => {
+                const isCorrect = option === currentQuestion.correctAnswer;
+                const isSelected = option === selectedAnswer;
+                return (
+                  <Label 
+                    key={`${currentQuestion.id}-option-${index}`} 
+                    htmlFor={`${currentQuestion.id}-option-${index}`}
+                    className={cn(
+                        "flex items-center space-x-4 p-4 rounded-lg border transition-all cursor-pointer",
+                        "hover:bg-accent/50",
+                        getOptionClass(option)
+                    )}
+                  >
+                    <RadioGroupItem value={option} id={`${currentQuestion.id}-option-${index}`} className="shrink-0" />
+                    <span className="text-base flex-1"><Translate>{option}</Translate></span>
+                    {isAnswered && isCorrect && <CheckCircle className="text-green-600" />}
+                    {isAnswered && isSelected && !isCorrect && <XCircle className="text-red-600" />}
+                  </Label>
+                )
+            })}
           </div>
         </RadioGroup>
       </CardContent>
@@ -293,8 +331,12 @@ export function QuizClient({ quiz, isTournament = false }: QuizClientProps) {
           {isHintLoading ? <LoaderCircle className="mr-2 h-4 w-4 animate-spin" /> : <Lightbulb className="mr-2 h-4 w-4" />}
           <Translate>Hint</Translate>
         </Button>
-        <Button onClick={handleNext}>
-          {currentQuestionIndex === quiz.questions.length - 1 ? <Translate>Finish</Translate> : <Translate>Next</Translate>}
+        <Button onClick={isAnswered ? handleNextQuestion : handleSubmitAnswer}>
+            {isAnswered
+            ? currentQuestionIndex === quiz.questions.length - 1
+                ? <Translate>Finish</Translate>
+                : <Translate>Next</Translate>
+            : <Translate>Submit</Translate>}
         </Button>
       </CardFooter>
       <audio ref={audioRef} className="hidden" onEnded={() => setIsAudioLoading(false)} />
@@ -303,3 +345,4 @@ export function QuizClient({ quiz, isTournament = false }: QuizClientProps) {
     </>
   );
 }
+
