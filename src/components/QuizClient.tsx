@@ -82,7 +82,7 @@ export function QuizClient({ quiz, isTournament = false }: QuizClientProps) {
     const xpGained = finalScore * 10;
     let newXp = currentUser.xp + xpGained;
     let newLevel = currentUser.level;
-    let newBadgeIds = [...currentUser.badgeIds];
+    let newBadgeIds = [...(currentUser.badgeIds || [])];
     let leveledUp = false;
     let newCompletedLessons = [...(currentUser.completedLessons || [])];
     let newCompletedTournaments = [...(currentUser.completedTournaments || [])];
@@ -105,7 +105,7 @@ export function QuizClient({ quiz, isTournament = false }: QuizClientProps) {
     }
 
     // Add Scholar badge if they get a perfect score
-    const hasScholarBadge = currentUser.badgeIds.some(b => b === 'scholar');
+    const hasScholarBadge = newBadgeIds.some(b => b === 'scholar');
     if(finalScore === quiz.questions.length && !hasScholarBadge){
       const scholarBadge = allBadges.find(b => b.id === 'scholar');
       if (scholarBadge) {
