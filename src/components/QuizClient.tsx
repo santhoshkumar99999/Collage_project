@@ -48,21 +48,13 @@ export function QuizClient({ quiz, isTournament = false }: QuizClientProps) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
-    const fetchUser = async () => {
-        const userId = await getAuthenticatedUserId();
-        if (userId) {
-            try {
-                const user = await getUser(userId);
-                setCurrentUser(user);
-            } catch (error) {
-                console.error("Failed to fetch user for quiz", error);
-                router.push('/login');
-            }
-        } else {
-            router.push('/login');
-        }
-    };
-    fetchUser();
+    const userId = getAuthenticatedUserId();
+    if (userId) {
+        const user = getUser(userId);
+        setCurrentUser(user);
+    } else {
+        router.push('/login');
+    }
   }, [router]);
 
   const currentQuestion = quiz.questions[currentQuestionIndex];
@@ -91,9 +83,10 @@ export function QuizClient({ quiz, isTournament = false }: QuizClientProps) {
     }
   };
 
-  const handleFinish = async (finalScore = score) => {
+  const handleFinish = (finalScore = score) => {
     if(!currentUser) return;
-    const [lessons, allBadges] = await Promise.all([getLessons(), getBadges()]);
+    const lessons = getLessons();
+    const allBadges = getBadges();
     const xpGained = finalScore * 10;
     let newXp = currentUser.xp + xpGained;
     let newLevel = currentUser.level;
@@ -138,7 +131,7 @@ export function QuizClient({ quiz, isTournament = false }: QuizClientProps) {
       }
     }
     
-    await updateUser({ 
+    updateUser({ 
       ...currentUser, 
       xp: newXp, 
       level: newLevel,

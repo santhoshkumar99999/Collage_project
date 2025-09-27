@@ -1,15 +1,11 @@
 
-
-import type { ObjectId } from 'mongodb';
-
 export interface Subject {
-  _id?: ObjectId;
   id: string;
   name: string;
   description: string;
-  icon: React.ElementType; // This will be added on the client-side
+  icon: React.ElementType; 
   imageId: string;
-  iconName?: string; // This is what we store in the DB
+  iconName?: string;
 }
 
 export interface Lesson {
@@ -36,7 +32,6 @@ export interface Quiz {
 }
 
 export interface User {
-  _id?: ObjectId;
   id: string;
   name: string;
   email: string;
@@ -53,7 +48,7 @@ export interface User {
 export interface Badge {
   id: string;
   name: string;
-  icon: React.ElementType;
+  icon: React.ElementType | string;
   color: string;
 }
 

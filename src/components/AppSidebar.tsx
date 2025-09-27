@@ -56,26 +56,18 @@ export function AppSidebar({ initialUserId }: { initialUserId: string | null }) 
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchUser = async () => {
-        if (initialUserId) {
-            try {
-                const user = await getUser(initialUserId);
-                setCurrentUser(user);
-            } catch (error) {
-                console.error("Failed to fetch user in sidebar", error);
-                setCurrentUser(null);
-            }
-        } else {
-            setCurrentUser(null);
-        }
-        setIsLoading(false);
-    };
-
-    fetchUser();
+    setIsLoading(true);
+    if (initialUserId) {
+        const user = getUser(initialUserId);
+        setCurrentUser(user);
+    } else {
+        setCurrentUser(null);
+    }
+    setIsLoading(false);
   }, [initialUserId]);
 
-  const handleLogout = async () => {
-    await logoutUser();
+  const handleLogout = () => {
+    logoutUser();
     setCurrentUser(null);
     router.push('/login');
     router.refresh();

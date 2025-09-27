@@ -10,36 +10,12 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import { PageHeader } from '@/components/PageHeader';
 import imageData from '@/lib/placeholder-images.json';
 import { Translate } from '@/components/Translate';
-import { BookOpen, Calculator, FlaskConical, Atom, Dna, Bot, Star, BrainCircuit, Rocket, Target, Zap } from 'lucide-react';
-
-const iconMap = {
-    Calculator,
-    FlaskConical,
-    Atom,
-    Dna,
-    Bot,
-    BookOpen,
-    Star,
-    BrainCircuit,
-    Rocket,
-    Target,
-    Zap,
-};
 
 export default function SubjectSelectionPage() {
   const [subjects, setSubjects] = useState<Subject[]>([]);
 
   useEffect(() => {
-    const fetchSubjects = async () => {
-        const allSubjects = await getSubjects(); 
-        const subjectsWithIcons = allSubjects.map(subject => ({
-            ...subject,
-            icon: iconMap[subject.iconName as keyof typeof iconMap] || BookOpen
-        }));
-        setSubjects(subjectsWithIcons);
-    }
-    
-    fetchSubjects();
+    setSubjects(getSubjects());
   }, []);
 
   return (

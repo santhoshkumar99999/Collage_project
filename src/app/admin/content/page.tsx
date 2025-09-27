@@ -1,5 +1,4 @@
 
-
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -48,10 +47,9 @@ export default function AdminContentPage() {
   const [subjectName, setSubjectName] = useState('');
   const [subjectDescription, setSubjectDescription] = useState('');
   
-  const refreshData = async () => {
-    const [currentSubjects, currentLessons] = await Promise.all([getSubjects(), getLessons()]);
-    setSubjects(currentSubjects);
-    setLessons(currentLessons);
+  const refreshData = () => {
+    setSubjects(getSubjects());
+    setLessons(getLessons());
   }
 
   useEffect(() => {
@@ -135,14 +133,14 @@ export default function AdminContentPage() {
       }
       
       try {
-        await addSubject({ name: subjectName, description: descriptionToSave });
+        addSubject({ name: subjectName, description: descriptionToSave });
         toast({
             title: 'Subject Added',
             description: `"${subjectName}" has been successfully added.`,
         });
         setSubjectName('');
         setSubjectDescription('');
-        refreshData(); // Re-fetch subjects from DB
+        refreshData(); // Re-fetch subjects
       } catch (e: any) {
         toast({
             title: 'Error Adding Subject',

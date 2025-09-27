@@ -5,38 +5,22 @@ import { getSubjects, getLessons } from '@/lib/data';
 import { PageHeader } from '@/components/PageHeader';
 import { Card, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { BookOpen, Gamepad2, Calculator, FlaskConical, Atom, Dna, Bot, Star, BrainCircuit, Rocket, Target, Zap } from 'lucide-react';
+import { BookOpen, Gamepad2 } from 'lucide-react';
 import { Translate } from '@/components/Translate';
 
-const iconMap = {
-    Calculator,
-    FlaskConical,
-    Atom,
-    Dna,
-    Bot,
-    BookOpen,
-    Star,
-    BrainCircuit,
-    Rocket,
-    Target,
-    Zap,
-};
-
-export default async function SubjectPage({ params }: { params: { subjectId: string } }) {
-  const subjects = await getSubjects();
-  const lessons = await getLessons();
+export default function SubjectPage({ params }: { params: { subjectId: string } }) {
+  const subjects = getSubjects();
+  const lessons = getLessons();
   const subject = subjects.find((s) => s.id === params.subjectId);
   const subjectLessons = lessons.filter((l) => l.subjectId === params.subjectId);
 
   if (!subject) {
     notFound();
   }
-  
-  const rehydratedSubject = { ...subject, icon: iconMap[subject.iconName as keyof typeof iconMap] || BookOpen };
 
   return (
     <>
-      <PageHeader title={rehydratedSubject.name} />
+      <PageHeader title={subject.name} />
       <main className="flex-1 p-4 md:p-6">
         <div className="space-y-4">
           <h2 className="text-2xl font-semibold mb-4 font-headline"><Translate>Available Lessons</Translate></h2>
@@ -72,8 +56,8 @@ export default async function SubjectPage({ params }: { params: { subjectId: str
   );
 }
 
-export async function generateStaticParams() {
-  const subjects = await getSubjects();
+export function generateStaticParams() {
+  const subjects = getSubjects();
   return subjects.map((subject) => ({
     subjectId: subject.id,
   }));

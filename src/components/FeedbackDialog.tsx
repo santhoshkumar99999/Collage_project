@@ -35,21 +35,15 @@ export function FeedbackDialog({ children }: { children: React.ReactNode }) {
     const [isOpen, setIsOpen] = useState(false);
 
     useEffect(() => {
-        const fetchUser = async () => {
-            const userId = await getAuthenticatedUserId();
-            if (isOpen && userId) {
-                try {
-                    const userData = await getUser(userId);
-                    setUser(userData);
-                } catch(error) {
-                    console.error("Failed to fetch user for feedback dialog", error);
-                    setUser(null);
-                }
-            } else if (!userId) {
+        if (isOpen) {
+            const userId = getAuthenticatedUserId();
+            if (userId) {
+                const userData = getUser(userId);
+                setUser(userData);
+            } else {
                 setUser(null);
             }
-        };
-        fetchUser();
+        }
     }, [isOpen]);
 
     const handleSubmit = (e: React.FormEvent) => {

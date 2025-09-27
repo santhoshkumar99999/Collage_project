@@ -25,20 +25,6 @@ import {
 } from "@/components/ui/dialog"
 import { Translate } from '@/components/Translate';
 
-const iconMap = {
-    Calculator,
-    FlaskConical,
-    Atom,
-    Dna,
-    Bot,
-    BookOpen,
-    Star,
-    BrainCircuit,
-    Rocket,
-    Target,
-    Zap,
-};
-
 const badgeIconMap = {
     Star,
     BookOpen,
@@ -61,52 +47,38 @@ export default function ProfilePage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const refreshUser = async () => {
+    const refreshUser = () => {
       setIsLoading(true);
-      const userId = await getAuthenticatedUserId();
+      const userId = getAuthenticatedUserId();
       if (userId) {
-        try {
-          const user = await getUser(userId);
-          if (user) {
-            setCurrentUser(user);
-            setName(user.name);
-            setProfileUrl(`${window.location.origin}/profile/${user.id}`);
-          } else {
-            router.push('/login');
-          }
-        } catch (error) {
-          console.error("Failed to fetch user", error);
+        const user = getUser(userId);
+        if (user) {
+          setCurrentUser(user);
+          setName(user.name);
+          setProfileUrl(`${window.location.origin}/profile/${user.id}`);
+        } else {
           router.push('/login');
-        } finally {
-          setIsLoading(false);
         }
       } else {
         router.push('/login');
       }
+      setIsLoading(false);
     };
     refreshUser();
   }, [router]);
 
   useEffect(() => {
-      const fetchRelatedData = async () => {
-        const [subjectsData, lessonsData, badgesData] = await Promise.all([
-            getSubjects(),
-            getLessons(),
-            getBadges()
-        ]);
-        const subjectsWithIcons = subjectsData.map(subject => ({
-            ...subject,
-            icon: iconMap[subject.iconName as keyof typeof iconMap] || BookOpen
-        }));
-         const badgesWithIcons = badgesData.map(badge => ({
-            ...badge,
-            icon: badgeIconMap[badge.icon as keyof typeof badgeIconMap] || Star
-        }));
-        setSubjects(subjectsWithIcons);
-        setLessons(lessonsData);
-        setAllBadges(badgesWithIcons);
-      }
-      fetchRelatedData();
+    const subjectsData = getSubjects();
+    const lessonsData = getLessons();
+    const badgesData = getBadges();
+
+     const badgesWithIcons = badgesData.map(badge => ({
+        ...badge,
+        icon: badgeIconMap[badge.icon as keyof typeof badgeIconMap] || Star
+    }));
+    setSubjects(subjectsData);
+    setLessons(lessonsData);
+    setAllBadges(badgesWithIcons);
   }, []);
 
 
@@ -130,17 +102,17 @@ export default function ProfilePage() {
 
   const xpPercentage = (currentUser.xp / currentUser.xpToNextLevel) * 100;
 
-  const handleSave = async () => {
+  const handleSave = () => {
     if (!name.trim()) {
         toast({ title: 'Name cannot be empty', variant: 'destructive' });
         return;
     }
     if (!currentUser) return;
     const updatedUser = { ...currentUser, name: name };
-    await updateUser(updatedUser);
-    const userId = await getAuthenticatedUserId();
+    updateUser(updatedUser);
+    const userId = getAuthenticatedUserId();
     if(userId) {
-      const user = await getUser(userId);
+      const user = getUser(userId);
        if (user) {
           setCurrentUser(user);
           setName(user.name);

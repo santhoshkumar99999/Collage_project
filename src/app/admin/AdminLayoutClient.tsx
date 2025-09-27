@@ -35,8 +35,8 @@ const adminMenuItems = [
 
 function AdminSidebar() {
     const router = useRouter();
-    const handleLogout = async () => {
-        await logoutUser();
+    const handleLogout = () => {
+        logoutUser();
         router.push('/login');
         router.refresh();
     };

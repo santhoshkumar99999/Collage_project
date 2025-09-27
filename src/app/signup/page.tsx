@@ -19,7 +19,7 @@ export default function StudentSignupPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleSignup = async () => {
+  const handleSignup = () => {
     if (!fullName || !email || !password) {
       toast({
         title: "Missing Fields",
@@ -30,7 +30,7 @@ export default function StudentSignupPage() {
     }
 
     try {
-      await addUser({ name: fullName, email, password });
+      addUser({ name: fullName, email, password });
       toast({
         title: "Account Created",
         description: "Your account has been successfully created. Please log in.",

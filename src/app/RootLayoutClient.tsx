@@ -14,10 +14,10 @@ export function RootLayoutClient({ children }: { children: React.ReactNode }) {
     const [isLoading, setIsLoading] = useState(true);
 
      useEffect(() => {
-        getAuthenticatedUserId().then(id => {
-            setUserId(id);
-            setIsLoading(false);
-        });
+        // Since auth is now client-side, we can read it directly.
+        const id = getAuthenticatedUserId();
+        setUserId(id);
+        setIsLoading(false);
     }, [pathname]);
 
 

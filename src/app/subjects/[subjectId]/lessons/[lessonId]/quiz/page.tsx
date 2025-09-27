@@ -4,8 +4,8 @@ import { getQuizzes } from '@/lib/data';
 import { PageHeader } from '@/components/PageHeader';
 import { QuizClient } from '@/components/QuizClient';
 
-export default async function QuizPage({ params }: { params: { lessonId: string } }) {
-  const quizzes = await getQuizzes();
+export default function QuizPage({ params }: { params: { lessonId: string } }) {
+  const quizzes = getQuizzes();
   const quiz = quizzes.find((q) => q.lessonId === params.lessonId);
 
   if (!quiz) {
@@ -22,8 +22,8 @@ export default async function QuizPage({ params }: { params: { lessonId: string 
   );
 }
 
-export async function generateStaticParams() {
-    const quizzes = await getQuizzes();
+export function generateStaticParams() {
+    const quizzes = getQuizzes();
     const params: { subjectId: string; lessonId: string; quizId: string }[] = [];
     quizzes.forEach(quiz => {
         // This is a bit of a hack as we don't know subjectId here.

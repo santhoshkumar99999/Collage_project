@@ -14,20 +14,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Translate } from '@/components/Translate';
 import { BookOpen, Calculator, FlaskConical, Atom, Dna, Bot, Star, BrainCircuit, Rocket, Target, Zap } from 'lucide-react';
 
-const iconMap = {
-    Calculator,
-    FlaskConical,
-    Atom,
-    Dna,
-    Bot,
-    BookOpen,
-    Star,
-    BrainCircuit,
-    Rocket,
-    Target,
-    Zap,
-};
-
 const badgeIconMap = {
     Star,
     BookOpen,
@@ -45,39 +31,24 @@ export default function PublicProfilePage({ params }: { params: { userId: string
   const [isLoading, setIsLoading] = useState(true);
   
   useEffect(() => {
-    const loadData = async () => {
-        setIsLoading(true);
-        try {
-            const [userData, subjectsData, lessonsData, badgesData] = await Promise.all([
-                getUser(params.userId),
-                getSubjects(),
-                getLessons(),
-                getBadges()
-            ]);
+    setIsLoading(true);
+    const userData = getUser(params.userId);
+    const subjectsData = getSubjects();
+    const lessonsData = getLessons();
+    const badgesData = getBadges();
 
-            if (userData) {
-                setUser(userData);
-            }
-             const subjectsWithIcons = subjectsData.map(subject => ({
-                ...subject,
-                icon: iconMap[subject.iconName as keyof typeof iconMap] || BookOpen
-            }));
-            const badgesWithIcons = badgesData.map(badge => ({
-                ...badge,
-                icon: badgeIconMap[badge.icon as keyof typeof badgeIconMap] || Star
-            }));
-
-            setSubjects(subjectsWithIcons);
-            setLessons(lessonsData);
-            setAllBadges(badgesWithIcons);
-        } catch (e) {
-            console.error("Failed to load profile data.", e);
-        } finally {
-            setIsLoading(false);
-        }
+    if (userData) {
+        setUser(userData);
     }
-    
-    loadData();
+    const badgesWithIcons = badgesData.map(badge => ({
+        ...badge,
+        icon: badgeIconMap[badge.icon as keyof typeof badgeIconMap] || Star
+    }));
+
+    setSubjects(subjectsData);
+    setLessons(lessonsData);
+    setAllBadges(badgesWithIcons);
+    setIsLoading(false);
   }, [params.userId]);
 
 

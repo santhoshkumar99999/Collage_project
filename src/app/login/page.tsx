@@ -24,13 +24,13 @@ export default function UnifiedLoginPage() {
   const [teacherEmail, setTeacherEmail] = useState('');
   const [teacherPassword, setTeacherPassword] = useState('');
 
-  const handleLogin = async (role: 'student' | 'teacher') => {
+  const handleLogin = (role: 'student' | 'teacher') => {
     setIsLoading(true);
     const email = role === 'student' ? studentEmail : teacherEmail;
     const password = role === 'student' ? studentPassword : teacherPassword;
 
     try {
-      const result = await loginUserAction({ email, password });
+      const result = loginUserAction({ email, password });
       if (result.success && result.userId) {
         
         toast({
@@ -43,7 +43,7 @@ export default function UnifiedLoginPage() {
         } else {
           router.push('/');
         }
-        router.refresh(); // This is important to re-fetch server-side data like the user state in the sidebar
+        router.refresh();
       } else {
         throw new Error(result.message);
       }

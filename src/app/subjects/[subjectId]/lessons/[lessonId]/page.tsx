@@ -1,17 +1,16 @@
 
-
 import { notFound } from 'next/navigation';
 import { getSubjects, getLessons } from '@/lib/data';
 import { PageHeader } from '@/components/PageHeader';
 import { Button } from '@/components/ui/button';
 import { Download } from 'lucide-react';
 import { LessonClient } from '@/components/LessonClient';
-import type { Lesson, Subject } from '@/lib/types';
+import type { Subject } from '@/lib/types';
 
 
-export default async function LessonPage({ params }: { params: { subjectId: string, lessonId: string } }) {
-  const subjects = await getSubjects();
-  const lessons = await getLessons();
+export default function LessonPage({ params }: { params: { subjectId: string, lessonId: string } }) {
+  const subjects = getSubjects();
+  const lessons = getLessons();
 
   const subject = subjects.find((s) => s.id === params.subjectId);
   const lesson = lessons.find((l) => l.id === params.lessonId && l.subjectId === params.subjectId);
@@ -36,9 +35,9 @@ export default async function LessonPage({ params }: { params: { subjectId: stri
   );
 }
 
-export async function generateStaticParams() {
-  const subjects = await getSubjects();
-  const lessons = await getLessons();
+export function generateStaticParams() {
+  const subjects = getSubjects();
+  const lessons = getLessons();
   const params: { subjectId: string; lessonId: string }[] = [];
   subjects.forEach(subject => {
     lessons

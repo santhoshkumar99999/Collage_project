@@ -48,18 +48,11 @@ export function Chatbot({ context, flowType }: ChatbotProps) {
   const { isListening, transcript, startListening, stopListening, isSupported } = useSpeechRecognition();
 
   useEffect(() => {
-    const fetchUser = async () => {
-        const userId = await getAuthenticatedUserId();
-        if(userId) {
-            try {
-                const user = await getUser(userId);
-                setCurrentUser(user);
-            } catch (error) {
-                console.error("Failed to fetch user for chatbot", error);
-            }
-        }
+    const userId = getAuthenticatedUserId();
+    if(userId) {
+        const user = getUser(userId);
+        setCurrentUser(user);
     }
-    fetchUser();
     const storedLanguage = localStorage.getItem('language');
     if (storedLanguage) {
       setHasSelectedLanguage(true);

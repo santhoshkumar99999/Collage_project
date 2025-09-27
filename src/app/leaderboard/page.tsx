@@ -24,16 +24,11 @@ export default function LeaderboardPage() {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const refreshLeaderboard = async () => {
+  const refreshLeaderboard = () => {
     setIsLoading(true);
-    try {
-        const newLeaderboard = await getLeaderboard();
-        setLeaderboard(newLeaderboard);
-    } catch (e) {
-        console.error("Failed to fetch leaderboard.", e);
-    } finally {
-        setIsLoading(false);
-    }
+    const newLeaderboard = getLeaderboard();
+    setLeaderboard(newLeaderboard);
+    setIsLoading(false);
   }
 
   useEffect(() => {

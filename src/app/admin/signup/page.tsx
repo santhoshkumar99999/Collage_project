@@ -19,7 +19,7 @@ export default function TeacherSignupPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleSignup = async () => {
+  const handleSignup = () => {
     if (!fullName || !email || !password) {
       toast({
         title: "Missing Fields",
@@ -30,7 +30,7 @@ export default function TeacherSignupPage() {
     }
 
     try {
-      await addUser({ name: fullName, email, password });
+      addUser({ name: fullName, email, password });
       toast({
         title: "Account Created",
         description: "Your teacher account has been successfully created. Please log in.",

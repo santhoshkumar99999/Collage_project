@@ -1,5 +1,4 @@
 
-
 "use client";
 
 import { useEffect, useState } from 'react';
@@ -36,18 +35,10 @@ export default function AdminStudentsPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    async function fetchUsers() {
-      setIsLoading(true);
-      try {
-        const studentUsers = await getUsers();
-        setUsers(studentUsers);
-      } catch (error) {
-        console.error("Failed to fetch users:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-    fetchUsers();
+    setIsLoading(true);
+    const studentUsers = getUsers();
+    setUsers(studentUsers);
+    setIsLoading(false);
   }, []);
 
   if (isLoading) {

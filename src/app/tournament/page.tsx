@@ -9,25 +9,11 @@ import { PageHeader } from '@/components/PageHeader';
 import imageData from '@/lib/placeholder-images.json';
 import { Translate } from '@/components/Translate';
 import { Button } from '@/components/ui/button';
-import { LoaderCircle, Swords, BookOpen, Calculator, FlaskConical, Atom, Dna, Bot, Star, BrainCircuit, Rocket, Target, Zap } from 'lucide-react';
+import { LoaderCircle, Swords } from 'lucide-react';
 import { generateQuiz } from '@/ai/flows/generate-quiz-flow';
 import { QuizClient } from '@/components/QuizClient';
 import type { Quiz, Subject } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
-
-const iconMap = {
-    Calculator,
-    FlaskConical,
-    Atom,
-    Dna,
-    Bot,
-    BookOpen,
-    Star,
-    BrainCircuit,
-    Rocket,
-    Target,
-    Zap,
-};
 
 export default function TournamentPage() {
     const { toast } = useToast();
@@ -37,15 +23,7 @@ export default function TournamentPage() {
     const [generatedQuiz, setGeneratedQuiz] = useState<Quiz | null>(null);
 
     useEffect(() => {
-        const fetchSubjects = async () => {
-            const subjectsData = await getSubjects();
-            const subjectsWithIcons = subjectsData.map(subject => ({
-                ...subject,
-                icon: iconMap[subject.iconName as keyof typeof iconMap] || BookOpen
-            }));
-            setSubjects(subjectsWithIcons);
-        }
-        fetchSubjects();
+        setSubjects(getSubjects());
     }, []);
     
     const handleSelectSubject = async (subject: Subject) => {
