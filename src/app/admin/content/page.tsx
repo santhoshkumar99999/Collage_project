@@ -133,15 +133,23 @@ export default function AdminContentPage() {
             setIsGenerating(false);
         }
       }
-
-      await addSubject({ name: subjectName, description: descriptionToSave });
-      toast({
-          title: 'Subject Added',
-          description: `"${subjectName}" has been successfully added.`,
-      });
-      setSubjectName('');
-      setSubjectDescription('');
-      refreshData(); // Re-fetch subjects from DB
+      
+      try {
+        await addSubject({ name: subjectName, description: descriptionToSave });
+        toast({
+            title: 'Subject Added',
+            description: `"${subjectName}" has been successfully added.`,
+        });
+        setSubjectName('');
+        setSubjectDescription('');
+        refreshData(); // Re-fetch subjects from DB
+      } catch (e: any) {
+        toast({
+            title: 'Error Adding Subject',
+            description: e.message,
+            variant: 'destructive',
+        });
+      }
   }
 
   return (

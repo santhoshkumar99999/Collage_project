@@ -24,12 +24,12 @@ const iconMap = {
 };
 
 const badges: Badge[] = [
-  { id: 'rookie', name: 'Rookie', icon: Star, color: 'text-yellow-400' },
-  { id: 'scholar', name: 'Scholar', icon: BookOpen, color: 'text-blue-400' },
-  { id: 'genius', name: 'Genius', icon: BrainCircuit, color: 'text-purple-400' },
-  { id: 'explorer', name: 'Explorer', icon: Rocket, color: 'text-red-400' },
-  { id: 'master', name: 'Master', icon: Target, color: 'text-green-400' },
-  { id: 'legend', name: 'Legend', icon: Zap, color: 'text-indigo-400' },
+  { id: 'rookie', name: 'Rookie', icon: 'Star', color: 'text-yellow-400' },
+  { id: 'scholar', name: 'Scholar', icon: 'BookOpen', color: 'text-blue-400' },
+  { id: 'genius', name: 'Genius', icon: 'BrainCircuit', color: 'text-purple-400' },
+  { id: 'explorer', name: 'Explorer', icon: 'Rocket', color: 'text-red-400' },
+  { id: 'master', name: 'Master', icon: 'Target', color: 'text-green-400' },
+  { id: 'legend', name: 'Legend', icon: 'Zap', color: 'text-indigo-400' },
 ];
 
 export async function getIconMap() {
@@ -42,12 +42,8 @@ export async function getIconMap() {
     return serializableIconMap;
 }
 
-export async function getBadges() {
-    const serializableBadges = badges.map(badge => ({
-        ...badge,
-        icon: badge.icon.displayName || badge.icon.name, // Serialize component to a name
-    }));
-    return serializableBadges;
+export async function getBadges(): Promise<Badge[]> {
+    return Promise.resolve(badges);
 }
 
 
@@ -297,47 +293,58 @@ const AUTH_COOKIE_NAME = 'currentUser_id';
 let db: Db;
 let usersCollection: Collection<User>;
 let subjectsCollection: Collection<Subject>;
-let dbReady = false;
 
-async function getDb() {
+async function getDb(): Promise<Db | null> {
   if (db) return db;
   try {
     const client = await clientPromise;
     db = client.db('vidyagram');
-    dbReady = true;
     return db;
   } catch (e) {
-    console.error("Failed to connect to MongoDB", e);
-    throw new Error("Could not connect to the database.");
+    console.error("Failed to connect to MongoDB. Please ensure the database server is running.", e);
+    return null;
   }
+}
+
+async function getCollection<T>(name: string, seedData?: Omit<T, '_id'>[]): Promise<Collection<T> | null> {
+    const db = await getDb();
+    if (!db) return null;
+
+    const collection = db.collection<T>(name);
+    
+    if (seedData) {
+        try {
+            const count = await collection.countDocuments();
+            if (count === 0) {
+                console.log(`No documents found in '${name}', seeding initial data...`);
+                await collection.insertMany(seedData as any[]);
+            }
+        } catch (e) {
+            console.error(`Failed to seed or count collection '${name}'.`, e);
+            // If we can't even count, we probably can't do anything else.
+            return null;
+        }
+    }
+
+    return collection;
 }
 
 async function getUsersCollection() {
     if (usersCollection) return usersCollection;
-    const db = await getDb();
-    const collection = db.collection<User>('users');
-    // Lazy seeding
-    const count = await collection.countDocuments();
-    if (count === 0) {
-        console.log("No users found, seeding initial user data...");
-        await collection.insertMany(initialUsers as any[]);
+    const collection = await getCollection<User>('users', initialUsers);
+    if (collection) {
+        usersCollection = collection;
     }
-    usersCollection = collection;
-    return usersCollection;
+    return collection;
 }
 
 async function getSubjectsCollection() {
     if (subjectsCollection) return subjectsCollection;
-    const db = await getDb();
-    const collection = db.collection<Subject>('subjects');
-     // Lazy seeding
-    const count = await collection.countDocuments();
-    if (count === 0) {
-        console.log("No subjects found, seeding initial subject data...");
-        await collection.insertMany(initialSubjects as any[]);
+    const collection = await getCollection<Subject>('subjects', initialSubjects);
+    if (collection) {
+        subjectsCollection = collection;
     }
-    subjectsCollection = collection;
-    return subjectsCollection;
+    return collection;
 }
 
 
@@ -362,26 +369,47 @@ export async function logoutUser() {
 
 export async function getUsers(): Promise<User[]> {
     const collection = await getUsersCollection();
-    const usersArray = await collection.find({}, { projection: { password: 0 } }).toArray();
-    return usersArray.map(user => serializeDocument(user) as User);
+    if (!collection) return [];
+    try {
+        const usersArray = await collection.find({}, { projection: { password: 0 } }).toArray();
+        return usersArray.map(user => serializeDocument(user) as User);
+    } catch (e) {
+        console.error("Failed to get users:", e);
+        return [];
+    }
 }
 
 export async function getUser(userId: string): Promise<User | null> {
     const collection = await getUsersCollection();
-    const user = await collection.findOne({ id: userId }, { projection: { password: 0 } });
-    return serializeDocument(user);
+    if (!collection) return null;
+    try {
+        const user = await collection.findOne({ id: userId }, { projection: { password: 0 } });
+        return serializeDocument(user);
+    } catch(e) {
+        console.error(`Failed to get user ${userId}:`, e);
+        return null;
+    }
 }
 
 export async function updateUser(updatedUser: User) {
   if (!updatedUser || !updatedUser.id) return;
   const collection = await getUsersCollection();
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { id, _id, ...dataToUpdate } = updatedUser;
-  await collection.updateOne({ id: updatedUser.id }, { $set: dataToUpdate });
+  if (!collection) return;
+  
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { id, _id, ...dataToUpdate } = updatedUser;
+    await collection.updateOne({ id: updatedUser.id }, { $set: dataToUpdate });
+  } catch (e) {
+      console.error(`Failed to update user ${updatedUser.id}:`, e);
+  }
 }
 
 export async function addUser({ name, email, password }: { name: string; email: string; password?: string }) {
     const collection = await getUsersCollection();
+    if (!collection) {
+        throw new Error("Database not available. Could not add user.");
+    }
     
     const existingUser = await collection.findOne({ email: email.toLowerCase() });
     if (existingUser) {
@@ -414,6 +442,11 @@ export async function addUser({ name, email, password }: { name: string; email: 
 export async function loginUserAction(credentials: { email: string, password?: string }): Promise<{ success: boolean; message: string; userId?: string }> {
     const { email, password } = credentials;
     const collection = await getUsersCollection();
+
+    if (!collection) {
+        return { success: false, message: 'Database connection failed. Please try again later.' };
+    }
+
     const user = await collection.findOne({ email: email.toLowerCase() });
 
     if (!user) {
@@ -438,12 +471,21 @@ export async function loginUserAction(credentials: { email: string, password?: s
 // --- Subject Functions ---
 export async function getSubjects(): Promise<Subject[]> {
     const collection = await getSubjectsCollection();
-    const dbSubjects = await collection.find({}).toArray();
-    return dbSubjects.map(s => serializeDocument(s) as Subject);
+    if (!collection) return [];
+    try {
+        const dbSubjects = await collection.find({}).toArray();
+        return dbSubjects.map(s => serializeDocument(s) as Subject);
+    } catch (e) {
+        console.error("Failed to get subjects:", e);
+        return [];
+    }
 }
 
-export async function addSubject(subject: { name: string, description: string }): Promise<Subject> {
+export async function addSubject(subject: { name: string, description: string }): Promise<Subject | null> {
     const collection = await getSubjectsCollection();
+    if (!collection) {
+        throw new Error("Database not available. Could not add subject.");
+    }
     const newSubject: Omit<Subject, 'id' | '_id'> & {id: string, iconName: string, imageId: string} = {
         ...subject,
         id: subject.name.toLowerCase().replace(/\s+/g, '-'),
@@ -472,6 +514,7 @@ export async function getQuizzes(): Promise<Quiz[]> {
 
 export async function getLeaderboard(): Promise<LeaderboardEntry[]> {
     const allUsers = await getUsers();
+    if (allUsers.length === 0) return [];
     const sortedUsers = [...allUsers].sort((a, b) => b.xp - a.xp);
     return sortedUsers.map((user, index) => ({
         rank: index + 1,
