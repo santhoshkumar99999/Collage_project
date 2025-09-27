@@ -174,9 +174,12 @@ export function Chatbot({ context, flowType }: ChatbotProps) {
           generateAndPlayAudio(response.answer, currentMessageIndex);
       }
 
-    } catch (error) {
-      console.error("Error getting answer from AI:", error);
-      const errorMessage: Message = { role: 'model', content: "Sorry, I'm having trouble connecting right now. Please try again later." };
+    } catch (error: any) {
+      let errorMessageContent = "Sorry, I'm having trouble connecting right now. Please try again later.";
+      if (error.message && error.message.includes('503')) {
+        errorMessageContent = "The AI service is temporarily unavailable. Please try again in a moment.";
+      }
+      const errorMessage: Message = { role: 'model', content: errorMessageContent };
       setMessages((prev) => [...prev, errorMessage]);
     } finally {
       setIsBotLoading(false);

@@ -118,11 +118,14 @@ export default function AdminContentPage() {
                 title: 'Description Generated',
                 description: 'AI has created a description for you.',
             });
-        } catch (error) {
+        } catch (error: any) {
             console.error("Failed to generate description:", error);
+            const desc = error.message && error.message.includes('503')
+                ? 'The AI service is temporarily unavailable. Please write a description manually.'
+                : 'Could not generate a description. Please write one manually.';
             toast({
                 title: 'AI Error',
-                description: 'Could not generate a description. Please write one manually.',
+                description: desc,
                 variant: 'destructive',
             });
             setIsGenerating(false);
