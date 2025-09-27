@@ -17,7 +17,7 @@ import {
     SelectTrigger,
     SelectValue,
   } from '@/components/ui/select';
-import { lessons as initialLessons, addSubject, getSubjects } from '@/lib/data';
+import { getLessons, addSubject, getSubjects } from '@/lib/data';
 import type { Lesson, Subject } from '@/lib/types';
 import {
     Table,
@@ -34,7 +34,7 @@ import { generateSubjectDescription } from '@/ai/flows/generate-subject-descript
 
 export default function AdminContentPage() {
   const { toast } = useToast();
-  const [lessons, setLessons] = useState<Lesson[]>(initialLessons);
+  const [lessons, setLessons] = useState<Lesson[]>([]);
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
 
@@ -48,13 +48,14 @@ export default function AdminContentPage() {
   const [subjectName, setSubjectName] = useState('');
   const [subjectDescription, setSubjectDescription] = useState('');
   
-  const refreshSubjects = async () => {
-    const currentSubjects = await getSubjects();
+  const refreshData = async () => {
+    const [currentSubjects, currentLessons] = await Promise.all([getSubjects(), getLessons()]);
     setSubjects(currentSubjects);
+    setLessons(currentLessons);
   }
 
   useEffect(() => {
-    refreshSubjects();
+    refreshData();
   }, []);
 
 
@@ -140,7 +141,7 @@ export default function AdminContentPage() {
       });
       setSubjectName('');
       setSubjectDescription('');
-      refreshSubjects(); // Re-fetch subjects from DB
+      refreshData(); // Re-fetch subjects from DB
   }
 
   return (

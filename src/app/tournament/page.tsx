@@ -1,28 +1,41 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { subjects } from '@/lib/data';
+import { getSubjects, iconMap } from '@/lib/data';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { PageHeader } from '@/components/PageHeader';
 import imageData from '@/lib/placeholder-images.json';
 import { Translate } from '@/components/Translate';
 import { Button } from '@/components/ui/button';
-import { LoaderCircle, Swords } from 'lucide-react';
+import { LoaderCircle, Swords, BookOpen } from 'lucide-react';
 import { generateQuiz } from '@/ai/flows/generate-quiz-flow';
 import { QuizClient } from '@/components/QuizClient';
-import type { Quiz } from '@/lib/types';
+import type { Quiz, Subject } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 
 
 export default function TournamentPage() {
     const { toast } = useToast();
-    const [selectedSubject, setSelectedSubject] = useState<typeof subjects[0] | null>(null);
+    const [subjects, setSubjects] = useState<Subject[]>([]);
+    const [selectedSubject, setSelectedSubject] = useState<Subject | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [generatedQuiz, setGeneratedQuiz] = useState<Quiz | null>(null);
+
+    useEffect(() => {
+        const fetchSubjects = async () => {
+            const subjectsData = await getSubjects();
+            const subjectsWithIcons = subjectsData.map(subject => ({
+                ...subject,
+                icon: iconMap[subject.iconName as keyof typeof iconMap] || BookOpen
+            }));
+            setSubjects(subjectsWithIcons);
+        }
+        fetchSubjects();
+    }, []);
     
-    const handleSelectSubject = async (subject: typeof subjects[0]) => {
+    const handleSelectSubject = async (subject: Subject) => {
         setSelectedSubject(subject);
         setIsLoading(true);
         setGeneratedQuiz(null);
@@ -82,6 +95,7 @@ export default function TournamentPage() {
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {subjects.map((subject) => {
                 const placeholder = imageData.placeholderImages.find(p => p.id === subject.imageId);
+                const SubjectIcon = subject.icon;
                 return (
                 <Card key={subject.id} className="h-full overflow-hidden transition-transform duration-300 ease-in-out hover:-translate-y-2 hover:shadow-2xl cursor-pointer" onClick={() => handleSelectSubject(subject)}>
                     <CardContent className="p-0 relative">
@@ -98,7 +112,7 @@ export default function TournamentPage() {
                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                          <div className="absolute bottom-0 left-0 p-4">
                             <h3 className="text-2xl font-bold text-white flex items-center gap-2 font-headline">
-                                <subject.icon className="w-6 h-6" />
+                                {SubjectIcon && <SubjectIcon className="w-6 h-6" />}
                                 <Translate>{subject.name}</Translate>
                             </h3>
                          </div>

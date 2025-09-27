@@ -4,8 +4,8 @@
 import { useState, useEffect } from 'react';
 import { notFound } from 'next/navigation';
 import { PageHeader } from '@/components/PageHeader';
-import { User, Subject } from '@/lib/types';
-import { lessons, getSubjects, getUser, iconMap } from '@/lib/data';
+import { User, Subject, Badge as BadgeType } from '@/lib/types';
+import { getLessons, getSubjects, getUser, iconMap, badges } from '@/lib/data';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Progress } from '@/components/ui/progress';
@@ -18,15 +18,17 @@ import { BookOpen } from 'lucide-react';
 export default function PublicProfilePage({ params }: { params: { userId: string } }) {
   const [user, setUser] = useState<User | null>(null);
   const [subjects, setSubjects] = useState<Subject[]>([]);
+  const [lessons, setLessons] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   
   useEffect(() => {
     const loadData = async () => {
         setIsLoading(true);
         try {
-            const [userData, subjectsData] = await Promise.all([
+            const [userData, subjectsData, lessonsData] = await Promise.all([
                 getUser(params.userId),
-                getSubjects()
+                getSubjects(),
+                getLessons()
             ]);
 
             if (userData) {
@@ -37,6 +39,7 @@ export default function PublicProfilePage({ params }: { params: { userId: string
                 icon: iconMap[subject.iconName as keyof typeof iconMap] || BookOpen
             }));
             setSubjects(subjectsWithIcons);
+            setLessons(lessonsData);
         } catch (e) {
             console.error("Failed to load profile data.", e);
         } finally {
@@ -58,6 +61,9 @@ export default function PublicProfilePage({ params }: { params: { userId: string
   const tournamentSubjects: Subject[] = user?.completedTournaments ? 
     subjects.filter(subject => user.completedTournaments!.includes(subject.id))
     : [];
+    
+  const userBadges: BadgeType[] = user ? user.badgeIds.map(badgeId => badges.find(b => b.id === badgeId)).filter(b => b !== undefined) as BadgeType[] : [];
+
 
   if (isLoading) {
     return (
@@ -199,8 +205,8 @@ export default function PublicProfilePage({ params }: { params: { userId: string
               <CardContent>
                 <TooltipProvider>
                   <div className="flex flex-wrap gap-4">
-                    {user.badges.length > 0 ? (
-                      user.badges.map((badge) => {
+                    {userBadges.length > 0 ? (
+                      userBadges.map((badge) => {
                         const BadgeIcon = badge.icon;
                         return (
                         <Tooltip key={badge.id}>

@@ -1,7 +1,7 @@
 
 
 import { notFound } from 'next/navigation';
-import { subjects, lessons } from '@/lib/data';
+import { getSubjects, getLessons } from '@/lib/data';
 import { PageHeader } from '@/components/PageHeader';
 import { Button } from '@/components/ui/button';
 import { Download } from 'lucide-react';
@@ -9,7 +9,9 @@ import { LessonClient } from '@/components/LessonClient';
 import type { Lesson, Subject } from '@/lib/types';
 
 
-export default function LessonPage({ params }: { params: { subjectId: string, lessonId: string } }) {
+export default async function LessonPage({ params }: { params: { subjectId: string, lessonId: string } }) {
+  const subjects = await getSubjects();
+  const lessons = await getLessons();
 
   const subject = subjects.find((s) => s.id === params.subjectId);
   const lesson = lessons.find((l) => l.id === params.lessonId && l.subjectId === params.subjectId);
@@ -29,12 +31,14 @@ export default function LessonPage({ params }: { params: { subjectId: string, le
             Download for Offline
         </Button>
       </PageHeader>
-      <LessonClient lesson={lesson} subject={serializableSubject} />
+      <LessonClient lesson={lesson} subject={serializableSubject as Subject} />
     </>
   );
 }
 
 export async function generateStaticParams() {
+  const subjects = await getSubjects();
+  const lessons = await getLessons();
   const params: { subjectId: string; lessonId: string }[] = [];
   subjects.forEach(subject => {
     lessons

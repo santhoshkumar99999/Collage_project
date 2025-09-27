@@ -15,7 +15,7 @@ import Link from 'next/link';
 import { Logo } from '@/components/Logo';
 import { Separator } from '@/components/ui/separator';
 import { LayoutDashboard, Users, FileText, BookOpen, User, Settings, LogOut } from 'lucide-react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,7 +23,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { logoutUser } from '@/lib/data';
 
 
@@ -34,8 +34,11 @@ const adminMenuItems = [
 ];
 
 function AdminSidebar() {
-    const handleLogout = () => {
-        logoutUser();
+    const router = useRouter();
+    const handleLogout = async () => {
+        await logoutUser();
+        router.push('/login');
+        router.refresh();
     };
 
     return (
@@ -78,11 +81,9 @@ function AdminSidebar() {
                         </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleLogout} asChild>
-                        <Link href="/login">
-                            <LogOut className="mr-2" />
-                            Logout
-                        </Link>
+                    <DropdownMenuItem onClick={handleLogout}>
+                        <LogOut className="mr-2" />
+                        Logout
                     </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
@@ -97,7 +98,7 @@ export function AdminLayoutClient({
   children: React.ReactNode
 }) {
   const pathname = usePathname();
-  const isAuthPage = pathname.startsWith('/admin/login') || pathname.startsWith('/admin/signup');
+  const isAuthPage = pathname.startsWith('/login') || pathname.startsWith('/signup');
   
   if (isAuthPage) {
     return <>{children}</>;

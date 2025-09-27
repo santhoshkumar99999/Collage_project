@@ -13,18 +13,12 @@ import { answerQuizQuestion } from '@/ai/flows/quiz-chat-flow';
 import { textToSpeech } from '@/ai/flows/tts-flow';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-import { getUser } from '@/lib/data';
+import { getUser, getAuthenticatedUserId } from '@/lib/data';
 import type { User } from '@/lib/types';
 import { useLanguage } from '@/hooks/use-language';
 import { LanguageSelector } from './LanguageSelector';
 import { useSpeechRecognition } from '@/hooks/use-speech-recognition';
 import { audioCache } from '@/services/audio-cache';
-
-// Client-side session management
-function getAuthenticatedUserId(): string | null {
-    if (typeof window === 'undefined') return null;
-    return localStorage.getItem('currentUser_id');
-}
 
 interface Message {
   role: 'user' | 'model';
@@ -55,7 +49,7 @@ export function Chatbot({ context, flowType }: ChatbotProps) {
 
   useEffect(() => {
     const fetchUser = async () => {
-        const userId = getAuthenticatedUserId();
+        const userId = await getAuthenticatedUserId();
         if(userId) {
             try {
                 const user = await getUser(userId);

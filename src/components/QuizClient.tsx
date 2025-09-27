@@ -11,19 +11,15 @@ import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
 import { CheckCircle, XCircle, Lightbulb, PartyPopper, Frown, Award, Volume2, LoaderCircle } from 'lucide-react';
-import { updateUser, getUser, badges, User, lessons } from '@/lib/data';
+import { updateUser, getUser, badges, getLessons, getAuthenticatedUserId } from '@/lib/data';
 import { Translate } from './Translate';
 import { textToSpeech } from '@/ai/flows/tts-flow';
 import { useLanguage } from '@/hooks/use-language';
 import { translateText } from '@/ai/flows/translate-flow';
 import { Chatbot } from './Chatbot';
 import { audioCache } from '@/services/audio-cache';
+import type { User } from '@/lib/types';
 
-// Client-side session management
-function getAuthenticatedUserId(): string | null {
-    if (typeof window === 'undefined') return null;
-    return localStorage.getItem('currentUser_id');
-}
 
 interface QuizClientProps {
     quiz: Quiz;
@@ -45,7 +41,7 @@ export function QuizClient({ quiz, isTournament = false }: QuizClientProps) {
 
   useEffect(() => {
     const fetchUser = async () => {
-        const userId = getAuthenticatedUserId();
+        const userId = await getAuthenticatedUserId();
         if (userId) {
             try {
                 const user = await getUser(userId);
@@ -89,10 +85,11 @@ export function QuizClient({ quiz, isTournament = false }: QuizClientProps) {
 
   const handleFinish = async (finalScore = score) => {
     if(!currentUser) return;
+    const lessons = await getLessons();
     const xpGained = finalScore * 10;
     let newXp = currentUser.xp + xpGained;
     let newLevel = currentUser.level;
-    let newBadges = [...currentUser.badges];
+    let newBadgeIds = [...currentUser.badgeIds];
     let leveledUp = false;
     let newCompletedLessons = [...(currentUser.completedLessons || [])];
     let newCompletedTournaments = [...(currentUser.completedTournaments || [])];
@@ -115,11 +112,11 @@ export function QuizClient({ quiz, isTournament = false }: QuizClientProps) {
     }
 
     // Add Scholar badge if they get a perfect score
-    const hasScholarBadge = currentUser.badges.some(b => b.id === 'scholar');
+    const hasScholarBadge = currentUser.badgeIds.some(b => b === 'scholar');
     if(finalScore === quiz.questions.length && !hasScholarBadge){
       const scholarBadge = badges.find(b => b.id === 'scholar');
       if (scholarBadge) {
-        newBadges.push(scholarBadge);
+        newBadgeIds.push(scholarBadge.id);
         toast({
           title: "Badge Unlocked!",
           description: `You've earned the ${scholarBadge.name} badge!`,
@@ -136,7 +133,7 @@ export function QuizClient({ quiz, isTournament = false }: QuizClientProps) {
       ...currentUser, 
       xp: newXp, 
       level: newLevel,
-      badges: newBadges,
+      badgeIds: newBadgeIds,
       completedLessons: newCompletedLessons,
       completedTournaments: newCompletedTournaments,
     });

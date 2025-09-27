@@ -2,10 +2,27 @@
 'use server';
 
 import type { Subject, Lesson, Quiz, User, LeaderboardEntry, Badge } from './types';
-import { Calculator, FlaskConical, Atom, Dna, Bot, BookOpen, BrainCircuit, Rocket, Star, Target, Zap } from 'lucide-react';
+import { Calculator, FlaskConical, Atom, Dna, Bot, BookOpen, Star, BrainCircuit, Rocket, Target, Zap } from 'lucide-react';
 import clientPromise from './mongodb';
-import { Collection, Db } from 'mongodb';
+import { Collection, Db, ObjectId } from 'mongodb';
+import { cookies } from 'next/headers';
 
+// This data is now client-side, as it contains non-serializable components
+export const iconMap = {
+    Calculator,
+    FlaskConical,
+    Atom,
+    Dna,
+    Bot,
+    BookOpen,
+    Star,
+    BrainCircuit,
+    Rocket,
+    Target,
+    Zap,
+};
+
+// This data is now client-side
 export const badges: Badge[] = [
   { id: 'rookie', name: 'Rookie', icon: Star, color: 'text-yellow-400' },
   { id: 'scholar', name: 'Scholar', icon: BookOpen, color: 'text-blue-400' },
@@ -14,6 +31,7 @@ export const badges: Badge[] = [
   { id: 'master', name: 'Master', icon: Target, color: 'text-green-400' },
   { id: 'legend', name: 'Legend', icon: Zap, color: 'text-indigo-400' },
 ];
+
 
 const initialUsers: Omit<User, '_id'>[] = [
   {
@@ -25,7 +43,7 @@ const initialUsers: Omit<User, '_id'>[] = [
     level: 5,
     xp: 450,
     xpToNextLevel: 500,
-    badges: [badges[0]],
+    badgeIds: ['rookie'],
     completedLessons: ['algebra-basics'],
     completedTournaments: ['mathematics'],
   },
@@ -38,7 +56,7 @@ const initialUsers: Omit<User, '_id'>[] = [
     level: 8,
     xp: 720,
     xpToNextLevel: 800,
-    badges: [badges[0], badges[1], badges[2]],
+    badgeIds: ['rookie', 'scholar', 'genius'],
     completedLessons: ['algebra-basics', 'geometry-intro', 'photosynthesis'],
     completedTournaments: ['mathematics', 'science'],
   },
@@ -51,173 +69,14 @@ const initialUsers: Omit<User, '_id'>[] = [
     level: 3,
     xp: 210,
     xpToNextLevel: 300,
-    badges: [badges[0]],
+    badgeIds: ['rookie'],
     completedLessons: [],
     completedTournaments: [],
   },
-  { id: 'user-4', name: 'Saanvi Gupta', email: 'saanvi@example.com', password: 'password', avatarUrl: 'https://picsum.photos/seed/user4/100/100', level: 7, xp: 650, xpToNextLevel: 700, badges: [badges[0], badges[1]], completedLessons: ['newtons-laws', 'cell-structure'], completedTournaments: ['physics'] },
-  { id: 'user-5', name: 'Arjun Reddy', email: 'arjun@example.com', password: 'password', avatarUrl: 'https://picsum.photos/seed/user5/100/100', level: 6, xp: 550, xpToNextLevel: 600, badges: [badges[0]], completedLessons: ['ml-intro'], completedTournaments: ['ai'] },
-  { id: 'user-teacher', name: 'Teacher', email: 'teacher@example.com', password: 'password', avatarUrl: 'https://picsum.photos/seed/teacher/100/100', level: 99, xp: 9999, xpToNextLevel: 10000, badges: badges, completedLessons: [], completedTournaments: [] },
+  { id: 'user-4', name: 'Saanvi Gupta', email: 'saanvi@example.com', password: 'password', avatarUrl: 'https://picsum.photos/seed/user4/100/100', level: 7, xp: 650, xpToNextLevel: 700, badgeIds: ['rookie', 'scholar'], completedLessons: ['newtons-laws', 'cell-structure'], completedTournaments: ['physics'] },
+  { id: 'user-5', name: 'Arjun Reddy', email: 'arjun@example.com', password: 'password', avatarUrl: 'https://picsum.photos/seed/user5/100/100', level: 6, xp: 550, xpToNextLevel: 600, badgeIds: ['rookie'], completedLessons: ['ml-intro'], completedTournaments: ['ai'] },
+  { id: 'user-teacher', name: 'Teacher', email: 'teacher@example.com', password: 'password', avatarUrl: 'https://picsum.photos/seed/teacher/100/100', level: 99, xp: 9999, xpToNextLevel: 10000, badgeIds: badges.map(b => b.id), completedLessons: [], completedTournaments: [] },
 ];
-
-const CURRENT_USER_ID_KEY = 'currentUser_id';
-
-// --- Database Connection ---
-let db: Db;
-let usersCollection: Collection<User>;
-let subjectsCollection: Collection<Subject>;
-
-async function getDb() {
-    if (db) return db;
-    const client = await clientPromise;
-    db = client.db('vidyagram');
-    return db;
-}
-
-async function getUsersCollection() {
-    if (usersCollection) return usersCollection;
-    const db = await getDb();
-    usersCollection = db.collection<User>('users');
-    return usersCollection;
-}
-
-async function getSubjectsCollection() {
-    if (subjectsCollection) return subjectsCollection;
-    const db = await getDb();
-    subjectsCollection = db.collection<Subject>('subjects');
-    return subjectsCollection;
-}
-
-// --- Data Seeding ---
-async function seedData() {
-    const users = await getUsersCollection();
-    const count = await users.countDocuments();
-    if (count === 0) {
-        console.log("No users found, seeding initial data...");
-        // Important: In a real app, hash passwords before inserting!
-        await users.insertMany(initialUsers as User[]);
-    }
-    const subjects = await getSubjectsCollection();
-    const subjectsCount = await subjects.countDocuments();
-    if(subjectsCount === 0){
-        console.log("No subjects found, seeding initial data...");
-        await subjects.insertMany(initialSubjects as Subject[]);
-    }
-}
-
-// Run seedData on startup.
-// This will run when the first server action from this file is called.
-// It's not ideal but works for a demo. A better approach is a separate seeding script.
-seedData().catch(console.error);
-
-
-// --- User Functions (now using localStorage for session, and DB for data) ---
-
-// This remains a client-side utility. It will be moved to components that need it.
-export function getAuthenticatedUserId(): string | null {
-    if (typeof window === 'undefined') return null;
-    return localStorage.getItem(CURRENT_USER_ID_KEY);
-}
-
-export function logoutUser() {
-    if (typeof window !== 'undefined') {
-        localStorage.removeItem(CURRENT_USER_ID_KEY);
-        window.dispatchEvent(new Event("storage"));
-    }
-}
-
-export async function getUsers(): Promise<User[]> {
-    const collection = await getUsersCollection();
-    // Exclude password from the data sent to the client
-    const usersArray = await collection.find({}, { projection: { password: 0 } }).toArray();
-    // MongoDB returns plain objects, so we need to ensure _id is a string if it exists
-    return usersArray.map(user => ({ ...user, _id: user._id?.toString() })) as unknown as User[];
-}
-
-export async function getUser(userId: string): Promise<User | null> {
-    const collection = await getUsersCollection();
-    const user = await collection.findOne({ id: userId }, { projection: { password: 0 } });
-    if (!user) return null;
-    // The data from mongo is plain JSON, re-hydrate badge icons
-    const rehydratedUser = {
-        ...user,
-        badges: user.badges?.map(badge => {
-            const badgeId = typeof badge === 'string' ? badge : (badge as any).id;
-            return badges.find(b => b.id === badgeId);
-        }).filter(Boolean) as Badge[] || [],
-    }
-    return JSON.parse(JSON.stringify(rehydratedUser));
-}
-
-export async function updateUser(updatedUser: User) {
-  if (!updatedUser || !updatedUser.id) return;
-  const collection = await getUsersCollection();
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { id, _id, ...dataToUpdate } = updatedUser;
-  await collection.updateOne({ id: updatedUser.id }, { $set: dataToUpdate });
-
-  // Client-side refresh is handled by router.refresh() or state updates in components
-}
-
-export async function addUser({ name, email, password }: { name: string; email: string; password?: string }) {
-    const collection = await getUsersCollection();
-    
-    const existingUser = await collection.findOne({ email: email.toLowerCase() });
-    if (existingUser) {
-      throw new Error('A user with this email already exists.');
-    }
-    
-    const userId = `user-${Date.now()}`;
-    const newUser: Omit<User, '_id'> = {
-      id: userId,
-      name,
-      email,
-      password, // In a real app, this should be hashed!
-      avatarUrl: `https://picsum.photos/seed/${userId}/100/100`,
-      level: 1,
-      xp: 0,
-      xpToNextLevel: 100,
-      badges: [],
-      completedLessons: [],
-      completedTournaments: [],
-    };
-    
-    const result = await collection.insertOne(newUser as User);
-    if (!result.acknowledged) {
-        throw new Error('Failed to create user.');
-    }
-
-    return JSON.parse(JSON.stringify(newUser));
-}
-
-export async function loginUserAction(credentials: { email: string, password?: string }): Promise<{ success: boolean; message: string; userId?: string }> {
-    const { email, password } = credentials;
-    const collection = await getUsersCollection();
-    const user = await collection.findOne({ email: email.toLowerCase() });
-
-    if (!user) {
-        return { success: false, message: 'No user found with this email.' };
-    }
-
-    if (user.password !== password) {
-        // This is a simple comparison. In a real app, you'd use bcrypt.compare()
-        return { success: false, message: 'Incorrect password.' };
-    }
-    
-    // On the client, we'll use this ID to set the session
-    return { success: true, message: 'Login successful!', userId: user.id };
-}
-
-// --- Subject Functions ---
-
-export const iconMap = {
-    Calculator,
-    FlaskConical,
-    Atom,
-    Dna,
-    Bot,
-    BookOpen,
-};
 
 const initialSubjects: Omit<Subject, '_id'>[] = [
   {
@@ -257,35 +116,8 @@ const initialSubjects: Omit<Subject, '_id'>[] = [
   },
 ];
 
-export async function getSubjects(): Promise<Subject[]> {
-    const collection = await getSubjectsCollection();
-    const dbSubjects = await collection.find({}).toArray();
-    // We don't return the icon component itself from the server action
-    const serializableSubjects = dbSubjects.map(s => ({...s, _id: s._id.toString()}));
-    return JSON.parse(JSON.stringify(serializableSubjects));
-}
-
-export async function addSubject(subject: { name: string, description: string }): Promise<Subject> {
-    const collection = await getSubjectsCollection();
-    const newSubject: Omit<Subject, 'id' | 'icon' | '_id'> & {id: string, iconName: string} = {
-        ...subject,
-        id: subject.name.toLowerCase().replace(/\s+/g, '-'),
-        iconName: 'BookOpen',
-        imageId: `custom-${Date.now()}`
-    };
-    
-    const result = await collection.insertOne(newSubject as Subject);
-     if (!result.acknowledged) {
-        throw new Error('Failed to create subject.');
-    }
-
-    return JSON.parse(JSON.stringify(newSubject));
-}
-
-
-// --- Static Data (for now) ---
-
-export const lessons: Lesson[] = [
+// Static data that is NOT exported, but used by exported functions
+const lessons: Lesson[] = [
   {
     id: 'algebra-basics',
     subjectId: 'mathematics',
@@ -344,7 +176,7 @@ export const lessons: Lesson[] = [
   },
 ];
 
-export const quizzes: Quiz[] = [
+const quizzes: Quiz[] = [
   {
     id: 'algebra-quiz',
     lessonId: 'algebra-basics',
@@ -431,6 +263,184 @@ export const quizzes: Quiz[] = [
   },
 ];
 
+
+const AUTH_COOKIE_NAME = 'currentUser_id';
+
+// --- Database Connection ---
+let db: Db;
+let usersCollection: Collection<User>;
+let subjectsCollection: Collection<Subject>;
+
+async function getDb() {
+    if (db) return db;
+    const client = await clientPromise;
+    db = client.db('vidyagram');
+    return db;
+}
+
+async function getUsersCollection() {
+    if (usersCollection) return usersCollection;
+    const db = await getDb();
+    usersCollection = db.collection<User>('users');
+    return usersCollection;
+}
+
+async function getSubjectsCollection() {
+    if (subjectsCollection) return subjectsCollection;
+    const db = await getDb();
+    subjectsCollection = db.collection<Subject>('subjects');
+    return subjectsCollection;
+}
+
+// --- Data Seeding ---
+async function seedData() {
+    try {
+        const users = await getUsersCollection();
+        const count = await users.countDocuments();
+        if (count === 0) {
+            console.log("No users found, seeding initial data...");
+            await users.insertMany(initialUsers as any[]);
+        }
+        const subjects = await getSubjectsCollection();
+        const subjectsCount = await subjects.countDocuments();
+        if(subjectsCount === 0){
+            console.log("No subjects found, seeding initial data...");
+            await subjects.insertMany(initialSubjects as any[]);
+        }
+    } catch (e) {
+        console.error("Error during seeding:", e);
+    }
+}
+seedData().catch(console.error);
+
+// --- Helper Functions ---
+function serializeDocument<T extends { _id?: ObjectId }>(doc: T | null): T | null {
+    if (!doc) return null;
+    const { _id, ...rest } = doc;
+    const id = _id?.toString();
+    return { ...rest, id } as T;
+}
+
+// --- User Functions ---
+export async function getAuthenticatedUserId(): Promise<string | null> {
+    const cookieStore = cookies();
+    return cookieStore.get(AUTH_COOKIE_NAME)?.value || null;
+}
+
+export async function logoutUser() {
+    const cookieStore = cookies();
+    cookieStore.delete(AUTH_COOKIE_NAME);
+}
+
+export async function getUsers(): Promise<User[]> {
+    const collection = await getUsersCollection();
+    const usersArray = await collection.find({}, { projection: { password: 0 } }).toArray();
+    return usersArray.map(user => serializeDocument(user) as User);
+}
+
+export async function getUser(userId: string): Promise<User | null> {
+    const collection = await getUsersCollection();
+    const user = await collection.findOne({ id: userId }, { projection: { password: 0 } });
+    return serializeDocument(user);
+}
+
+export async function updateUser(updatedUser: User) {
+  if (!updatedUser || !updatedUser.id) return;
+  const collection = await getUsersCollection();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { id, _id, ...dataToUpdate } = updatedUser;
+  await collection.updateOne({ id: updatedUser.id }, { $set: dataToUpdate });
+}
+
+export async function addUser({ name, email, password }: { name: string; email: string; password?: string }) {
+    const collection = await getUsersCollection();
+    
+    const existingUser = await collection.findOne({ email: email.toLowerCase() });
+    if (existingUser) {
+      throw new Error('A user with this email already exists.');
+    }
+    
+    const userId = `user-${Date.now()}`;
+    const newUser: Omit<User, '_id'> = {
+      id: userId,
+      name,
+      email,
+      password, // In a real app, this should be hashed!
+      avatarUrl: `https://picsum.photos/seed/${userId}/100/100`,
+      level: 1,
+      xp: 0,
+      xpToNextLevel: 100,
+      badgeIds: [],
+      completedLessons: [],
+      completedTournaments: [],
+    };
+    
+    const result = await collection.insertOne(newUser as User);
+     if (!result.acknowledged) {
+        throw new Error('Failed to create user.');
+    }
+
+    return serializeDocument(newUser as User);
+}
+
+export async function loginUserAction(credentials: { email: string, password?: string }): Promise<{ success: boolean; message: string; userId?: string }> {
+    const { email, password } = credentials;
+    const collection = await getUsersCollection();
+    const user = await collection.findOne({ email: email.toLowerCase() });
+
+    if (!user) {
+        return { success: false, message: 'No user found with this email.' };
+    }
+
+    if (user.password !== password) {
+        return { success: false, message: 'Incorrect password.' };
+    }
+    
+    const cookieStore = cookies();
+    cookieStore.set(AUTH_COOKIE_NAME, user.id, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 60 * 60 * 24 * 7, // One week
+        path: '/',
+    });
+    
+    return { success: true, message: 'Login successful!', userId: user.id };
+}
+
+// --- Subject Functions ---
+export async function getSubjects(): Promise<Subject[]> {
+    const collection = await getSubjectsCollection();
+    const dbSubjects = await collection.find({}).toArray();
+    return dbSubjects.map(s => serializeDocument(s) as Subject);
+}
+
+export async function addSubject(subject: { name: string, description: string }): Promise<Subject> {
+    const collection = await getSubjectsCollection();
+    const newSubject: Omit<Subject, 'id' | '_id'> & {id: string, iconName: string, imageId: string} = {
+        ...subject,
+        id: subject.name.toLowerCase().replace(/\s+/g, '-'),
+        iconName: 'BookOpen',
+        imageId: `custom-${Date.now()}`
+    };
+    
+    const result = await collection.insertOne(newSubject as Subject);
+     if (!result.acknowledged) {
+        throw new Error('Failed to create subject.');
+    }
+    return serializeDocument(newSubject as Subject)!;
+}
+
+// --- Static Data Functions (for now) ---
+export async function getLessons(): Promise<Lesson[]> {
+    // In a real app, this would fetch from a 'lessons' collection in MongoDB.
+    // For now, we return the static array.
+    return Promise.resolve(lessons);
+}
+
+export async function getQuizzes(): Promise<Quiz[]> {
+    // In a real app, this would fetch from a 'quizzes' collection in MongoDB.
+    return Promise.resolve(quizzes);
+}
 
 export async function getLeaderboard(): Promise<LeaderboardEntry[]> {
     const allUsers = await getUsers();

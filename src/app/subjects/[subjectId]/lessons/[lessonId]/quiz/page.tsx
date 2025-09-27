@@ -1,10 +1,11 @@
 
 import { notFound } from 'next/navigation';
-import { quizzes } from '@/lib/data';
+import { getQuizzes } from '@/lib/data';
 import { PageHeader } from '@/components/PageHeader';
 import { QuizClient } from '@/components/QuizClient';
 
-export default function QuizPage({ params }: { params: { lessonId: string } }) {
+export default async function QuizPage({ params }: { params: { lessonId: string } }) {
+  const quizzes = await getQuizzes();
   const quiz = quizzes.find((q) => q.lessonId === params.lessonId);
 
   if (!quiz) {
@@ -22,6 +23,7 @@ export default function QuizPage({ params }: { params: { lessonId: string } }) {
 }
 
 export async function generateStaticParams() {
+    const quizzes = await getQuizzes();
     const params: { subjectId: string; lessonId: string; quizId: string }[] = [];
     quizzes.forEach(quiz => {
         // This is a bit of a hack as we don't know subjectId here.

@@ -5,8 +5,8 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import QRCode from "react-qr-code";
 import { PageHeader } from '@/components/PageHeader';
-import { getUser, updateUser, getAuthenticatedUserId, lessons, getSubjects, iconMap } from '@/lib/data';
-import { User, Subject } from '@/lib/types';
+import { getUser, updateUser, getAuthenticatedUserId, getLessons, getSubjects, iconMap, badges } from '@/lib/data';
+import { User, Subject, Lesson, Badge as BadgeType } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Progress } from '@/components/ui/progress';
@@ -31,50 +31,54 @@ export default function ProfilePage() {
   const router = useRouter();
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [subjects, setSubjects] = useState<Subject[]>([]);
+  const [lessons, setLessons] = useState<Lesson[]>([]);
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState('');
   const [profileUrl, setProfileUrl] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
-  const refreshUser = async () => {
-    setIsLoading(true);
-    const userId = getAuthenticatedUserId();
-     if (userId) {
-      try {
-        const user = await getUser(userId);
-        if (user) {
-          setCurrentUser(user);
-          setName(user.name);
-          setProfileUrl(`${window.location.origin}/profile/${user.id}`);
-        } else {
+  useEffect(() => {
+    const refreshUser = async () => {
+      setIsLoading(true);
+      const userId = await getAuthenticatedUserId();
+      if (userId) {
+        try {
+          const user = await getUser(userId);
+          if (user) {
+            setCurrentUser(user);
+            setName(user.name);
+            setProfileUrl(`${window.location.origin}/profile/${user.id}`);
+          } else {
+            router.push('/login');
+          }
+        } catch (error) {
+          console.error("Failed to fetch user", error);
           router.push('/login');
+        } finally {
+          setIsLoading(false);
         }
-      } catch (error) {
-        console.error("Failed to fetch user", error);
+      } else {
         router.push('/login');
-      } finally {
-        setIsLoading(false);
       }
-    } else {
-      router.push('/login');
-    }
-  };
+    };
+    refreshUser();
+  }, [router]);
 
   useEffect(() => {
-    refreshUser();
-    getSubjects().then(s => {
-        const subjectsWithIcons = s.map(subject => ({
+      const fetchRelatedData = async () => {
+        const [subjectsData, lessonsData] = await Promise.all([
+            getSubjects(),
+            getLessons()
+        ]);
+        const subjectsWithIcons = subjectsData.map(subject => ({
             ...subject,
             icon: iconMap[subject.iconName as keyof typeof iconMap] || BookOpen
         }));
         setSubjects(subjectsWithIcons);
-    });
-    
-    window.addEventListener('storage', refreshUser);
-    return () => {
-      window.removeEventListener('storage', refreshUser);
-    }
-  }, [router]);
+        setLessons(lessonsData);
+      }
+      fetchRelatedData();
+  }, []);
 
 
   const learnedSubjects = currentUser ? 
@@ -83,6 +87,8 @@ export default function ProfilePage() {
             currentUser.completedLessons.includes(lesson.id) && lesson.subjectId === subject.id
         )
     ) : [];
+  
+  const userBadges: BadgeType[] = currentUser ? currentUser.badgeIds.map(badgeId => badges.find(b => b.id === badgeId)).filter(b => b !== undefined) as BadgeType[] : [];
 
 
   if (isLoading || !currentUser) {
@@ -103,7 +109,14 @@ export default function ProfilePage() {
     if (!currentUser) return;
     const updatedUser = { ...currentUser, name: name };
     await updateUser(updatedUser);
-    await refreshUser(); // Re-fetch from server to confirm
+    const userId = await getAuthenticatedUserId();
+    if(userId) {
+      const user = await getUser(userId);
+       if (user) {
+          setCurrentUser(user);
+          setName(user.name);
+        }
+    }
     setIsEditing(false);
     toast({
         title: "Profile Updated",
@@ -217,8 +230,8 @@ export default function ProfilePage() {
                                 <Tooltip key={subject.id}>
                                     <TooltipTrigger>
                                         <div className="flex flex-col items-center gap-2">
-                                            <div className="p-3 rounded-full bg-accent">
-                                                {SubjectIcon && <SubjectIcon className="w-8 h-8 text-primary" />}
+                                            <div className="p-3 rounded-full bg-secondary">
+                                                {SubjectIcon && <SubjectIcon className="w-8 h-8 text-secondary-foreground" />}
                                             </div>
                                         </div>
                                     </TooltipTrigger>
@@ -243,8 +256,8 @@ export default function ProfilePage() {
               <CardContent>
                 <TooltipProvider>
                   <div className="flex flex-wrap gap-4">
-                    {currentUser.badges.length > 0 ? (
-                      currentUser.badges.map((badge) => {
+                    {userBadges.length > 0 ? (
+                      userBadges.map((badge) => {
                         const BadgeIcon = badge.icon;
                         return (
                         <Tooltip key={badge.id}>

@@ -32,9 +32,6 @@ export default function UnifiedLoginPage() {
     try {
       const result = await loginUserAction({ email, password });
       if (result.success && result.userId) {
-        // Store user ID in localStorage to manage session
-        localStorage.setItem('currentUser_id', result.userId);
-        window.dispatchEvent(new Event("storage"));
         
         toast({
           title: "Login Successful",
@@ -46,6 +43,7 @@ export default function UnifiedLoginPage() {
         } else {
           router.push('/');
         }
+        router.refresh(); // This is important to re-fetch server-side data like the user state in the sidebar
       } else {
         throw new Error(result.message);
       }

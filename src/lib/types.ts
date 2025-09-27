@@ -7,9 +7,9 @@ export interface Subject {
   id: string;
   name: string;
   description: string;
-  icon: React.ElementType;
+  icon: React.ElementType; // This will be added on the client-side
   imageId: string;
-  iconName?: string;
+  iconName?: string; // This is what we store in the DB
 }
 
 export interface Lesson {
@@ -45,7 +45,7 @@ export interface User {
   level: number;
   xp: number;
   xpToNextLevel: number;
-  badges: Badge[];
+  badgeIds: string[];
   completedLessons: string[];
   completedTournaments?: string[];
 }
@@ -62,5 +62,3 @@ export interface LeaderboardEntry {
   user: User;
   xp: number;
 }
-
-    

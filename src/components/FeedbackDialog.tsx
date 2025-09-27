@@ -22,17 +22,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { getUser } from "@/lib/data";
+import { getUser, getAuthenticatedUserId } from "@/lib/data";
 import { useToast } from "@/hooks/use-toast";
 import type { User } from '@/lib/types';
 import { Translate } from './Translate';
-
-// Client-side session management
-function getAuthenticatedUserId(): string | null {
-    if (typeof window === 'undefined') return null;
-    return localStorage.getItem('currentUser_id');
-}
-
 
 export function FeedbackDialog({ children }: { children: React.ReactNode }) {
     const { toast } = useToast();
@@ -43,7 +36,7 @@ export function FeedbackDialog({ children }: { children: React.ReactNode }) {
 
     useEffect(() => {
         const fetchUser = async () => {
-            const userId = getAuthenticatedUserId();
+            const userId = await getAuthenticatedUserId();
             if (isOpen && userId) {
                 try {
                     const userData = await getUser(userId);

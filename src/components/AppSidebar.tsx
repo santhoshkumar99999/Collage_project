@@ -2,7 +2,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   BookOpen,
   LayoutDashboard,
@@ -14,6 +14,7 @@ import {
   LogOut,
   MessageSquareHeart,
   Swords,
+  LoaderCircle,
 } from "lucide-react";
 
 import {
@@ -27,7 +28,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Logo } from "./Logo";
 import { Separator } from "./ui/separator";
-import { getUser } from "@/lib/data";
+import { getUser, logoutUser } from "@/lib/data";
 import { useEffect, useState } from "react";
 import type { User as UserType } from "@/lib/types";
 import {
@@ -40,18 +41,6 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { FeedbackDialog } from "./FeedbackDialog";
 
-// Client-side session management
-function getAuthenticatedUserId(): string | null {
-    if (typeof window === 'undefined') return null;
-    return localStorage.getItem('currentUser_id');
-}
-
-function logoutUser() {
-    if (typeof window !== 'undefined') {
-        localStorage.removeItem('currentUser_id');
-        window.dispatchEvent(new Event("storage"));
-    }
-}
 
 const menuItems = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
@@ -60,40 +49,46 @@ const menuItems = [
   { href: "/profile", label: "Profile", icon: User },
 ];
 
-export function AppSidebar() {
+export function AppSidebar({ initialUserId }: { initialUserId: string | null }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [currentUser, setCurrentUser] = useState<UserType | null>(null);
-
-  const refreshUser = async () => {
-    const userId = getAuthenticatedUserId();
-    if (userId) {
-        try {
-            const user = await getUser(userId);
-            setCurrentUser(user);
-        } catch (error) {
-            console.error("Failed to fetch user in sidebar", error);
-            setCurrentUser(null);
-        }
-    } else {
-        setCurrentUser(null);
-    }
-  }
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    refreshUser();
-    // Also listen for storage changes to update the user
-    window.addEventListener('storage', refreshUser);
-    return () => {
-        window.removeEventListener('storage', refreshUser);
-    }
-  }, [pathname]);
+    const fetchUser = async () => {
+        if (initialUserId) {
+            try {
+                const user = await getUser(initialUserId);
+                setCurrentUser(user);
+            } catch (error) {
+                console.error("Failed to fetch user in sidebar", error);
+                setCurrentUser(null);
+            }
+        } else {
+            setCurrentUser(null);
+        }
+        setIsLoading(false);
+    };
 
-  const handleLogout = () => {
-    logoutUser();
-    refreshUser();
-    // No need to push to /login, the component will re-render to show the login button
+    fetchUser();
+  }, [initialUserId]);
+
+  const handleLogout = async () => {
+    await logoutUser();
+    setCurrentUser(null);
+    router.push('/login');
+    router.refresh();
   };
 
+  if(isLoading){
+      return (
+        <Sidebar>
+            <SidebarHeader><Logo /></SidebarHeader>
+            <SidebarContent><LoaderCircle className="mx-auto animate-spin" /></SidebarContent>
+        </Sidebar>
+      )
+  }
 
   return (
     <Sidebar>
@@ -157,17 +152,15 @@ export function AppSidebar() {
                 </DropdownMenuItem>
               </FeedbackDialog>
               <DropdownMenuItem asChild>
-                 <Link href="/login">
+                 <Link href="/admin/dashboard">
                   <Shield className="mr-2" />
                   Teacher Portal
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-               <DropdownMenuItem onClick={handleLogout} asChild>
-                 <Link href="/login">
+               <DropdownMenuItem onClick={handleLogout}>
                   <LogOut className="mr-2" />
                   Logout
-                </Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
