@@ -83,11 +83,11 @@ export function QuizClient({ quiz, isTournament = false }: QuizClientProps) {
     if (currentQuestionIndex < quiz.questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     } else {
-      handleFinish();
+      handleFinish(score);
     }
   }
 
-  const handleFinish = (finalScore = score) => {
+  const handleFinish = (finalScore: number) => {
     if(!currentUser) return;
     const lessons = getLessons();
     const allBadges = getBadges();

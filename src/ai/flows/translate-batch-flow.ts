@@ -65,13 +65,13 @@ const translateBatchFlow = ai.defineFlow(
         if (output && Array.isArray(output.translations) && output.translations.length === input.texts.length) {
            return output;
         }
+        // If validation fails, fall through to the fallback
+        throw new Error('Malformed translation response from AI.');
+
     } catch (error) {
         console.error("Error during batch translation, returning original texts.", error);
         // Fallback to original texts on any API error.
         return { translations: input.texts };
     }
-
-    // Fallback for safety - return original texts if output is malformed
-    return { translations: input.texts };
   }
 );

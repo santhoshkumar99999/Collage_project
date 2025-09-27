@@ -83,7 +83,7 @@ const quizChatFlow = ai.defineFlow(
   async (input) => {
     try {
         const {output} = await prompt(input);
-        if (!output) {
+        if (!output || !output.answer) {
             throw new Error("AI failed to generate an answer.");
         }
         return output;

@@ -44,7 +44,7 @@ const generateSubjectDescriptionFlow = ai.defineFlow(
   async (input) => {
     try {
         const {output} = await prompt(input);
-        if (!output) {
+        if (!output || !output.description) {
             throw new Error("AI failed to generate a description.");
         }
         return output;

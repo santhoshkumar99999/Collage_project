@@ -33,11 +33,10 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  // This is the correct way to configure external modules for Turbopack
   experimental: {
     turbo: {
       resolve: {
-        externals: ["async_hooks"],
+        externals: ['async_hooks'],
       },
     },
   },
