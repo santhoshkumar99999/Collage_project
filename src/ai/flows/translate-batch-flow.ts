@@ -58,11 +58,17 @@ const translateBatchFlow = ai.defineFlow(
         return { translations: [] };
     }
 
-    const {output} = await prompt(input);
-    
-    // Basic validation in case the model doesn't return the right shape
-    if (output && Array.isArray(output.translations) && output.translations.length === input.texts.length) {
-       return output;
+    try {
+        const {output} = await prompt(input);
+        
+        // Basic validation in case the model doesn't return the right shape
+        if (output && Array.isArray(output.translations) && output.translations.length === input.texts.length) {
+           return output;
+        }
+    } catch (error) {
+        console.error("Error during batch translation, returning original texts.", error);
+        // Fallback to original texts on any API error.
+        return { translations: input.texts };
     }
 
     // Fallback for safety - return original texts if output is malformed
