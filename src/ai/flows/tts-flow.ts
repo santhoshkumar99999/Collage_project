@@ -12,7 +12,10 @@ import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 import * as wav from 'wav';
 
-const TextToSpeechInputSchema = z.string();
+const TextToSpeechInputSchema = z.object({
+  prompt: z.string().describe('The text to convert to speech. For multi-speaker, format as "Speaker1: ... Speaker2: ..."'),
+  speakers: z.number().default(1).describe('The number of distinct speakers in the prompt.'),
+});
 export type TextToSpeechInput = z.infer<typeof TextToSpeechInputSchema>;
 
 const TextToSpeechOutputSchema = z.object({
@@ -30,24 +33,43 @@ const ttsFlow = ai.defineFlow(
       inputSchema: TextToSpeechInputSchema,
       outputSchema: TextToSpeechOutputSchema,
     },
-    async (query) => {
+    async (input) => {
       if (!process.env.GEMINI_API_KEY) {
         throw new Error(
           'GEMINI_API_KEY is not set. Please set it in your .env file.'
         );
       }
+      
+      const isMultiSpeaker = input.speakers > 1;
+
+      const speechConfig = isMultiSpeaker ? {
+          multiSpeakerVoiceConfig: {
+            speakerVoiceConfigs: [
+              {
+                speaker: 'User',
+                voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Algenib' } },
+              },
+              {
+                speaker: 'AI',
+                voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Achernar' } },
+              },
+            ],
+          },
+        } : {
+            voiceConfig: {
+              prebuiltVoiceConfig: { voiceName: 'Algenib' },
+            },
+        };
+
       const { media } = await ai.generate({
         model: 'googleai/gemini-2.5-flash-preview-tts',
         config: {
           responseModalities: ['AUDIO'],
-          speechConfig: {
-            voiceConfig: {
-              prebuiltVoiceConfig: { voiceName: 'Algenib' },
-            },
-          },
+          speechConfig,
         },
-        prompt: query,
+        prompt: input.prompt,
       });
+
       if (!media) {
         throw new Error('no media returned');
       }

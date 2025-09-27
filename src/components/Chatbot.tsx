@@ -88,7 +88,11 @@ export function Chatbot({ context, flowType }: ChatbotProps) {
   };
   
   const generateAndPlayAudio = async (text: string, messageIndex: number) => {
-    const cacheKey = `${language}:${text}`;
+    const userMessage = messages[messageIndex - 1];
+    const prompt = userMessage ? `User: ${userMessage.content}\nAI: ${text}` : `AI: ${text}`;
+    const speakers = userMessage ? 2 : 1;
+    
+    const cacheKey = `${language}:${prompt}`;
     if (audioCache.has(cacheKey)) {
         const audioUrl = audioCache.get(cacheKey)!;
         setMessages(prev => prev.map((msg, idx) => idx === messageIndex ? { ...msg, audioUrl, isAudioLoading: false } : msg));
@@ -98,11 +102,13 @@ export function Chatbot({ context, flowType }: ChatbotProps) {
 
     setMessages(prev => prev.map((msg, idx) => idx === messageIndex ? { ...msg, isAudioLoading: true } : msg));
     try {
-      const audioResponse = await textToSpeech(text);
+      const audioResponse = await textToSpeech({ prompt, speakers });
       const audioUrl = audioResponse.media;
       audioCache.set(cacheKey, audioUrl);
       setMessages(prev => prev.map((msg, idx) => idx === messageIndex ? { ...msg, audioUrl, isAudioLoading: false } : msg));
-      playAudio(audioUrl);
+      if (autoPlay) {
+        playAudio(audioUrl);
+      }
 
     } catch (error) {
       console.error("Error generating speech:", error);
@@ -143,10 +149,11 @@ export function Chatbot({ context, flowType }: ChatbotProps) {
       }
 
       const modelMessage: Message = { role: 'model', content: response.answer, isAudioLoading: false };
-      const newMessages = [...messages, userMessage, modelMessage];
-
-      setMessages(newMessages);
       
+      // We are setting the state with the model message first
+      setMessages((prev) => [...prev, modelMessage]);
+      
+      // Then generate audio. This ensures messages array is up-to-date.
       if (autoPlay) {
           generateAndPlayAudio(response.answer, currentMessageIndex);
       }
