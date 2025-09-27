@@ -1,12 +1,34 @@
 
+"use client";
+
 import { notFound } from 'next/navigation';
+import { useState, useEffect } from 'react';
 import { getQuizzes } from '@/lib/data';
+import type { Quiz } from '@/lib/types';
 import { PageHeader } from '@/components/PageHeader';
 import { QuizClient } from '@/components/QuizClient';
+import { LoaderCircle } from 'lucide-react';
 
 export default function QuizPage({ params }: { params: { lessonId: string } }) {
-  const quizzes = getQuizzes();
-  const quiz = quizzes.find((q) => q.lessonId === params.lessonId);
+  const [quiz, setQuiz] = useState<Quiz | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const quizzes = getQuizzes();
+    const currentQuiz = quizzes.find((q) => q.lessonId === params.lessonId);
+    if (currentQuiz) {
+      setQuiz(currentQuiz);
+    }
+    setIsLoading(false);
+  }, [params.lessonId]);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <LoaderCircle className="w-12 h-12 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   if (!quiz) {
     notFound();
@@ -20,16 +42,4 @@ export default function QuizPage({ params }: { params: { lessonId: string } }) {
       </main>
     </>
   );
-}
-
-export function generateStaticParams() {
-    const quizzes = getQuizzes();
-    const params: { subjectId: string; lessonId: string; quizId: string }[] = [];
-    quizzes.forEach(quiz => {
-        // This is a bit of a hack as we don't know subjectId here.
-        // In a real app, you'd fetch this from the db.
-        // For now we assume a lessonId is unique enough.
-        params.push({ subjectId: 'any', lessonId: quiz.lessonId, quizId: quiz.id });
-    });
-    return params;
 }

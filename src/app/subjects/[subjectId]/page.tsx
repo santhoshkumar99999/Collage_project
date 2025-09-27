@@ -1,7 +1,11 @@
 
+"use client";
+
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { getSubjects, getLessons } from '@/lib/data';
+import type { Subject, Lesson } from '@/lib/types';
 import { PageHeader } from '@/components/PageHeader';
 import { Card, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,10 +13,26 @@ import { BookOpen, Gamepad2 } from 'lucide-react';
 import { Translate } from '@/components/Translate';
 
 export default function SubjectPage({ params }: { params: { subjectId: string } }) {
-  const subjects = getSubjects();
-  const lessons = getLessons();
-  const subject = subjects.find((s) => s.id === params.subjectId);
-  const subjectLessons = lessons.filter((l) => l.subjectId === params.subjectId);
+  const [subject, setSubject] = useState<Subject | null>(null);
+  const [subjectLessons, setSubjectLessons] = useState<Lesson[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const allSubjects = getSubjects();
+    const allLessons = getLessons();
+    const currentSubject = allSubjects.find((s) => s.id === params.subjectId) || null;
+    
+    if (currentSubject) {
+      setSubject(currentSubject);
+      setSubjectLessons(allLessons.filter((l) => l.subjectId === params.subjectId));
+    }
+    setIsLoading(false);
+  }, [params.subjectId]);
+
+  if (isLoading) {
+    // You can add a loading skeleton here if you want
+    return <PageHeader title="Loading..." />;
+  }
 
   if (!subject) {
     notFound();
@@ -54,11 +74,4 @@ export default function SubjectPage({ params }: { params: { subjectId: string } 
       </main>
     </>
   );
-}
-
-export function generateStaticParams() {
-  const subjects = getSubjects();
-  return subjects.map((subject) => ({
-    subjectId: subject.id,
-  }));
 }
